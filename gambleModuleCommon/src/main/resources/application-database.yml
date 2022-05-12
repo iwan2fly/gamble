@@ -1,0 +1,55 @@
+# Database 프로파일
+
+# p6spy - sql log spy
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
+
+# JPA
+spring:
+  jpa:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: validate
+        show_sql: true
+        format_sql: true
+        enable_lazy_load_no_trans: true
+        dialect: org.hibernate.dialect.MySQL5Dialect
+    database: mysql
+
+---
+# 개봘환경/테스트환경 프로파일
+spring:
+  config:
+    activate:
+      on-profile: dev, test
+  # 데이터베이스
+  datasource:
+    master:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/db?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&enabledTLSProtocols=TLSv1.2
+      username: app
+      password: q1w2e3r4
+      hikari:
+        connection-timeout: 3000
+        validation-timeout: 3000
+        minimum-idle: 5
+        max-lifetime: 240000
+        maximum-pool-size: 20
+    read:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/db?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&enabledTLSProtocols=TLSv1.2
+      username: app
+      password: q1w2e3r4
+      hikari:
+        connection-timeout: 3000
+        validation-timeout: 3000
+        minimum-idle: 5
+        max-lifetime: 240000
+        maximum-pool-size: 20
+        domain-read-only: true
+        connection-test-query: SELECT 1
+
+

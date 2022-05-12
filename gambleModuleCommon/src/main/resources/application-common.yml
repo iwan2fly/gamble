@@ -1,0 +1,45 @@
+# 공통환경 프로파일
+
+# 로그
+logging:
+  level:
+    org.springframework.security: INFO
+    org.springframework: INFO
+    org.hibernate: INFO
+    com.yagaja: DEBUG
+  logback:
+    rollingpolicy:
+      max-file-size: 50MB
+      max-history: 30
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+---
+# 개봘환경/테스트환경 프로파일
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+---
+# 개봘환경/테스트환경 프로파일
+# 네이버 API 프록시 서버 설정
+spring:
+  config:
+    activate:
+      on-profile: test
+---
+# 알파(운영 미러)환경  프로파일
+spring:
+  config:
+    activate:
+      on-profile: alpha
+
+---
+# 운영환경  프로파일
+spring:
+  config:
+    activate:
+      on-profile: real
