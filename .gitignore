@@ -43,5 +43,3 @@ gen
 /gambleModuleCommon/build/tmp/jar/MANIFEST.MF
 /gambleModuleCommon/build/tmp/war/MANIFEST.MF
 /gambleModuleCommon/build/bootWarMainClassName
-
-/gambleAppWeb/src/main/resources/
