@@ -18,7 +18,6 @@ gen
 /gambleServerAuth/build/tmp/compileJava/previous-compilation-data.bin
 /gambleServerAuth/build/tmp/war/MANIFEST.MF
 /gambleServerAuth/build/bootWarMainClassName
-/gambleServerAuth/build.gradle
 /gambleModuleDomain/build/classes/java/main/kr/co/glog/domain/member/entity/Member.class
 /gambleModuleDomain/build/classes/java/main/kr/co/glog/domain/member/exception/MemberNotFoundException.class
 /gambleModuleDomain/build/classes/java/main/kr/co/glog/domain/BaseModel.class
@@ -34,7 +33,6 @@ gen
 /gambleModuleDomain/build/tmp/jar/MANIFEST.MF
 /gambleModuleDomain/build/tmp/war/MANIFEST.MF
 /gambleModuleDomain/build/bootWarMainClassName
-/gambleModuleDomain/build.gradle
 /gambleModuleCommon/build/classes/java/main/kr/co/glog/common/exception/ApplicationRuntimeException.class
 /gambleModuleCommon/build/libs/gambleModuleCommon-plain.jar
 /gambleModuleCommon/build/libs/gambleModuleCommon-plain.war
@@ -45,4 +43,4 @@ gen
 /gambleModuleCommon/build/tmp/jar/MANIFEST.MF
 /gambleModuleCommon/build/tmp/war/MANIFEST.MF
 /gambleModuleCommon/build/bootWarMainClassName
-/gambleModuleCommon/build.gradle
+
