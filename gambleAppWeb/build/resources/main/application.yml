@@ -17,6 +17,13 @@ spring:
       max-file-size: 5MB
       max-request-size: 5MB
 
+# JWT 설정
+jwt:
+  header: Authorization
+  # secret: {secret key}
+  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmctYm9vdC1zZWN1cml0eS1qd3QtdHV0b3JpYWwK
+  access-token-validity-in-seconds: 1800 # 초 단위
+  refresh-token-validity-in-seconds: 604800
 
 # 캐싱 변수
 caching:

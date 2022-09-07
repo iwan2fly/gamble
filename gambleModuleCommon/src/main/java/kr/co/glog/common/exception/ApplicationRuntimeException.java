@@ -8,13 +8,16 @@ import lombok.ToString;
 @Getter @Setter @ToString
 public class ApplicationRuntimeException extends RuntimeException {
 
-	String exception	= "ApplicationRuntimeException";
-	String message		= "예외 상황";
+	String exception		= "ApplicationRuntimeException";
+	String message			= "예외 상황";
 
-	public ApplicationRuntimeException() {}
+
+	public ApplicationRuntimeException() {
+
+	}
 
 	public ApplicationRuntimeException(String message ) {
-		this.message = this.message + " [" + message + "]";
+		setMessage( this.message + " [" + message + "]" );
 	}
 	
 }

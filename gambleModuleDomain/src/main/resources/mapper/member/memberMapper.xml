@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.glog.domain.member.mapper.MemberMapper">
+
+    <insert id="insertMember" parameterType="Member" useGeneratedKeys="true" keyProperty="memberId">
+        INSERT INTO member
+            ( memberName, pwd, email, lastLoginTime, lastLogoutTime, lastPwdUpdateTime, authFailCount, memberStatusCode, insertTime, updateTime )
+        VALUES
+            ( #{memberName}, #{pwd}, #{email}, #{lastLoginTime}, #{lastLogoutTime}, #{lastPwdUpdateTime}, #{authFailCount}, #{memberStatusCode}, now(), now() )
+    </insert>
+
+    <update id="updateMember" parameterType="Member">
+        UPDATE 	member
+        SET
+        <trim prefix="" suffixOverrides=",">
+            <if test="memberName != null">memberName = #{memberName},</if>
+            <if test="pwd != null">pwd = #{pwd},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="lastLoginTime != null">lastLoginTime = #{lastLoginTime},</if>
+            <if test="lastLogoutTime != null">lastLogoutTime = #{lastLogoutTime},</if>
+            <if test="lastPwdUpdateTime != null">lastPwdUpdateTime = #{lastPwdUpdateTime},</if>
+            <if test="authFailCount != null">authFailCount = #{authFailCount},</if>
+            <if test="memberStatusCode != null">memberStatusCode = #{memberStatusCode},</if>
+            updateTime = now()
+        </trim>
+        WHERE 	memberId=#{memberId}
+    </update>
+
+    <delete id="deleteMember" parameterType="Member">
+        DELETE FROM member
+        WHERE 	memberId=#{memberId}
+    </delete>
+
+    <select id="selectMemberList" parameterType="MemberParam" resultType="MemberResult" >
+        SELECT 	member.*
+        FROM 	member
+        <include refid="whereMember" ></include>
+        <include refid="orderMember" ></include>
+    </select>
+
+    <select id="selectMemberListCount" parameterType="MemberParam" resultType="java.lang.Integer">
+        SELECT 	COUNT(*)
+        FROM   	member
+        <include refid="whereMember" ></include>
+    </select>
+
+    <sql id="whereMember">
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="memberId != null and memberId != ''">AND member.memberId=#{memberId}</if>
+                <if test="memberName != null and memberName != ''">AND member.memberName=#{memberName}</if>
+                <if test="pwd != null and pwd != ''">AND member.pwd=#{pwd}</if>
+                <if test="lastLoginTime != null and lastLoginTime != ''">AND member.lastLoginTime=#{lastLoginTime}</if>
+                <if test="lastLogoutTime != null and lastLogoutTime != ''">AND member.lastLogoutTime=#{lastLogoutTime}</if>
+                <if test="lastPwdUpdateTime != null and lastPwdUpdateTime != ''">AND member.lastPwdUpdateTime=#{lastPwdUpdateTime}</if>
+                <if test="authFailCount != null and authFailCount != ''">AND member.authFailCount=#{authFailCount}</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND member.memberName like CONCAT('%',#{pagingParam.filter},'%')</if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="orderMember">
+        <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
+            <choose>
+                <when test="pagingParam.sortIndex eq 'memberId'">memberId</when>
+                <when test="pagingParam.sortIndex eq 'memberName'">memberName</when>
+                <when test="pagingParam.sortIndex eq 'pwd'">pwd</when>
+                <when test="pagingParam.sortIndex eq 'lastLoginTime'">lastLoginTime</when>
+                <when test="pagingParam.sortIndex eq 'lastLogoutTime'">lastLogoutTime</when>
+                <when test="pagingParam.sortIndex eq 'lastPwdUpdateTime'">lastPwdUpdateTime</when>
+                <when test="pagingParam.sortIndex eq 'authFailCount'">authFailCount</when>
+                <otherwise>memberId</otherwise>
+            </choose>
+            <choose>
+                <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
+                <otherwise>ASC</otherwise>
+            </choose>
+        </if>
+        <if test="pagingParam.rows gt 0">
+            LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}
+        </if>
+    </sql>
+    
+</mapper>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.glog.domain.stock.mapper.StockMapper">
+
+    <insert id="insertStock" parameterType="Stock" keyProperty="stockCode">
+        INSERT INTO stock
+            ( stockCode, stockName, currentPrice, stockTypeCode, marketTypeCode, stockCount, listedDate, facePrice, foreignersStockLimit, foreignersStockCount, foreignersHoldRate, insertTime, updateTime )
+        VALUES
+            ( #{stockCode}, #{stockName}, #{currentPrice}, #{stockTypeCode}, #{marketTypeCode}, #{stockCount}, #{listedDate}, #{facePrice}, #{foreignersStockLimit}, #{foreignersStockCount}, #{foreignersHoldRate}, now(), now() )
+    </insert>
+
+    <insert id="insertsStock" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="sotckId" keyProperty="stockCode">
+        INSERT INTO stock
+        ( stockCode, stockName, stockTypeCode, marketTypeCode, stockCount, listedDate, facePrice, foreignersStockLimit, foreignersStockCount, foreignersHoldRate, insertTime, updateTime )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," open="" close="">
+            ( #{item.item.stockCode}, #{stockName}, #{item.stockTypeCode}, #{item.marketTypeCode}, #{item.stockCount}, #{item.listedDate}, #{item.facePrice}, #{item.foreignersStockLimit}, #{item.foreignersStockCount}, #{item.foreignersHoldRate}, now(), now() )
+        </foreach>
+    </insert>
+
+    <update id="updateStock" parameterType="Stock">
+        UPDATE 	stock
+        SET
+        <trim prefix="" suffixOverrides=",">
+            <if test="stockName != null">stockName = #{stockName},</if>
+            <if test="stockCode != null">stockCode = #{stockCode},</if>
+            <if test="currentPrice != null">currentPrice = #{currentPrice},</if>
+            <if test="stockTypeCode != null">stockTypeCode = #{stockTypeCode},</if>
+            <if test="marketTypeCode != null">marketTypeCode = #{marketTypeCode},</if>
+            <if test="stockCount != null">stockCount = #{stockCount},</if>
+            <if test="listedDate != null">listedDate = #{listedDate},</if>
+            <if test="facePrice != null">facePrice = #{facePrice},</if>
+            <if test="foreignersStockLimit != null">foreignersStockLimit = #{foreignersStockLimit},</if>
+            <if test="foreignersStockCount != null">foreignersStockCount = #{foreignersStockCount},</if>
+            <if test="foreignersHoldRate != null">foreignersHoldRate = #{foreignersHoldRate},</if>
+            updateTime = now()
+        </trim>
+        WHERE stock.stockCode=#{stockCode}
+    </update>
+
+    <delete id="deleteStock" parameterType="Stock">
+        DELETE FROM stock
+        WHERE 	stockCode=#{stockCode}
+    </delete>
+
+    <select id="selectStockList" parameterType="StockParam" resultType="StockResult" >
+        SELECT 	stock.*
+        FROM 	stock
+        <include refid="whereStock" ></include>
+        <include refid="orderStock" ></include>
+    </select>
+
+    <select id="selectStockListCount" parameterType="StockParam" resultType="java.lang.Integer">
+        SELECT 	COUNT(*)
+        FROM   	stock
+        <include refid="whereStock" ></include>
+    </select>
+
+    <sql id="whereStock">
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="stockCode != null and stockCode != ''">AND stock.stockCode=#{stockCode}</if>
+                <if test="stockName != null and stockName != ''">AND stock.stockName=#{stockName}</if>
+                <if test="stockCode != null and stockCode != ''">AND stock.stockCode=#{stockCode}</if>
+                <if test="currentPrice != null and currentPrice != ''">AND stock.currentPrice=#{currentPrice}</if>
+                <if test="marketTypeCode != null and marketTypeCode != ''">AND stock.marketTypeCode=#{marketTypeCode}</if>
+                <if test="stockCount != null and stockCount != ''">AND stock.stockCount=#{stockCount}</if>
+                <if test="listedDate != null and listedDate != ''">AND stock.listedDate=#{listedDate}</if>
+                <if test="facePrice != null and facePrice != ''">AND stock.facePrice=#{facePrice}</if>
+                <if test="foreignersStockLimit != null and foreignersStockLimit != ''">AND stock.foreignersStockLimit=#{foreignersStockLimit}</if>
+                <if test="foreignersStockCount != null and foreignersStockCount != ''">AND stock.foreignersStockCount=#{foreignersStockCount}</if>
+                <if test="foreignersStockCount != null and foreignersStockCount != ''">AND stock.foreignersStockCount=#{foreignersStockCount}</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND stock.stockName like CONCAT('%',#{pagingParam.filter},'%')</if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="orderStock">
+        <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
+            <choose>
+                <when test="pagingParam.sortIndex eq 'stockCode'">stockCode</when>
+                <when test="pagingParam.sortIndex eq 'stockName'">stockName</when>
+                <when test="pagingParam.sortIndex eq 'stockCode'">stockCode</when>
+                <when test="pagingParam.sortIndex eq 'currentPrice'">currentPrice</when>
+                <when test="pagingParam.sortIndex eq 'marketTypeCode'">marketTypeCode</when>
+                <when test="pagingParam.sortIndex eq 'stockCount'">stockCount</when>
+                <when test="pagingParam.sortIndex eq 'listedDate'">listedDate</when>
+                <when test="pagingParam.sortIndex eq 'facePrice'">facePrice</when>
+                <when test="pagingParam.sortIndex eq 'foreignersStockLimit'">foreignersStockLimit</when>
+                <when test="pagingParam.sortIndex eq 'foreignersStockCount'">foreignersStockCount</when>
+                <when test="pagingParam.sortIndex eq 'foreignersStockCount'">foreignersStockCount</when>
+                <otherwise>stockCode</otherwise>
+            </choose>
+            <choose>
+                <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
+                <otherwise>ASC</otherwise>
+            </choose>
+        </if>
+        <if test="pagingParam.rows gt 0">
+            LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}
+        </if>
+    </sql>
+    
+</mapper>

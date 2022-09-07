@@ -10,7 +10,7 @@ import lombok.ToString;
 public class MemberNotFoundException extends ApplicationRuntimeException {
 
 	String exception	= "MemberNotFoundException";
-	String message		= "예외 상황";
+	String message		= "사용자가 존재하지 않습니다.";
 
 	public MemberNotFoundException() {}
 

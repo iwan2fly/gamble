@@ -1,46 +1,36 @@
 package kr.co.glog.domain.member.entity;
 
-import kr.co.glog.domain.EntityModel;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
+import org.apache.ibatis.type.Alias;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-@Getter
+@Getter @Setter
 @ToString(callSuper=true)
-// @AllArgsConstructor
-//@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name="member")
-public class Member extends EntityModel {
-
-    @Id
-    @Column(nullable = false, unique = true)
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Alias("Member")
+public class Member {
     private Long memberId;
-
-    @Column(nullable = false)
-    String memberName;
-
-
+    private String memberName;
     private String pwd;
-
-
     private String email;
-
-
+    private String roles;
     private Timestamp lastLoginTime;
-
-
     private Timestamp lastLogoutTime;
-
-
     private Timestamp lastPwdUpdateTime;
-
-
     private Short authFailCount;
-
-
     private String memberStatusCode ;
+
+    public ArrayList<String> getRoleList() {
+        ArrayList<String> roleList = new ArrayList<String>();
+        if ( this.roles != null ) {
+            roleList = (ArrayList)Arrays.asList(this.roles.split(",") );
+        }
+
+        return roleList;
+    }
 }
