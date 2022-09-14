@@ -6,6 +6,7 @@ import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.Stock;
 import kr.co.glog.domain.stock.entity.StockDaily;
 import kr.co.glog.external.daumFinance.model.DaumDailyStock;
+import kr.co.glog.external.daumFinance.model.DaumInvestorStock;
 import kr.co.glog.external.daumFinance.model.IncludedStock;
 import kr.co.glog.external.daumFinance.model.RankingStock;
 import lombok.RequiredArgsConstructor;
@@ -57,5 +58,22 @@ public class StockDailyService {
         return stockDaily;
     }
 
+    /**
+     * DaumInvestorStock -> StockDaily
+     * @param daumInvestorStock
+     */
+    public StockDaily getStockDailyFromDaumInvestorStock( DaumInvestorStock daumInvestorStock ) {
 
+        if ( daumInvestorStock == null ) throw new ParameterMissingException( "daumInvestorStock" );
+        log.debug( daumInvestorStock.toString() );
+
+        StockDaily stockDaily = new StockDaily();
+        stockDaily.setTradeDate( daumInvestorStock.getDate().substring(0, 10).replaceAll("-", "") ) ;
+        stockDaily.setVolumeOrg( daumInvestorStock.getInstitutionCumulativeStraightPurchaseVolume() );
+        stockDaily.setVolumeForeigner( daumInvestorStock.getForeignStraightPurchaseVolume() );
+        stockDaily.setForeignerStockCount( daumInvestorStock.getForeignOwnShares() );
+        stockDaily.setForeignerHoldRate( daumInvestorStock.getForeignOwnSharesRate() );
+
+        return stockDaily;
+    }
 }

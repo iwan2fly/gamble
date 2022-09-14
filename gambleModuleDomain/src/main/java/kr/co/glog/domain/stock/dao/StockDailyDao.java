@@ -80,6 +80,13 @@ public class StockDailyDao {
         return insertCount;
     }
 
+    public StockDaily updateStockDaily( StockDaily stockDaily ) {
+        if ( stockDaily == null ) throw new ParameterMissingException( "StockDaily" );
+        if ( stockDaily.getStockCode() == null || stockDaily.getTradeDate() == null ) throw new ParameterMissingException( "종목코드와 날짜는 필수값입니다.");
+        stockDailyMapper.updateStockDaily(stockDaily);
+        return stockDaily;
+    }
+
     public StockDaily saveStockDaily(StockDaily stockDaily) {
         if ( stockDaily == null ) throw new ParameterMissingException( "StockDaily" );
         if ( stockDaily.getStockCode() == null || stockDaily.getTradeDate() == null ) throw new ParameterMissingException( "종목코드와 날짜는 필수값입니다.");

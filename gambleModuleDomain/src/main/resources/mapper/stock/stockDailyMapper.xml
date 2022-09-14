@@ -22,8 +22,6 @@
         UPDATE 	stockDaily
         SET
         <trim prefix="" suffixOverrides=",">
-            <if test="stockCode != null">stockCode = #{stockCode},</if>
-            <if test="tradeDate != null">tradeDate = #{tradeDate},</if>
             <if test="priceFinal != null">priceFinal = #{priceFinal},</if>
             <if test="priceChange != null">priceChange = #{priceChange},</if>
             <if test="priceStart != null">priceStart = #{priceStart},</if>
@@ -37,15 +35,8 @@
             <if test="foreignerHoldRate != null">foreignerHoldRate = #{foreignerHoldRate},</if>
             updateTime = now()
         </trim>
-        <where>
-            <trim prefixOverrides = "AND | OR">
-                <if test="stockDailyId != null and stockDailyId != ''">AND stockDaily.stockDailyId=#{stockDailyId}</if>
-                <if test="stockCode != null and stockCode != ''">
-                    AND stockDaily.stockCode=#{stockCode}
-                    AND stockDaily.tradeDate=#{tradeDate}
-                </if>
-            </trim>
-        </where>
+        WHERE stockDaily.stockCode=#{stockCode}
+        AND stockDaily.tradeDate=#{tradeDate}
     </update>
 
     <delete id="deleteStockDaily" parameterType="StockDaily">

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 @Slf4j
 @Service
-public class DailyStockPriceScrapper {
+public class NaverDailyStockPriceScrapper {
 
 
     /**

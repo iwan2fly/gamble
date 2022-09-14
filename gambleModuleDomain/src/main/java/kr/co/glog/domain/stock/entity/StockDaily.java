@@ -24,8 +24,8 @@ public class StockDaily extends EntityModel {
     Integer	priceLow;		            // 저가
     Integer	volume;			            // 거래량
     Float 	rateChange;			        // 변동비
-    Integer	volumeOrg;			        // 기관 순매매
-    Integer	volumeForeigner;	        // 외인 순매매
+    Long	volumeOrg;			        // 기관 순매매
+    Long	volumeForeigner;	        // 외인 순매매
     Long	foreignerStockCount;		// 외인보유
     Float	foreignerHoldRate;	        // 외인보유율
 

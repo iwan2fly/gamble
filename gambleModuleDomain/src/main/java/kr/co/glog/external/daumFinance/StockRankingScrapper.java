@@ -154,7 +154,7 @@ public class StockRankingScrapper {
             try {
                 stockDao.insertStock(stock);
             } catch ( org.springframework.dao.DuplicateKeyException dke ) {
-
+                log.debug( stock.getStockName() + "[" + stock.getStockCode() + "] Already Registered" );
             }
         }
 
