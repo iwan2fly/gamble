@@ -1,5 +1,6 @@
 package kr.co.glog.batch;
 
+import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
@@ -161,7 +162,7 @@ public class getStockDailyPriceScheduler {
 
 
     // 다음 증권 일별가격 첫 페이지 ( 10개 ) 만 Upsert
-    @Scheduled(cron = "0 00 16 * * *")
+    @Scheduled(cron = "0 54 19 * * *")
     public void stockDailyDataUpsert() throws InterruptedException {
 
         log.info( "다음증권 일별 데이터 전 종목 첫페이지 Upsert 시작 ");
@@ -179,9 +180,41 @@ public class getStockDailyPriceScheduler {
         stockParam.setPagingParam( pagingParam );
         ArrayList<StockResult> stockList = stockDao.getStockList(stockParam);
 
+
         for ( StockResult stockResult : stockList ) {
-            daumDailyStockScrapper.upsertDailyStock( stockResult.getStockCode() );
-            daumDailyInvestorScrapper.upsertDailyStock( stockResult.getStockCode() );
+
+            // 일별데이터 업서트 최대 3번 시도
+            boolean isSuccess = false;
+            for ( int i = 0; i < 3; i++ ) {
+
+                try {
+                    daumDailyStockScrapper.upsertDailyStock(stockResult.getStockCode());
+                    isSuccess = true;
+                } catch ( Exception e ) {
+                    isSuccess = false;
+                }
+
+                if ( isSuccess ) break;
+            }
+
+            if ( !isSuccess ) throw new ApplicationRuntimeException( stockResult.getStockName() + "[" + stockResult.getStockCode() + "] 일별데이터 업서트 3회 시도 실패로 배치처리를 중지합니다.");
+
+            isSuccess = false;
+            for ( int i = 0; i < 3; i++ ) {
+
+                try {
+                    daumDailyInvestorScrapper.upsertDailyStock( stockResult.getStockCode() );
+                    isSuccess = true;
+                } catch ( Exception e ) {
+                    isSuccess = false;
+                }
+
+                if ( isSuccess ) break;
+            }
+
+            if ( !isSuccess ) throw new ApplicationRuntimeException( stockResult.getStockName() + "[" + stockResult.getStockCode() + "] 일별데이터 업서트 3회 시도 실패로 배치처리를 중지합니다.");
+
+
         }
 
         log.info( "다음증권 일별 데이터 전 종목 첫페이지 Upsert 정상종료 ");

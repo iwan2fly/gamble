@@ -19,7 +19,7 @@ public class Stock extends EntityModel {
     String  marketTypeCode;             // 시장구분코드 ( KOSPI, KOSDAQ, KOTC, KONEX, ETC
 
     Long    stockCount;                 // 상장주식수
-    String  listedDate;                 // 상장일
+    String  issueDate;                  // 상장일
     Integer facePrice;                  // 액면가
     Long    foreignersStockLimit;       // 외국인보유한도주식수
     Long    foreignersStockCount;       // 외욱인보유주식수

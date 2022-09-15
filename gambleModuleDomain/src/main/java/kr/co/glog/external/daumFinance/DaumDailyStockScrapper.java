@@ -9,10 +9,7 @@ package kr.co.glog.external.daumFinance;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.domain.service.StockDailyService;
-import kr.co.glog.domain.service.StockService;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
-import kr.co.glog.domain.stock.dao.StockDao;
-import kr.co.glog.domain.stock.entity.Stock;
 import kr.co.glog.domain.stock.entity.StockDaily;
 import kr.co.glog.external.daumFinance.model.DaumDailyStock;
 import kr.co.glog.external.daumFinance.model.RankingStock;
@@ -36,14 +33,14 @@ public class DaumDailyStockScrapper {
     private final StockDailyDao stockDailyDao;
 
     /**
-     * 다음 주식에서 특정 종목의 일자별 가격 데이터를 읽어옵니다.
+     * 다음 주식에서 특정 종목의 일자별 가격 문서를 읽어옵니다.
      * @param stockCode
      * @param perPage
      * @param page
      * @return
      * @throws ApplicationRuntimeException
      */
-    private Document getDailyStockPriceDocument( String stockCode, int perPage, int page ) throws ApplicationRuntimeException {
+    private Document getDocument(String stockCode, int perPage, int page ) throws ApplicationRuntimeException {
         if ( perPage > 100 ) perPage = 100;     // 페이지당 100개가 한계
 
         Document document	= null;
@@ -55,36 +52,14 @@ public class DaumDailyStockScrapper {
         String header = "A";                    // 일반 주식은 다음에서 A로 시작
         if ( stockCode.charAt(0) == '5' || stockCode.charAt(0) == '6' || stockCode.charAt(0) == '7' ) header = "Q";         // ETN은 Q로 시작하고 500000번대..
         url = url.replaceAll( "##header##", ""+header );
-
         log.debug( url );
 
-        int tryCount = 0;
-        boolean isSuccess = false;
-        while ( tryCount < 5 ) {
-
-            try {
-                document = Jsoup.connect(url).header("referer", "https://finance.daum.net/domestic/market_cap").ignoreContentType(true).get();
-                isSuccess = true;
-            } catch (Exception e) {
-                tryCount++;
-                log.debug("TRY 1 FAIL : RETRY");
-
-                if ( tryCount >= 5 ) {
-                    throw new ApplicationRuntimeException( "특정 종목의 일자별 가격 데이터를 읽는 중 오류가 발생했습니다.");
-                }
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-
-            if ( isSuccess ) break;
+        try {
+            document = Jsoup.connect(url).header("referer", "https://finance.daum.net/domestic/market_cap").ignoreContentType(true).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ApplicationRuntimeException( "다음 특정 종목의 일자별 데이터를 읽는 중 오류가 발생했습니다.");
         }
-
-
 
         return document;
     }
@@ -95,20 +70,15 @@ public class DaumDailyStockScrapper {
      * @return
      * @throws ApplicationRuntimeException
      */
-    public int getDailyStockPriceTotalPages( String stockCode, int perPage ) throws ApplicationRuntimeException {
-        int totalPages = 0;
-        try {
-            Document document = getDailyStockPriceDocument( stockCode, perPage, 1);
-            totalPages = getDailyStockPriceTotalPages( document );            // 목록의 전체 페이지
-        } catch ( Exception e ) {
-            e.printStackTrace();
-            throw new ApplicationRuntimeException( "특정 종목 일자별 가격 데이터 페이지 개수를 읽는 중 오류가 발생했습니다.");
-        }
+    public int getTotalPages( String stockCode, int perPage ) throws ApplicationRuntimeException {
 
-        return totalPages;
+        Document document = getDocument( stockCode, perPage, 1);
+        return  getTotalPages( document );            // 목록의 전체 페이지
+
     }
 
-    public int getDailyStockPriceTotalPages( Document document ) throws ApplicationRuntimeException {
+    public int getTotalPages( Document document ) throws ApplicationRuntimeException {
+
         if ( document == null ) throw new ApplicationRuntimeException("Document data is null");
 
         int totalPages = 0;
@@ -127,6 +97,36 @@ public class DaumDailyStockScrapper {
 
 
     /**
+     * Document 로부터 일자별 가격 데이터 목록을 리턴
+     * @param document
+     * @return
+     * @throws ApplicationRuntimeException
+     */
+    public ArrayList<DaumDailyStock> getDailyStockList( Document document ) throws ApplicationRuntimeException {
+
+        ArrayList<DaumDailyStock> rankingStockList = new ArrayList<DaumDailyStock>();
+
+        try {
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(document.text());
+            JSONArray dataArray = (JSONArray) jsonObject.get("data");        // 현재 페이지의 주식 목록
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            int count = 0;
+
+            for (int i = 0; i < dataArray.size(); i++) {
+                DaumDailyStock daumDailyStock = objectMapper.readValue(dataArray.get(i).toString(), DaumDailyStock.class);
+                log.debug(count++ + " : " + daumDailyStock.toString());
+                rankingStockList.add(daumDailyStock);
+            }
+        } catch ( Exception e ) {
+            throw new ApplicationRuntimeException( "일자별 가격 데이터 문서 파싱 중 오류가 발생했습니다.");
+        }
+
+        return rankingStockList;
+    }
+
+    /**
      * 특정 종목 일자별 가격 데이터 목록을 가져옵니다.
      * @param stockCode
      * @param perPage
@@ -134,46 +134,10 @@ public class DaumDailyStockScrapper {
      * @return
      * @throws ApplicationRuntimeException
      */
-    public ArrayList<DaumDailyStock> getDailyStockPriceList( String stockCode, int perPage, int page ) throws ApplicationRuntimeException {
+    public ArrayList<DaumDailyStock> getDailyStockList(String stockCode, int perPage, int page ) throws ApplicationRuntimeException {
 
-        Document document	= null;
-        ArrayList<DaumDailyStock> daumDailyStockList = new ArrayList<DaumDailyStock>();
-
-        JSONArray dataArray = null;
-        try {
-            int tryCount = 0;
-            boolean isSuccess = false;
-            while ( tryCount < 5 ) {
-                try {
-                    document = getDailyStockPriceDocument(stockCode, perPage, page);
-                    JSONParser jsonParser = new JSONParser();
-                    JSONObject jsonObject = (JSONObject) jsonParser.parse(document.text());
-                    dataArray = (JSONArray) jsonObject.get("data");        // 현재 페이지의 주식 목록
-                    isSuccess = true;
-                } catch ( Exception e ) {
-                    tryCount++;     // 파싱이 실패할 경우 5번 더 읽어요.
-                }
-
-                if ( isSuccess ) break;
-            }
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            int count = 0;
-
-            for ( int i = 0; i < dataArray.size(); i++ ) {
-                DaumDailyStock daumDailyStock = objectMapper.readValue( dataArray.get(i).toString(), DaumDailyStock.class );
-                log.debug( count++ + " : " + daumDailyStock.toString() );
-                daumDailyStockList.add( daumDailyStock );
-            }
-
-        } catch ( ApplicationRuntimeException are ) {
-            throw are;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ApplicationRuntimeException( "다음 특정종목 일별 시세 데이터 파싱 중 오류가 발생했습니다.");
-        }
-
-        return daumDailyStockList;
+        Document document	= getDocument( stockCode, perPage, page);;
+        return  getDailyStockList( document );
     }
 
 
@@ -187,13 +151,13 @@ public class DaumDailyStockScrapper {
         int perPage = 100;
 
         ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
-        int totalPages = getDailyStockPriceTotalPages( stockCode, perPage );
+        int totalPages = getTotalPages( stockCode, perPage );
 
         log.debug( "totalPages : " + totalPages );
 
         for ( int page = 1; page <= totalPages; page++ ) {
 
-            ArrayList<DaumDailyStock> daumDailyStockList = getDailyStockPriceList( stockCode, perPage, page );
+            ArrayList<DaumDailyStock> daumDailyStockList = getDailyStockList( stockCode, perPage, page );
 
             for ( DaumDailyStock daumDailyStock : daumDailyStockList ) {
                 StockDaily stockDaily = stockDailyService.getStockDailyFromDaumDailyStock( daumDailyStock );
@@ -230,7 +194,7 @@ public class DaumDailyStockScrapper {
         int perPage = 10;
 
         ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
-        ArrayList<DaumDailyStock> daumDailyStockList = getDailyStockPriceList( stockCode, perPage, 1 );
+        ArrayList<DaumDailyStock> daumDailyStockList = getDailyStockList( stockCode, perPage, 1 );
 
         for ( DaumDailyStock daumDailyStock : daumDailyStockList ) {
             StockDaily stockDaily = stockDailyService.getStockDailyFromDaumDailyStock( daumDailyStock );

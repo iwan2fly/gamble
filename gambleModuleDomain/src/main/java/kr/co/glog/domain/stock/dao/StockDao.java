@@ -80,6 +80,14 @@ public class StockDao {
         return insertCount;
     }
 
+    public Stock updateStock( Stock stock ) {
+        if ( stock == null ) throw new ParameterMissingException( "Stock" );
+        if ( stock.getStockCode() == null ) throw new ParameterMissingException( "stockCode" );
+        stockMapper.updateStock( stock );
+
+        return stock;
+    }
+
     public Stock saveStock( Stock stock ) {
         if ( stock == null ) throw new ParameterMissingException( "Stock" );
 
