@@ -3,12 +3,12 @@ package kr.co.glog.batch;
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
+import kr.co.glog.domain.stock.dao.DartCorpDao;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
-import kr.co.glog.domain.stock.model.StockDailyParam;
-import kr.co.glog.domain.stock.model.StockDailyResult;
-import kr.co.glog.domain.stock.model.StockParam;
-import kr.co.glog.domain.stock.model.StockResult;
+import kr.co.glog.domain.stock.model.*;
+import kr.co.glog.external.dartApi.DartCompanyApi;
+import kr.co.glog.external.dartApi.DartCorpCodeApi;
 import kr.co.glog.external.daumFinance.DaumDailyInvestorScrapper;
 import kr.co.glog.external.daumFinance.DaumDailyStockScrapper;
 import kr.co.glog.external.daumFinance.StockRankingScrapper;
@@ -31,14 +31,17 @@ public class getStockDailyPriceScheduler {
     private final DaumDailyInvestorScrapper daumDailyInvestorScrapper;
     private final StockDao stockDao;
     private final StockDailyDao stockDailyDao;
+    private final DartCorpCodeApi dartCorpCodeApi;
+    private final DartCorpDao dartCorpDao;
+    private final DartCompanyApi dartCompanyApi;
 
     //스프링 스케줄러 / 쿼츠 크론 표현식
     //초		분		시		일			월		요일			연도
     //0-59	0-55	0-23	1-31 / ?	1-12	0-6 / ?		생략가능
 
     // 코스피 코스닥 전 종목 조회 후 stock 테이블에 등록
-    @Scheduled(cron = "0 31 16 13 * * ")
-    /*@Scheduled(fixedRate = 999999999)*/
+    // @Scheduled(cron = "0 31 16 13 * * ")
+    // @Scheduled(fixedRate = 999999999)
     public void runFixCudLog() throws InterruptedException {
 
         log.info( "getStockDailyPriceScheduler START" );
@@ -99,7 +102,7 @@ public class getStockDailyPriceScheduler {
 
     // 최초 증권종목 데이터 생성 시 1회만 사용하면 됨
     // 투자자별 거래 전체 데이터 업데이트
-    @Scheduled(cron = "0 12 12 08 * *")
+    // @Scheduled(cron = "0 12 12 08 * *")
     public void allStockDailyInvestorUpdate() throws InterruptedException {
 
         // 전종목 조회
@@ -218,5 +221,45 @@ public class getStockDailyPriceScheduler {
         }
 
         log.info( "다음증권 일별 데이터 전 종목 첫페이지 Upsert 정상종료 ");
+    }
+
+
+    /**
+     * DART의 고유번호 파일 다운로드 받아서, 있는 건 업데이트하고, 없는 건 등록
+     * @throws InterruptedException
+     */
+    @Scheduled(cron = "0 47 09 19 * * ")
+    public void updateCorpCode() throws InterruptedException {
+
+        log.info( "corpCodeApi START" );
+        try {
+            dartCorpCodeApi.updateCorpCode();
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
+        log.info( "coprCodeApi END" );
+
+    }
+
+    /**
+     *  DART 의 고유번호로 기업개황 가져와서 있는 건 업데이트하고, 없는 건 등록
+     * @throws InterruptedException
+     */
+    @Scheduled(cron = "0 23 10 19 * * ")
+    public void updateDartCompany() throws InterruptedException {
+
+        log.info( "corpCodeApi START" );
+        try {
+            DartCorpParam dartCorpParam = new DartCorpParam();
+            dartCorpParam.setHasStockCode( true );
+            ArrayList<DartCorpResult> dartCorpList = dartCorpDao.getDartCorpList( dartCorpParam );
+            for ( DartCorpResult dartCorpResult : dartCorpList ) {
+                dartCompanyApi.updateDartCompany(dartCorpResult.getCorpCode());
+            }
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
+        log.info( "coprCodeApi END" );
+
     }
 }

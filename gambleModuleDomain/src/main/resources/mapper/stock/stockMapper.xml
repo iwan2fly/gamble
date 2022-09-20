@@ -14,7 +14,7 @@
         ( stockCode, stockName, stockTypeCode, marketTypeCode, stockCount, issueDate, facePrice, foreignersStockLimit, foreignersStockCount, foreignersHoldRate, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            ( #{item.item.stockCode}, #{stockName}, #{item.stockTypeCode}, #{item.marketTypeCode}, #{item.stockCount}, #{item.issueDate}, #{item.facePrice}, #{item.foreignersStockLimit}, #{item.foreignersStockCount}, #{item.foreignersHoldRate}, now(), now() )
+            ( #{item.stockCode}, #{stockName}, #{item.stockTypeCode}, #{item.marketTypeCode}, #{item.stockCount}, #{item.issueDate}, #{item.facePrice}, #{item.foreignersStockLimit}, #{item.foreignersStockCount}, #{item.foreignersHoldRate}, now(), now() )
         </foreach>
     </insert>
 

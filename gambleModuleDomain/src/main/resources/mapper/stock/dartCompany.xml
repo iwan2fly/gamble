@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.glog.domain.stock.mapper.DartCompanyMapper">
+
+    <insert id="insertDartCompany" parameterType="DartCompany" keyProperty="dartCompanyCode">
+        INSERT INTO dartCompany
+            ( corpCode, companyName, companyNameEng, stockName, stockCode, ceoName, companyClass, companyNo, businessNo, address, homepage, ir, phone, fax, industryCode, establishDate, accountsMonth, insertTime, updateTime )
+        VALUES
+            ( #{corpCode}, #{companyName}, #{companyNameEng}, #{stockName}, #{stockCode}, #{ceoName}, #{companyClass}, #{companyNo}, #{businessNo}, #{address}, #{homepage}, #{ir}, #{phone}, #{fax}, #{industryCode}, #{establishDate}, #{accountsMonth}, now(), now() )
+    </insert>
+
+    <insert id="insertsDartCompany" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="sotckId" keyProperty="dartCompanyCode">
+        INSERT INTO dartCompany
+        ( corpCode, companyName, companyNameEng, stockName, stockCode, ceoName, companyClass, companyNo, businessNo, address, homepage, ir, phone, fax, industryCode, establishDate, accountsMonth, insertTime, updateTime )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," open="" close="">
+            ( #{item.corpCode}, #{item.companyName}, #{item.companyNameEng}, #{item.stockName}, #{item.stockCode}, #{item.ceoName}, #{item.companyClass}, #{item.companyNo}, #{item.businessNo}, #{item.address}, #{item.homepage}, #{item.ir}, #{item.phone}, #{item.fax}, #{item.industryCode}, #{item.establishDate}, #{item.accountsMonth}, now(), now() )
+        </foreach>
+    </insert>
+
+    <update id="updateDartCompany" parameterType="DartCompany">
+        UPDATE 	dartCompany
+        SET
+        <trim prefix="" suffixOverrides=",">
+            <if test="companyName != null">companyName = #{companyName},</if>
+            <if test="companyNameEng != null">companyNameEng = #{companyNameEng},</if>
+            <if test="stockName != null">stockName = #{stockName},</if>
+            <if test="stockCode != null">stockCode = #{stockCode},</if>
+            <if test="ceoName != null">ceoName = #{ceoName},</if>
+            <if test="companyClass != null">companyClass = #{companyClass},</if>
+            <if test="companyNo != null">companyNo = #{companyNo},</if>
+            <if test="businessNo != null">businessNo = #{businessNo},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="homepage != null">homepage = #{homepage},</if>
+            <if test="ir != null">ir = #{ir},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="fax != null">fax = #{fax},</if>
+            <if test="industryCode != null">industryCode = #{industryCode},</if>
+            <if test="establishDate != null">establishDate = #{establishDate},</if>
+            <if test="accountsMonth != null">accountsMonth = #{accountsMonth},</if>
+            updateTime = now()
+        </trim>
+        WHERE dartCompany.corpCode=#{corpCode}
+    </update>
+
+    <delete id="deleteDartCompany" parameterType="DartCompany">
+        DELETE FROM dartCompany
+        WHERE 	corpCode=#{corpCode}
+    </delete>
+
+    <select id="selectDartCompanyList" parameterType="DartCompanyParam" resultType="DartCompanyResult" >
+        SELECT 	dartCompany.*
+        FROM 	dartCompany
+        <include refid="whereDartCompany" ></include>
+        <include refid="orderDartCompany" ></include>
+    </select>
+
+    <select id="selectDartCompanyListCount" parameterType="DartCompanyParam" resultType="java.lang.Integer">
+        SELECT 	COUNT(*)
+        FROM   	dartCompany
+        <include refid="whereDartCompany" ></include>
+    </select>
+
+    <sql id="whereDartCompany">
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="corpCode != null and corpCode != ''">AND dartCompany.corpCode=#{corpCode}</if>
+                <if test="companyName != null and companyName != ''">AND dartCompany.companyName=#{companyName}</if>
+                <if test="companyNameEng != null and companyNameEng != ''">AND dartCompany.companyNameEng=#{companyNameEng}</if>
+                <if test="stockName != null and stockName != ''">AND dartCompany.stockName=#{stockName}</if>
+                <if test="stockCode != null and stockCode != ''">AND dartCompany.stockCode=#{stockCode}</if>
+                <if test="ceoName != null and ceoName != ''">AND dartCompany.ceoName=#{ceoName}</if>
+                <if test="companyClass != null and companyClass != ''">AND dartCompany.companyClass=#{companyClass}</if>
+                <if test="companyNo != null and companyNo != ''">AND dartCompany.companyNo=#{companyNo}</if>
+                <if test="businessNo != null and businessNo != ''">AND dartCompany.businessNo=#{businessNo}</if>
+                <if test="address != null and address != ''">AND dartCompany.address=#{address}</if>
+                <if test="homepage != null and homepage != ''">AND dartCompany.homepage=#{homepage}</if>
+                <if test="ir != null and ir != ''">AND dartCompany.ir=#{ir}</if>
+                <if test="phone != null and phone != ''">AND dartCompany.phone=#{phone}</if>
+                <if test="fax != null and fax != ''">AND dartCompany.fax=#{fax}</if>
+                <if test="industryCode != null and industryCode != ''">AND dartCompany.industryCode=#{industryCode}</if>
+                <if test="establishDate != null and establishDate != ''">AND dartCompany.establishDate=#{establishDate}</if>
+                <if test="accountsMonth != null and accountsMonth != ''">AND dartCompany.accountsMonth=#{accountsMonth}</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND dartCompany.corpName like CONCAT('%',#{pagingParam.filter},'%')</if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="orderDartCompany">
+        <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
+            <choose>
+                <when test="pagingParam.sortIndex eq 'corpCode'">corpCode</when>
+                <when test="pagingParam.sortIndex eq 'companyName'">companyName</when>
+                <when test="pagingParam.sortIndex eq 'companyNameEng'">companyNameEng</when>
+                <when test="pagingParam.sortIndex eq 'stockName'">stockName</when>
+                <when test="pagingParam.sortIndex eq 'stockCode'">stockCode</when>
+                <when test="pagingParam.sortIndex eq 'ceoName'">ceoName</when>
+                <when test="pagingParam.sortIndex eq 'comapnyClass'">companyClass</when>
+                <when test="pagingParam.sortIndex eq 'companyNo'">companyNo</when>
+                <when test="pagingParam.sortIndex eq 'businessNo'">businessNo</when>
+                <when test="pagingParam.sortIndex eq 'address'">address</when>
+                <when test="pagingParam.sortIndex eq 'homepage'">homepage</when>
+                <when test="pagingParam.sortIndex eq 'ir'">ir</when>
+                <when test="pagingParam.sortIndex eq 'phone'">phone</when>
+                <when test="pagingParam.sortIndex eq 'fax'">fax</when>
+                <when test="pagingParam.sortIndex eq 'industryCode'">industryCode</when>
+                <when test="pagingParam.sortIndex eq 'establishDate'">establishDate</when>
+                <when test="pagingParam.sortIndex eq 'accountsMonth'">accountsMonth</when>
+                <otherwise>dartCompanyCode</otherwise>
+            </choose>
+            <choose>
+                <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
+                <otherwise>ASC</otherwise>
+            </choose>
+        </if>
+        <if test="pagingParam.rows gt 0">
+            LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}
+        </if>
+    </sql>
+    
+</mapper>
