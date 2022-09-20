@@ -14,4 +14,6 @@ import org.apache.ibatis.type.Alias;
 public class DartCompanyParam extends DartCompany {
 
     PagingParam pagingParam = new PagingParam();
+
+    boolean hasStockCode;
 }

@@ -8,6 +8,7 @@ import kr.co.glog.domain.stock.model.StockResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
@@ -80,12 +81,10 @@ public class StockDao {
         return insertCount;
     }
 
-    public Stock updateStock( Stock stock ) {
+    public int updateStock( Stock stock ) {
         if ( stock == null ) throw new ParameterMissingException( "Stock" );
         if ( stock.getStockCode() == null ) throw new ParameterMissingException( "stockCode" );
-        stockMapper.updateStock( stock );
-
-        return stock;
+        return stockMapper.updateStock( stock );
     }
 
     public Stock saveStock( Stock stock ) {

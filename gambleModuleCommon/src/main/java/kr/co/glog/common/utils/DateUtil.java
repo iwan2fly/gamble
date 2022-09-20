@@ -861,6 +861,7 @@ public class DateUtil {
 		return cal.getTime();
 	}
 
+	/*
 	public static void main( String [] args ) throws ParseException
 	{
 		System.out.println( DateUtil.get20000101() );
@@ -874,5 +875,5 @@ public class DateUtil {
 		System.out.println( DateUtil.daysBetween("20220129", "20220130", "yyyyMMdd") );
 		System.out.println( DateUtil.getDayOfWeek( "20220127" ) + ", " + DateUtil.getDayOfWeekLableEng( DateUtil.getDayOfWeek( "20220127" ) ) );
 	}
-
+	*/
 }

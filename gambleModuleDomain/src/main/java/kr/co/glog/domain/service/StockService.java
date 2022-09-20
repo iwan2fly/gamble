@@ -53,7 +53,7 @@ public class StockService {
 
     /**
      * RankingStock -> Stock
-     * @param includedStock
+     * @param rankingStock
      */
     public Stock getStockFromRankingStock( RankingStock rankingStock ) {
 
@@ -80,5 +80,15 @@ public class StockService {
         */
 
         return stock;
+    }
+
+    public int updateInsert( Stock stock ) {
+        int result = stockDao.updateStock( stock );
+
+        if ( result == 00 ) {
+            result = stockDao.insertStock( stock );
+        }
+
+        return result;
     }
 }

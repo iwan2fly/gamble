@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.domain.service.StockDailyService;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
+import kr.co.glog.domain.stock.dao.StockDao;
+import kr.co.glog.domain.stock.entity.Stock;
 import kr.co.glog.domain.stock.entity.StockDaily;
 import kr.co.glog.external.daumFinance.model.DaumDailyStock;
 import kr.co.glog.external.daumFinance.model.RankingStock;
@@ -31,6 +33,7 @@ public class DaumDailyStockScrapper {
 
     private final StockDailyService stockDailyService;
     private final StockDailyDao stockDailyDao;
+    private final StockDao stockDao;
 
     /**
      * 다음 주식에서 특정 종목의 일자별 가격 문서를 읽어옵니다.
@@ -189,21 +192,46 @@ public class DaumDailyStockScrapper {
      * 특정 종목의 일별 데이터 첫 페이지를 테이블에 업서트
      * @param stockCode
      */
-    public void upsertDailyStock( String stockCode  ) {
+    public void upsertDailyStock( String stockCode  ) throws InterruptedException {
 
         int perPage = 10;
 
+        // 다음
         ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
-        ArrayList<DaumDailyStock> daumDailyStockList = getDailyStockList( stockCode, perPage, 1 );
+        ArrayList<DaumDailyStock> daumDailyStockList = null;
 
+        int readCount = 0;
+        boolean isRead = false;
+        while ( !isRead ) {
+
+            try {
+                daumDailyStockList = getDailyStockList(stockCode, perPage, 1);
+                isRead = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                readCount++;
+                Thread.sleep( 3000 );
+            }
+        }
+
+        // 우리 DB에 맞게 컨버트
         for ( DaumDailyStock daumDailyStock : daumDailyStockList ) {
             StockDaily stockDaily = stockDailyService.getStockDailyFromDaumDailyStock( daumDailyStock );
             stockDailyList.add( stockDaily );
         }
 
-        for ( StockDaily stockDaily : stockDailyList ) {
+        for ( int i = 0; i < stockDailyList.size(); i++ ) {
+            StockDaily stockDaily = stockDailyList.get(i);
+
             log.debug( stockDaily.toString() );
             try {
+                // 리스트의 첫번째는 가장 최근날짜의 가격, stock 테이블의 현재가격 업데이트
+                if ( i == 0 ) {
+                    Stock stock = new Stock();
+                    stock.setStockCode( stockCode );
+                    stock.setCurrentPrice( stockDaily.getPriceFinal() );
+                    stockDao.updateStock( stock );
+                }
                 stockDailyDao.saveStockDaily( stockDaily );
             } catch ( org.springframework.dao.DuplicateKeyException dke ) {
 

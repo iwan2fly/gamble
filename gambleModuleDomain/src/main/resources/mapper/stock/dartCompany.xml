@@ -4,17 +4,17 @@
 
     <insert id="insertDartCompany" parameterType="DartCompany" keyProperty="dartCompanyCode">
         INSERT INTO dartCompany
-            ( corpCode, companyName, companyNameEng, stockName, stockCode, ceoName, companyClass, companyNo, businessNo, address, homepage, ir, phone, fax, industryCode, establishDate, accountsMonth, insertTime, updateTime )
+            ( corpCode, companyName, companyNameEng, stockName, stockCode, ceoName, companyClass, companyNo, businessNo, address, homepage, ir, phone, fax, industryCode, establishDate, accountsMonth, modifyDate, insertTime, updateTime )
         VALUES
-            ( #{corpCode}, #{companyName}, #{companyNameEng}, #{stockName}, #{stockCode}, #{ceoName}, #{companyClass}, #{companyNo}, #{businessNo}, #{address}, #{homepage}, #{ir}, #{phone}, #{fax}, #{industryCode}, #{establishDate}, #{accountsMonth}, now(), now() )
+            ( #{corpCode}, #{companyName}, #{companyNameEng}, #{stockName}, #{stockCode}, #{ceoName}, #{companyClass}, #{companyNo}, #{businessNo}, #{address}, #{homepage}, #{ir}, #{phone}, #{fax}, #{industryCode}, #{establishDate}, #{accountsMonth}, #{modifyDate}, now(), now() )
     </insert>
 
     <insert id="insertsDartCompany" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="sotckId" keyProperty="dartCompanyCode">
         INSERT INTO dartCompany
-        ( corpCode, companyName, companyNameEng, stockName, stockCode, ceoName, companyClass, companyNo, businessNo, address, homepage, ir, phone, fax, industryCode, establishDate, accountsMonth, insertTime, updateTime )
+        ( corpCode, companyName, companyNameEng, stockName, stockCode, ceoName, companyClass, companyNo, businessNo, address, homepage, ir, phone, fax, industryCode, establishDate, accountsMonth, modifyDate, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            ( #{item.corpCode}, #{item.companyName}, #{item.companyNameEng}, #{item.stockName}, #{item.stockCode}, #{item.ceoName}, #{item.companyClass}, #{item.companyNo}, #{item.businessNo}, #{item.address}, #{item.homepage}, #{item.ir}, #{item.phone}, #{item.fax}, #{item.industryCode}, #{item.establishDate}, #{item.accountsMonth}, now(), now() )
+            ( #{item.corpCode}, #{item.companyName}, #{item.companyNameEng}, #{item.stockName}, #{item.stockCode}, #{item.ceoName}, #{item.companyClass}, #{item.companyNo}, #{item.businessNo}, #{item.address}, #{item.homepage}, #{item.ir}, #{item.phone}, #{item.fax}, #{item.industryCode}, #{item.establishDate}, #{item.accountsMonth}, #{item.modifyDate}, now(), now() )
         </foreach>
     </insert>
 
@@ -38,6 +38,7 @@
             <if test="industryCode != null">industryCode = #{industryCode},</if>
             <if test="establishDate != null">establishDate = #{establishDate},</if>
             <if test="accountsMonth != null">accountsMonth = #{accountsMonth},</if>
+            <if test="modifyDate != null">modifyDate = #{modifyDate},</if>
             updateTime = now()
         </trim>
         WHERE dartCompany.corpCode=#{corpCode}
@@ -81,6 +82,8 @@
                 <if test="industryCode != null and industryCode != ''">AND dartCompany.industryCode=#{industryCode}</if>
                 <if test="establishDate != null and establishDate != ''">AND dartCompany.establishDate=#{establishDate}</if>
                 <if test="accountsMonth != null and accountsMonth != ''">AND dartCompany.accountsMonth=#{accountsMonth}</if>
+                <if test="modifyDate != null and modifyDate != ''">AND dartCompany.modifyDate=#{modifyDate}</if>
+                <if test="hasStockCode != null and hasStockCode != ''">AND ( stockCode is not null AND stockCode !='' )</if>
                 <if test="pagingParam.filter != null and pagingParam.filter != ''">AND dartCompany.corpName like CONCAT('%',#{pagingParam.filter},'%')</if>
             </trim>
         </where>
@@ -106,6 +109,7 @@
                 <when test="pagingParam.sortIndex eq 'industryCode'">industryCode</when>
                 <when test="pagingParam.sortIndex eq 'establishDate'">establishDate</when>
                 <when test="pagingParam.sortIndex eq 'accountsMonth'">accountsMonth</when>
+                <when test="pagingParam.sortIndex eq 'modifyDate'">modifyDate</when>
                 <otherwise>dartCompanyCode</otherwise>
             </choose>
             <choose>

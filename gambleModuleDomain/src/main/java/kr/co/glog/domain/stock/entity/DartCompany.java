@@ -28,4 +28,5 @@ public class DartCompany extends EntityModel {
     String  industryCode;         // 업종코드
     String  establishDate;              // 설립일
     String  accountsMonth;              // 결산월
+    String  modifyDate;                 // DART 수정일자
 }

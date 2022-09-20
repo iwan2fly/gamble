@@ -13,6 +13,7 @@ import org.apache.ibatis.type.Alias;
 public class Stock extends EntityModel {
 
     String  stockCode;                  // 종목코드
+    String  isin;                       // SEIBRO 표준코드
     String  stockName;                  // 종목명
     Integer currentPrice;               // 현재가
     String  stockTypeCode;              // 주식종류코드 ( 보통주, 우선주 )

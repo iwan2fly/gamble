@@ -2,7 +2,6 @@ package kr.co.glog.external.dartApi;
 
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.domain.stock.dao.DartCompanyDao;
-import kr.co.glog.domain.stock.dao.DartCorpDao;
 import kr.co.glog.domain.stock.entity.DartCompany;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

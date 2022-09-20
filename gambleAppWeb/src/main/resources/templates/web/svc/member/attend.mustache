@@ -1,0 +1,967 @@
+{{>web/layouts/fullNavHeader}}
+
+
+<!-- Page Sidebar Ends-->
+<div class="page-body">
+
+    <div class="container-fluid">
+        <div class="page-header">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h3>주사위 던지기</h3>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html"><i data-feather="home"></i></a></li>
+                        <li class="breadcrumb-item">단순</li>
+                        <li class="breadcrumb-item active">주사위 던지기</li>
+                    </ol>
+                </div>
+                <div class="col-lg-6">
+                    <!-- Bookmark Start-->
+                    <div class="bookmark">
+                        <ul>
+                            <li><a href="chat.html" data-container="body" data-bs-toggle="popover" data-placement="top" title="" data-original-title="Chat"><i data-feather="message-square"></i></a></li>
+                            <li><a href="product-page.html" data-container="body" data-bs-toggle="popover" data-placement="top" title="" data-original-title="Icons"><i data-feather="shopping-bag">               </i></a></li>
+                            <li><a href="user-profile.html" data-container="body" data-bs-toggle="popover" data-placement="top" title="" data-original-title="Learning"><i data-feather="users"></i></a></li>
+                            <li><a href="javascript:void(0)"><i class="bookmark-search" data-feather="heart"></i></a>
+                                <form class="form-inline search-form">
+                                    <div class="form-group form-control-search">
+                                        <input type="text" placeholder="Search..">
+                                    </div>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Bookmark Ends-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container-fluid starts-->
+    <div class="container-fluid calendar-basic">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div id="menu">
+                              <div id="menu-navi">
+                                <div class="menu-navi-left">
+                                  <button class="btn btn-primary move-today" type="button" data-action="move-today">Today</button>
+                                </div>
+                                <div class="render-range menu-navi-center" id="renderRange">2022.09</div>
+                                <div class="menu-navi-right">
+                                  <button class="btn btn-primary" id="dropdownMenu-calendarType" type="button" data-bs-toggle="dropdown"><i id="calendarTypeIcon" class="calendar-icon fa fa-th"></i><span id="calendarTypeName">Monthly</span><i class="fa fa-angle-down"></i></button>
+                                  <ul class="dropdown-menu" role="menu">
+                                    <li role="presentation"><a class="dropdown-menu-title" role="menuitem" data-action="toggle-daily"><i class="fa fa-bars"></i>Daily</a></li>
+                                    <li role="presentation"><a class="dropdown-menu-title" role="menuitem" data-action="toggle-weekly"><i class="fa fa-th-large"></i>Weekly</a></li>
+                                    <li role="presentation"><a class="dropdown-menu-title" role="menuitem" data-action="toggle-monthly"><i class="fa fa-th"></i>Month</a></li>
+                                    <li role="presentation"><a class="dropdown-menu-title" role="menuitem" data-action="toggle-weeks2"><i class="fa fa-th-large"></i>2 weeks</a></li>
+                                    <li role="presentation"><a class="dropdown-menu-title" role="menuitem" data-action="toggle-weeks3"><i class="fa fa-th-large"></i>3 weeks</a></li>
+                                    <li class="dropdown-divider" role="presentation"></li>
+                                    <li role="presentation"><a role="menuitem" data-action="toggle-workweek">
+                                        <input class="tui-full-calendar-checkbox-square" type="checkbox" value="toggle-workweek" checked=""><span class="checkbox-title"></span>Show weekends</a></li>
+                                    <li role="presentation"><a role="menuitem" data-action="toggle-start-day-1">
+                                        <input class="tui-full-calendar-checkbox-square" type="checkbox" value="toggle-start-day-1"><span class="checkbox-title"></span>Start Week on Monday</a></li>
+                                    <li role="presentation"><a role="menuitem" data-action="toggle-narrow-weekend">
+                                        <input class="tui-full-calendar-checkbox-square" type="checkbox" value="toggle-narrow-weekend"><span class="checkbox-title"></span>Narrower than weekdays</a></li>
+                                  </ul>
+                                  <div class="move-btn">
+                                    <button class="btn btn-primary move-day" type="button" data-action="move-prev"><i class="fa fa-angle-left" data-action="move-prev"></i></button>
+                                    <button class="btn btn-primary move-day" type="button" data-action="move-next"><i class="fa fa-angle-right" data-action="move-next"></i></button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div id="lnb">
+                              <div class="lnb-new-schedule">
+                                <button class="btn lnb-new-schedule-btn btn-primary" id="btn-new-schedule" type="button" data-bs-toggle="modal">New schedule</button>
+                              </div>
+                              <div class="lnb-calendars" id="lnb-calendars">
+                                <div class="lnb-calendars-d1" id="calendarList"><div class="lnb-calendars-item"><label><input type="checkbox" class="tui-full-calendar-checkbox-round" value="1" checked=""><span style="border-color: #4d8aff; background-color: #4d8aff;"></span><span>My Calendar</span></label></div>
+    <div class="lnb-calendars-item"><label><input type="checkbox" class="tui-full-calendar-checkbox-round" value="2" checked=""><span style="border-color: #fd2d63; background-color: #fd2d63;"></span><span>Company</span></label></div>
+    <div class="lnb-calendars-item"><label><input type="checkbox" class="tui-full-calendar-checkbox-round" value="3" checked=""><span style="border-color: #47cf60; background-color: #47cf60;"></span><span>Family</span></label></div>
+    <div class="lnb-calendars-item"><label><input type="checkbox" class="tui-full-calendar-checkbox-round" value="4" checked=""><span style="border-color: #a927f9; background-color: #a927f9;"></span><span>Friend</span></label></div>
+    <div class="lnb-calendars-item"><label><input type="checkbox" class="tui-full-calendar-checkbox-round" value="5" checked=""><span style="border-color: #fd761e; background-color: #fd761e;"></span><span>Travel</span></label></div>
+    <div class="lnb-calendars-item"><label><input type="checkbox" class="tui-full-calendar-checkbox-round" value="6" checked=""><span style="border-color: #20d0ec; background-color: #20d0ec;"></span><span>etc</span></label></div>
+    <div class="lnb-calendars-item"><label><input type="checkbox" class="tui-full-calendar-checkbox-round" value="7" checked=""><span style="border-color: #e2c636; background-color: #e2c636;"></span><span>Birthdays</span></label></div>
+    <div class="lnb-calendars-item"><label><input type="checkbox" class="tui-full-calendar-checkbox-round" value="8" checked=""><span style="border-color: #d22d3d; background-color: #d22d3d;"></span><span>National Holidays</span></label></div></div>
+                                <div class="lnb-calendars-item m-0 p-0">
+                                  <label>
+                                    <input class="tui-full-calendar-checkbox-square" type="checkbox" value="all" checked=""><span></span><strong>View all</strong>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-12">
+                            <div id="right">
+                              <div id="calendar"><div class="tui-full-calendar-layout tui-view-8 tui-view-13 tui-view-16" style="background-color: white;"><div class="tui-full-calendar-month tui-view-3 tui-view-4 tui-full-calendar-vlayout-container"><div class="tui-view-6" data-panel-index="0" style="height: 31px;"><div class="tui-full-calendar-month-dayname" style="border-top: 1px solid #e5e5e5; height: 31px; font-size: 12px; background-color: inherit; text-align: left; font-weight: normal;">
+        <div class="tui-full-calendar-month-dayname-item" style="position: absolute;
+                    width: 14.285714285714286%;
+                    left: 0%;
+                    padding-left: 10px;
+                    padding-right: 0;
+                    line-height: 31px;
+                    border-right: none;
+                    ">
+            <span class="tui-full-calendar-holiday-sun" style="color: #fd2d63;">
+                Sun
+            </span>
+        </div>
+        <div class="tui-full-calendar-month-dayname-item" style="position: absolute;
+                    width: 14.285714285714286%;
+                    left: 14.285714285714286%;
+                    padding-left: 10px;
+                    padding-right: 0;
+                    line-height: 31px;
+                    border-right: none;
+                    ">
+            <span class="" style="color: #333;">
+                Mon
+            </span>
+        </div>
+        <div class="tui-full-calendar-month-dayname-item" style="position: absolute;
+                    width: 14.285714285714286%;
+                    left: 28.571428571428573%;
+                    padding-left: 10px;
+                    padding-right: 0;
+                    line-height: 31px;
+                    border-right: none;
+                    ">
+            <span class="" style="color: #333;">
+                Tue
+            </span>
+        </div>
+        <div class="tui-full-calendar-month-dayname-item" style="position: absolute;
+                    width: 14.285714285714286%;
+                    left: 42.85714285714286%;
+                    padding-left: 10px;
+                    padding-right: 0;
+                    line-height: 31px;
+                    border-right: none;
+                    ">
+            <span class="" style="color: #333;">
+                Wed
+            </span>
+        </div>
+        <div class="tui-full-calendar-month-dayname-item" style="position: absolute;
+                    width: 14.285714285714286%;
+                    left: 57.142857142857146%;
+                    padding-left: 10px;
+                    padding-right: 0;
+                    line-height: 31px;
+                    border-right: none;
+                    ">
+            <span class="" style="color: #333;">
+                Thu
+            </span>
+        </div>
+        <div class="tui-full-calendar-month-dayname-item" style="position: absolute;
+                    width: 14.285714285714286%;
+                    left: 71.42857142857143%;
+                    padding-left: 10px;
+                    padding-right: 0;
+                    line-height: 31px;
+                    border-right: none;
+                    ">
+            <span class="" style="color: #333;">
+                Fri
+            </span>
+        </div>
+        <div class="tui-full-calendar-month-dayname-item" style="position: absolute;
+                    width: 14.285714285714286%;
+                    left: 85.71428571428572%;
+                    padding-left: 10px;
+                    padding-right: 0;
+                    line-height: 31px;
+                    ">
+            <span class="tui-full-calendar-holiday-sat" style="color: #333;">
+                Sat
+            </span>
+        </div>
+    </div>
+    </div><div class="tui-view-7" data-panel-index="1" data-auto-height="true" style="height: 569px;"><div class="tui-full-calendar-month-week-item" style="height: 16.6667%;"><div class="tui-full-calendar-weekday tui-view-50"><div class="tui-full-calendar-weekday-border" style="
+        border-top: 1px solid #e5e5e5;
+    "></div>
+    <div class="tui-full-calendar-weekday-grid">
+    <div class="tui-full-calendar-weekday-grid-line tui-full-calendar-holiday-sun tui-full-calendar-near-month-day tui-full-calendar-extra-date" style="width:14.285714285714286%; left:0%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: rgba(255, 64, 64, 0.4);"><span class="tui-full-calendar-weekday-grid-date">28</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: rgba(255, 64, 64, 0.4);"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day tui-full-calendar-extra-date" style="width:14.285714285714286%; left:14.285714285714286%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: rgba(51, 51, 51, 0.4);"><span class="tui-full-calendar-weekday-grid-date">29</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: rgba(51, 51, 51, 0.4);"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day tui-full-calendar-extra-date" style="width:14.285714285714286%; left:28.571428571428573%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: rgba(51, 51, 51, 0.4);"><span class="tui-full-calendar-weekday-grid-date">30</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: rgba(51, 51, 51, 0.4);"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day tui-full-calendar-extra-date" style="width:14.285714285714286%; left:42.85714285714286%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: rgba(51, 51, 51, 0.4);"><span class="tui-full-calendar-weekday-grid-date">31</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: rgba(51, 51, 51, 0.4);"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:57.142857142857146%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">1</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:71.42857142857143%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">2</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line tui-full-calendar-holiday-sat tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:85.71428571428572%; background-color: inherit; font-size: 14px;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">3</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    </div>
+    <div class="tui-full-calendar-weekday-schedules">
+
+
+    <div data-id="21" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-21
+
+                " style="top:34px;left:14.285714285714286%;width:28.571428571428573%;height:0px;
+                    margin-top:2px">
+            <div data-schedule-id="d5f9badf-0972-5131-a146-88051342183b" data-calendar-id="1" class="tui-full-calendar-weekday-schedule " style="height:24px; line-height:24px; border-radius: 2px;
+                        margin-left: 8px;
+                        margin-right: 8px;
+                        color:#ffffff; background-color:#4d8aff; border-color:#4d8aff;
+                        ">
+                <span class="tui-full-calendar-weekday-schedule-title" data-title="Notoniel duevu zestuolu." title="Notoniel duevu zestuolu."><span class="calendar-font-icon ic-readonly-b"></span> Notoniel duevu zestuolu.</span>
+
+            </div>
+        </div>
+
+
+
+    <div data-id="40" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-40
+
+                 tui-full-calendar-weekday-exceed-right" style="top:34px;left:85.71428571428572%;width:14.285714285714286%;height:0px;
+                    margin-top:2px">
+            <div data-schedule-id="9bb48c03-4599-5738-9256-f797f0170436" data-calendar-id="7" class="tui-full-calendar-weekday-schedule " style="height:24px; line-height:24px; border-radius: 2px;
+                        margin-left: 8px;
+                        color:#ffffff; background-color:#e2c636; border-color:#e2c636;
+                        ">
+                <span class="tui-full-calendar-weekday-schedule-title" data-title="Va soiv sop." title="Va soiv sop."><span class="calendar-font-icon ic-readonly-b"></span> Va soiv sop.</span>
+
+            </div>
+        </div>
+    </div>
+    </div></div><div class="tui-full-calendar-month-week-item" style="height: 16.6667%;"><div class="tui-full-calendar-weekday tui-view-51"><div class="tui-full-calendar-weekday-border" style="
+        border-top: 1px solid #e5e5e5;
+    "></div>
+    <div class="tui-full-calendar-weekday-grid">
+    <div class="tui-full-calendar-weekday-grid-line tui-full-calendar-holiday-sun tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:0%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #fd2d63;"><span class="tui-full-calendar-weekday-grid-date">4</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #fd2d63;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:14.285714285714286%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">5</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:28.571428571428573%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">6</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:42.85714285714286%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">7</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:57.142857142857146%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">8</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:71.42857142857143%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">9</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line tui-full-calendar-holiday-sat tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:85.71428571428572%; background-color: inherit; font-size: 14px;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">10</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    </div>
+    <div class="tui-full-calendar-weekday-schedules">
+
+
+    <div data-id="40" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-40
+                 tui-full-calendar-weekday-exceed-left
+                " style="top:34px;left:0%;width:14.285714285714286%;height:0px;
+                    margin-top:2px">
+            <div data-schedule-id="9bb48c03-4599-5738-9256-f797f0170436" data-calendar-id="7" class="tui-full-calendar-weekday-schedule " style="height:24px; line-height:24px; border-radius: 2px;
+                        margin-right: 8px;
+                        color:#ffffff; background-color:#e2c636; border-color:#e2c636;
+                        ">
+                <span class="tui-full-calendar-weekday-schedule-title" data-title="Va soiv sop." title="Va soiv sop."><span class="calendar-font-icon ic-readonly-b"></span> Va soiv sop.</span>
+
+            </div>
+        </div>
+    </div>
+    </div></div><div class="tui-full-calendar-month-week-item" style="height: 16.6667%;"><div class="tui-full-calendar-weekday tui-view-52"><div class="tui-full-calendar-weekday-border" style="
+        border-top: 1px solid #e5e5e5;
+    "></div>
+    <div class="tui-full-calendar-weekday-grid">
+    <div class="tui-full-calendar-weekday-grid-line tui-full-calendar-holiday-sun tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:0%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #fd2d63;"><span class="tui-full-calendar-weekday-grid-date">11</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #fd2d63;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:14.285714285714286%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">12</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:28.571428571428573%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">13</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:42.85714285714286%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">14</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:57.142857142857146%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">15</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:71.42857142857143%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">16</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line tui-full-calendar-holiday-sat tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:85.71428571428572%; background-color: inherit; font-size: 14px;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">17</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    </div>
+    <div class="tui-full-calendar-weekday-schedules">
+
+
+    <div data-id="24" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-24
+
+                " style="top:34px;left:0%;width:28.571428571428573%;height:0px;
+                    margin-top:2px">
+            <div data-schedule-id="93c90ad0-8f86-5007-9838-5a847061326b" data-calendar-id="2" class="tui-full-calendar-weekday-schedule " style="height:24px; line-height:24px; border-radius: 2px;
+                        margin-left: 8px;
+                        margin-right: 8px;
+                        color:#ffffff; background-color:#fd2d63; border-color:#fd2d63;
+                        ">
+                <span class="tui-full-calendar-weekday-schedule-title" data-title="Nek owa goluk." title="Nek owa goluk."><span class="calendar-font-icon ic-repeat-b"></span> Nek owa goluk.</span>
+                <span class="tui-full-calendar-weekday-resize-handle handle-y" style="line-height: 24px;">&nbsp;</span>
+            </div>
+        </div>
+
+
+    <div data-id="42" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-42
+
+                " style="top:60px;left:0%;width:14.285714285714286%;height:0px;
+                    margin-top:2px">
+                    <div data-schedule-id="f085c4f9-28db-51ce-8610-196f3a4d52ed" data-calendar-id="8" class="tui-full-calendar-weekday-schedule tui-full-calendar-weekday-schedule-time" style="height:24px; line-height:24px; ">
+                        <span class="tui-full-calendar-weekday-schedule-bullet" style="top: 8px;
+                                    background:#d22d3d
+                                "></span>
+                        <span class="tui-full-calendar-weekday-schedule-title" style="
+                                    color:#333;
+                                " data-title="Fik haru uv." title="Fik haru uv."><strong>17:00</strong> <span class="calendar-font-icon ic-user-b"></span> Fik haru uv.</span>
+                    </div>
+        </div>
+
+
+
+    <div data-id="31" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-31
+
+                 tui-full-calendar-weekday-exceed-right" style="top:34px;left:71.42857142857143%;width:28.571428571428573%;height:0px;
+                    margin-top:2px">
+            <div data-schedule-id="2e1bd167-89c2-5891-8161-fdee49c40c75" data-calendar-id="4" class="tui-full-calendar-weekday-schedule " style="height:24px; line-height:24px; border-radius: 2px;
+                        margin-left: 8px;
+                        color:#ffffff; background-color:#a927f9; border-color:#a927f9;
+                        ">
+                <span class="tui-full-calendar-weekday-schedule-title" data-title="Pabun wu upekaw." title="Pabun wu upekaw."><span class="calendar-font-icon ic-repeat-b"></span> Pabun wu upekaw.</span>
+                <span class="tui-full-calendar-weekday-resize-handle handle-y" style="line-height: 24px;">&nbsp;</span>
+            </div>
+        </div>
+
+
+    <div data-id="35" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-35
+
+                " style="top:60px;left:71.42857142857143%;width:28.571428571428573%;height:0px;
+                    margin-top:2px">
+            <div data-schedule-id="ddb42a04-1233-56a5-8ecd-a600bd355d28" data-calendar-id="6" class="tui-full-calendar-weekday-schedule " style="height:24px; line-height:24px; border-radius: 2px;
+                        margin-left: 8px;
+                        margin-right: 8px;
+                        color:#ffffff; background-color:#20d0ec; border-color:#20d0ec;
+                        ">
+                <span class="tui-full-calendar-weekday-schedule-title" data-title="Vi loazopa na." title="Vi loazopa na."><span class="calendar-font-icon ic-user-b"></span> Vi loazopa na.</span>
+                <span class="tui-full-calendar-weekday-resize-handle handle-y" style="line-height: 24px;">&nbsp;</span>
+            </div>
+        </div>
+    </div>
+    </div></div><div class="tui-full-calendar-month-week-item" style="height: 16.6667%;"><div class="tui-full-calendar-weekday tui-view-53"><div class="tui-full-calendar-weekday-border" style="
+        border-top: 1px solid #e5e5e5;
+    "></div>
+    <div class="tui-full-calendar-weekday-grid">
+    <div class="tui-full-calendar-weekday-grid-line tui-full-calendar-holiday-sun tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:0%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #fd2d63;"><span class="tui-full-calendar-weekday-grid-date">18</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #fd2d63;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:14.285714285714286%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">19</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:28.571428571428573%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">20</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:42.85714285714286%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">21</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:57.142857142857146%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">22</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:71.42857142857143%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">23</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line tui-full-calendar-holiday-sat tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:85.71428571428572%; background-color: inherit; font-size: 14px;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">24</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    </div>
+    <div class="tui-full-calendar-weekday-schedules">
+
+
+    <div data-id="31" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-31
+                 tui-full-calendar-weekday-exceed-left
+                " style="top:34px;left:0%;width:42.85714285714286%;height:0px;
+                    margin-top:2px">
+            <div data-schedule-id="2e1bd167-89c2-5891-8161-fdee49c40c75" data-calendar-id="4" class="tui-full-calendar-weekday-schedule " style="height:24px; line-height:24px; border-radius: 2px;
+                        margin-right: 8px;
+                        color:#ffffff; background-color:#a927f9; border-color:#a927f9;
+                        ">
+                <span class="tui-full-calendar-weekday-schedule-title" data-title="Pabun wu upekaw." title="Pabun wu upekaw."><span class="calendar-font-icon ic-repeat-b"></span> Pabun wu upekaw.</span>
+                <span class="tui-full-calendar-weekday-resize-handle handle-y" style="line-height: 24px;">&nbsp;</span>
+            </div>
+        </div>
+
+
+    <div data-id="37" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-37
+
+                " style="top:60px;left:28.571428571428573%;width:42.85714285714286%;height:0px;
+                    margin-top:2px">
+            <div data-schedule-id="8ec7c977-326f-57d4-a3bc-3ab69c2ca7e6" data-calendar-id="6" class="tui-full-calendar-weekday-schedule " style="height:24px; line-height:24px; border-radius: 2px;
+                        margin-left: 8px;
+                        margin-right: 8px;
+                        color:#ffffff; background-color:#20d0ec; border-color:#20d0ec;
+                        ">
+                <span class="tui-full-calendar-weekday-schedule-title" data-title="Sih sadremevo gubdehana." title="Sih sadremevo gubdehana."><span class="calendar-font-icon ic-user-b"></span> Sih sadremevo gubdehana.</span>
+                <span class="tui-full-calendar-weekday-resize-handle handle-y" style="line-height: 24px;">&nbsp;</span>
+            </div>
+        </div>
+
+
+
+    <div data-id="38" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-38
+
+                " style="top:34px;left:42.85714285714286%;width:14.285714285714286%;height:0px;
+                    margin-top:2px">
+                    <div data-schedule-id="9a23f954-4b87-5784-b9c3-eace9a5a0ed4" data-calendar-id="7" class="tui-full-calendar-weekday-schedule tui-full-calendar-weekday-schedule-time" style="height:24px; line-height:24px; ">
+                        <span class="tui-full-calendar-weekday-schedule-bullet" style="top: 8px;
+                                    background:#e2c636
+                                "></span>
+                        <span class="tui-full-calendar-weekday-schedule-title" style="
+                                    color:#333;
+                                " data-title="Oco juprufob ju." title="Oco juprufob ju."><strong>20:30</strong> <span class="calendar-font-icon ic-lock-b"></span> Private</span>
+                    </div>
+        </div>
+
+
+    <div data-id="34" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-34
+
+                " style="top:60px;left:14.285714285714286%;width:14.285714285714286%;height:0px;
+                    margin-top:2px">
+                    <div data-schedule-id="483fc217-077b-5078-b336-cd07740fe643" data-calendar-id="5" class="tui-full-calendar-weekday-schedule tui-full-calendar-weekday-schedule-time" style="height:24px; line-height:24px; ">
+                        <span class="tui-full-calendar-weekday-schedule-bullet" style="top: 8px;
+                                    background:#fd761e
+                                "></span>
+                        <span class="tui-full-calendar-weekday-schedule-title" style="
+                                    color:#333;
+                                " data-title="Mujon hel so." title="Mujon hel so."><strong>08:30</strong> <span class="calendar-font-icon ic-user-b"></span> Mujon hel so.</span>
+                    </div>
+        </div>
+
+
+
+    <div data-id="39" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-39
+
+                " style="top:34px;left:57.142857142857146%;width:14.285714285714286%;height:0px;
+                    margin-top:2px">
+                    <div data-schedule-id="e5e41355-9aec-5d11-9228-b21327f33d53" data-calendar-id="7" class="tui-full-calendar-weekday-schedule tui-full-calendar-weekday-schedule-time" style="height:24px; line-height:24px; ">
+                        <span class="tui-full-calendar-weekday-schedule-bullet" style="top: 8px;
+                                    background:#e2c636
+                                "></span>
+                        <span class="tui-full-calendar-weekday-schedule-title" style="
+                                    color:#333;
+                                " data-title="Mojerap fu ezu." title="Mojerap fu ezu."><strong>17:00</strong> <span class="calendar-font-icon ic-lock-b"></span> Private</span>
+                    </div>
+        </div>
+
+
+
+    <div data-id="29" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-29
+
+                " style="top:34px;left:71.42857142857143%;width:14.285714285714286%;height:0px;
+                    margin-top:2px">
+                    <div data-schedule-id="6a817a43-cbf3-502f-b538-eaa0944072fe" data-calendar-id="4" class="tui-full-calendar-weekday-schedule tui-full-calendar-weekday-schedule-time" style="height:24px; line-height:24px; ">
+                        <span class="tui-full-calendar-weekday-schedule-bullet" style="top: 8px;
+                                    background:#a927f9
+                                "></span>
+                        <span class="tui-full-calendar-weekday-schedule-title" style="
+                                    color:#333;
+                                " data-title="Koni tegu aweke." title="Koni tegu aweke."><strong>18:00</strong> <span class="calendar-font-icon ic-location-b"></span> Koni tegu aweke.</span>
+                    </div>
+        </div>
+
+
+
+    <div data-id="20" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-20
+
+                " style="top:34px;left:85.71428571428572%;width:14.285714285714286%;height:0px;
+                    margin-top:2px">
+                    <div data-schedule-id="07466c9f-deeb-5563-b225-0f2fbbef835b" data-calendar-id="1" class="tui-full-calendar-weekday-schedule tui-full-calendar-weekday-schedule-time" style="height:24px; line-height:24px; ">
+                        <span class="tui-full-calendar-weekday-schedule-bullet" style="top: 8px;
+                                    background:#4d8aff
+                                "></span>
+                        <span class="tui-full-calendar-weekday-schedule-title" style="
+                                    color:#333;
+                                " data-title="Kur jihizec bas." title="Kur jihizec bas."><strong>13:30</strong> <span class="calendar-font-icon ic-user-b"></span> Kur jihizec bas.</span>
+                    </div>
+        </div>
+    </div>
+    </div></div><div class="tui-full-calendar-month-week-item" style="height: 16.6667%;"><div class="tui-full-calendar-weekday tui-view-54"><div class="tui-full-calendar-weekday-border" style="
+        border-top: 1px solid #e5e5e5;
+    "></div>
+    <div class="tui-full-calendar-weekday-grid">
+    <div class="tui-full-calendar-weekday-grid-line tui-full-calendar-holiday-sun tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:0%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #fd2d63;"><span class="tui-full-calendar-weekday-grid-date">25</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #fd2d63;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day tui-full-calendar-today" style="width:14.285714285714286%; left:14.285714285714286%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date tui-full-calendar-weekday-grid-date-decorator">26</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:28.571428571428573%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">27</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:42.85714285714286%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">28</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:57.142857142857146%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">29</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day" style="width:14.285714285714286%; left:71.42857142857143%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: #333;"><span class="tui-full-calendar-weekday-grid-date">30</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: #333;"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line tui-full-calendar-holiday-sat tui-full-calendar-near-month-day tui-full-calendar-extra-date" style="width:14.285714285714286%; left:85.71428571428572%; background-color: inherit; font-size: 14px;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: rgba(51, 51, 51, 0.4);"><span class="tui-full-calendar-weekday-grid-date">1</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: rgba(51, 51, 51, 0.4);"></span>
+            </div>
+        </div>
+    </div>
+    <div class="tui-full-calendar-weekday-schedules">
+
+
+    <div data-id="33" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-33
+
+                " style="top:34px;left:28.571428571428573%;width:42.85714285714286%;height:0px;
+                    margin-top:2px">
+            <div data-schedule-id="156d8cb1-3e8b-54f5-9487-42f36e62d4a5" data-calendar-id="5" class="tui-full-calendar-weekday-schedule " style="height:24px; line-height:24px; border-radius: 2px;
+                        margin-left: 8px;
+                        margin-right: 8px;
+                        color:#ffffff; background-color:#fd761e; border-color:#fd761e;
+                        ">
+                <span class="tui-full-calendar-weekday-schedule-title" data-title="Vi dirinal te." title="Vi dirinal te."><span class="calendar-font-icon ic-user-b"></span> Vi dirinal te.</span>
+                <span class="tui-full-calendar-weekday-resize-handle handle-y" style="line-height: 24px;">&nbsp;</span>
+            </div>
+        </div>
+
+
+    <div data-id="36" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-36
+
+                " style="top:60px;left:42.85714285714286%;width:57.142857142857146%;height:0px;
+                    margin-top:2px">
+            <div data-schedule-id="6f2ab8fc-4cef-502f-a8d4-355c4c7cf160" data-calendar-id="6" class="tui-full-calendar-weekday-schedule " style="height:24px; line-height:24px; border-radius: 2px;
+                        margin-left: 8px;
+                        margin-right: 8px;
+                        color:#ffffff; background-color:#20d0ec; border-color:#20d0ec;
+                        ">
+                <span class="tui-full-calendar-weekday-schedule-title" data-title="Lezlibco kev ewse." title="Lezlibco kev ewse."><span class="calendar-font-icon ic-lock-b"></span> Private</span>
+                <span class="tui-full-calendar-weekday-resize-handle handle-y" style="line-height: 24px;">&nbsp;</span>
+            </div>
+        </div>
+    </div>
+    </div></div><div class="tui-full-calendar-month-week-item" style="height: 16.6667%;"><div class="tui-full-calendar-weekday tui-view-55"><div class="tui-full-calendar-weekday-border" style="
+        border-top: 1px solid #e5e5e5;
+    "></div>
+    <div class="tui-full-calendar-weekday-grid">
+    <div class="tui-full-calendar-weekday-grid-line tui-full-calendar-holiday-sun tui-full-calendar-near-month-day tui-full-calendar-extra-date" style="width:14.285714285714286%; left:0%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: rgba(255, 64, 64, 0.4);"><span class="tui-full-calendar-weekday-grid-date">2</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: rgba(255, 64, 64, 0.4);"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day tui-full-calendar-extra-date" style="width:14.285714285714286%; left:14.285714285714286%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: rgba(51, 51, 51, 0.4);"><span class="tui-full-calendar-weekday-grid-date">3</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: rgba(51, 51, 51, 0.4);"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day tui-full-calendar-extra-date" style="width:14.285714285714286%; left:28.571428571428573%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: rgba(51, 51, 51, 0.4);"><span class="tui-full-calendar-weekday-grid-date">4</span></span>
+                    <span class="tui-full-calendar-weekday-exceed-in-month" data-ymd="20221004"><span class="tui-full-calendar-weekday-grid-more-schedules">1 more</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: rgba(51, 51, 51, 0.4);"></span>
+                    <span class="tui-full-calendar-weekday-exceed-in-month" data-ymd="20221004"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day tui-full-calendar-extra-date" style="width:14.285714285714286%; left:42.85714285714286%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: rgba(51, 51, 51, 0.4);"><span class="tui-full-calendar-weekday-grid-date">5</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: rgba(51, 51, 51, 0.4);"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day tui-full-calendar-extra-date" style="width:14.285714285714286%; left:57.142857142857146%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: rgba(51, 51, 51, 0.4);"><span class="tui-full-calendar-weekday-grid-date">6</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: rgba(51, 51, 51, 0.4);"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line  tui-full-calendar-near-month-day tui-full-calendar-extra-date" style="width:14.285714285714286%; left:71.42857142857143%; background-color: inherit; font-size: 14px;
+            border-right:1px solid #e5e5e5;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: rgba(51, 51, 51, 0.4);"><span class="tui-full-calendar-weekday-grid-date">7</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: rgba(51, 51, 51, 0.4);"></span>
+            </div>
+        </div>
+    <div class="tui-full-calendar-weekday-grid-line tui-full-calendar-holiday-sat tui-full-calendar-near-month-day tui-full-calendar-extra-date" style="width:14.285714285714286%; left:85.71428571428572%; background-color: inherit; font-size: 14px;
+            ">
+            <div class="tui-full-calendar-weekday-grid-header">
+                <span style="color: rgba(51, 51, 51, 0.4);"><span class="tui-full-calendar-weekday-grid-date">8</span></span>
+            </div>
+            <div class="tui-full-calendar-weekday-grid-footer">
+                <span style="color: rgba(51, 51, 51, 0.4);"></span>
+            </div>
+        </div>
+    </div>
+    <div class="tui-full-calendar-weekday-schedules">
+
+
+    <div data-id="41" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-41
+
+                " style="top:34px;left:14.285714285714286%;width:28.571428571428573%;height:0px;
+                    margin-top:2px">
+            <div data-schedule-id="f99bd033-c74f-5d27-bd99-bd00fe666e13" data-calendar-id="8" class="tui-full-calendar-weekday-schedule " style="height:24px; line-height:24px; border-radius: 2px;
+                        margin-left: 8px;
+                        margin-right: 8px;
+                        color:#ffffff; background-color:#d22d3d; border-color:#d22d3d;
+                        ">
+                <span class="tui-full-calendar-weekday-schedule-title" data-title="Neijuf tadegme cucili." title="Neijuf tadegme cucili."><span class="calendar-font-icon ic-readonly-b"></span> Neijuf tadegme cucili.</span>
+
+            </div>
+        </div>
+
+
+    <div data-id="26" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-26
+
+                " style="top:60px;left:28.571428571428573%;width:28.571428571428573%;height:0px;
+                    margin-top:2px">
+            <div data-schedule-id="af418fc0-c91b-56d4-8479-e54c63eebfda" data-calendar-id="3" class="tui-full-calendar-weekday-schedule " style="height:24px; line-height:24px; border-radius: 2px;
+                        margin-left: 8px;
+                        margin-right: 8px;
+                        color:#ffffff; background-color:#47cf60; border-color:#47cf60;
+                        ">
+                <span class="tui-full-calendar-weekday-schedule-title" data-title="Egijezzo pinbe agijenev." title="Egijezzo pinbe agijenev."><span class="calendar-font-icon ic-readonly-b"></span> Egijezzo pinbe agijenev.</span>
+
+            </div>
+        </div>
+
+
+
+
+
+    <div data-id="27" class="tui-full-calendar-weekday-schedule-block
+                    tui-full-calendar-weekday-schedule-block-27
+
+                " style="top:34px;left:0%;width:14.285714285714286%;height:0px;
+                    margin-top:2px">
+                    <div data-schedule-id="c93f619d-28bb-54a2-8ab0-fae16069dcb6" data-calendar-id="3" class="tui-full-calendar-weekday-schedule tui-full-calendar-weekday-schedule-time" style="height:24px; line-height:24px; ">
+                        <span class="tui-full-calendar-weekday-schedule-bullet" style="top: 8px;
+                                    background:#47cf60
+                                "></span>
+                        <span class="tui-full-calendar-weekday-schedule-title" style="
+                                    color:#333;
+                                " data-title="Peglogsis tidegzoh zodidsul." title="Peglogsis tidegzoh zodidsul."><strong>06:00</strong> <span class="calendar-font-icon ic-readonly-b"></span> Peglogsis tidegzoh zodidsul.</span>
+                    </div>
+        </div>
+    </div>
+    </div></div></div></div><div class="tui-full-calendar-floating-layer tui-view-9" style="display: none; position: absolute;"></div><div class="tui-full-calendar-floating-layer tui-view-14" style="display: none; position: absolute;"></div><div class="tui-full-calendar-floating-layer tui-view-17" style="display: none; position: absolute;"></div></div></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+    <!-- Container-fluid Ends-->
+</div>
+
+
+
+
+{{>web/layouts/fullNavFooter}}

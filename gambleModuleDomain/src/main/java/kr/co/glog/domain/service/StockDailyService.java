@@ -69,7 +69,7 @@ public class StockDailyService {
 
         StockDaily stockDaily = new StockDaily();
         stockDaily.setTradeDate( daumInvestorStock.getDate().substring(0, 10).replaceAll("-", "") ) ;
-        stockDaily.setVolumeOrg( daumInvestorStock.getInstitutionCumulativeStraightPurchaseVolume() );
+        stockDaily.setVolumeOrg( daumInvestorStock.getInstitutionStraightPurchaseVolume() );
         stockDaily.setVolumeForeigner( daumInvestorStock.getForeignStraightPurchaseVolume() );
         stockDaily.setForeignerStockCount( daumInvestorStock.getForeignOwnShares() );
         stockDaily.setForeignerHoldRate( daumInvestorStock.getForeignOwnSharesRate() );

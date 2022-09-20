@@ -14,4 +14,6 @@ import org.apache.ibatis.type.Alias;
 public class StockParam extends Stock {
 
     PagingParam pagingParam = new PagingParam();
+
+    String  startStockCode;             // 검색 전용.. 시작 주식코드
 }

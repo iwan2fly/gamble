@@ -46,19 +46,38 @@ public class DaumDailyInvestorScrapper {
     private Document getDocument(String stockCode, int perPage, int page ) throws ApplicationRuntimeException {
         if ( perPage > 100 ) perPage = 100;     // 페이지당 100개가 한계
 
-        Document document	= null;
-        String url	=  "https://finance.daum.net/api/charts/investors/days?symbolCode=##header####stockCode##&page=##page##&perPage=##perPage##";
-        url = url.replaceAll( "##stockCode##", stockCode );
-        url = url.replaceAll( "##page##", ""+page );
-        url = url.replaceAll( "##perPage##", ""+perPage );
-
         String header = "A";                    // 일반 주식은 다음에서 A로 시작
         if ( stockCode.charAt(0) == '5' || stockCode.charAt(0) == '6' || stockCode.charAt(0) == '7' ) header = "Q";         // ETN은 Q로 시작하고 500000번대..
-        url = url.replaceAll( "##header##", ""+header );
+        String symbolCode = header + stockCode;
+
+        Document document	= null;
+        String url = "https://finance.daum.net/api/investor/days?page=##page##&perPage=##perPage##&symbolCode=##symbolCode##&pagination=true";
+        url = url.replaceAll( "##symbolCode##", symbolCode );
+        url = url.replaceAll( "##page##", ""+page );
+        url = url.replaceAll( "##perPage##", ""+perPage );
         log.debug( url );
 
         try {
-            document = Jsoup.connect(url).header("referer", "https://finance.daum.net/domestic/market_cap").ignoreContentType(true).get();
+            String referer = "https://finance.daum.net/quotes/" + symbolCode;
+            boolean isRead = false;
+            int retryCount = 0;
+            while ( !isRead ) {
+                if ( retryCount >= 3 ) break;
+                try {
+                    document = Jsoup.connect(url).header("referer", referer ).ignoreContentType(true).get();
+                    isRead = true;
+                    break;
+                } catch ( Exception e ) {
+                    e.printStackTrace();
+                    retryCount++;
+                    Thread.sleep( 3000 );
+                }
+            }
+
+            if ( !isRead ) {
+                throw new ApplicationRuntimeException( "다음 특정 종목의 투자자별 데이터를 읽는 중 오류가 발생했습니다.");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new ApplicationRuntimeException( "다음 특정 종목의 투자자별 데이터를 읽는 중 오류가 발생했습니다.");
@@ -81,8 +100,8 @@ public class DaumDailyInvestorScrapper {
         try {
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject)jsonParser.parse( document.text() );
-            log.debug( jsonObject.get("totalPage").toString() );
-            totalPages = Integer.parseInt( jsonObject.get("totalPage").toString() );             // 목록의 전체 페이지
+            log.debug( jsonObject.get("totalPages").toString() );
+            totalPages = Integer.parseInt( jsonObject.get("totalPages").toString() );             // 목록의 전체 페이지
         } catch ( Exception e ) {
             e.printStackTrace();
             throw new ApplicationRuntimeException( "특정 종목 투자자별 가격 데이터 페이지 개수를 읽는 중 오류가 발생했습니다.");
@@ -116,8 +135,28 @@ public class DaumDailyInvestorScrapper {
      */
     public ArrayList<DaumInvestorStock> getDailyInvestorList( String stockCode, int perPage, int page ) throws ApplicationRuntimeException {
 
-        Document document	= getDocument(stockCode, perPage, page);;
-        return getDailyInvestorList( document );
+        ArrayList<DaumInvestorStock> list = null;
+        boolean isRead = false;
+        int retryCount = 0;
+
+        while ( !isRead ) {
+            if ( retryCount >=3 ) {
+                throw new ApplicationRuntimeException( "투자자별월별 데이터를 제대로 읽지 못했습니다.");
+            }
+
+            try {
+                Document document = getDocument(stockCode, perPage, page);
+                list = getDailyInvestorList(document);
+                isRead = true;
+            } catch (Exception e) {
+                retryCount++;
+                try {
+                    Thread.sleep(3000);
+                } catch ( Exception ee ) {}
+            }
+        }
+
+        return list;
 
     }
 
@@ -153,7 +192,7 @@ public class DaumDailyInvestorScrapper {
      * 특정 종목의 전체 투자자별 데이터를 StockDaily 테이블에 업데이트
      * @param stockCode
      */
-    public void updateDailyInvestorFullData( String stockCode  ) {
+    public void updateDailyInvestorFullData( String stockCode  ) throws InterruptedException {
 
         int perPage = 100;
 
