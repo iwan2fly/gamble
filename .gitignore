@@ -327,3 +327,5 @@ DerivedData/
 **/src/test/resources/
 /gradlew.bat
 /gradlew
+/gambleAppWeb/CORPCODE.xml
+/gambleAppWeb/corpCode.zip
