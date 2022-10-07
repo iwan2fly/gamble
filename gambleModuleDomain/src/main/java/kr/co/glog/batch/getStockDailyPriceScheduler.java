@@ -249,7 +249,7 @@ public class getStockDailyPriceScheduler {
      * DART의 고유번호 파일 다운로드 받아서, 있는 건 업데이트하고, 없는 건 등록
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 12 10 27 * * ")
+    @Scheduled(cron = "0 11 14 07 * * ")
     public void updateCorpCode() throws InterruptedException {
 
         log.info( "corpCodeApi START" );
@@ -294,7 +294,7 @@ public class getStockDailyPriceScheduler {
      *  한국예탁결제원_주식정보서비스 : 시장별 단축코드 전체 조회
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 58 11 04 * * ")
+    @Scheduled(cron = "0 48 10 07 * * ")
     public void getShortByMart() throws InterruptedException {
 
         log.info( "Seibro getShorTbyMartN1 START" );
