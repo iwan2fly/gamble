@@ -1,8 +1,8 @@
 package kr.co.glog.external.dartApi;
 
 import kr.co.glog.common.exception.ApplicationRuntimeException;
-import kr.co.glog.domain.stock.dao.DartCompanyDao;
-import kr.co.glog.domain.stock.entity.DartCompany;
+import kr.co.glog.domain.stock.dao.CompanyDao;
+import kr.co.glog.domain.stock.entity.Company;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -28,10 +28,10 @@ import java.util.zip.ZipInputStream;
 @RequiredArgsConstructor
 public class DartCorpCodeApi {
 
-    private final DartCompanyDao DartCompanyDao;
+    private final CompanyDao companyDao;
 
     // 기본 URL
-    public static String url = "https://opendart.fss.or.kr/api/corpCode.xml?crtfc_key=4324bafbe5c2c9436bc1bdc4ccb907adc3c41110";
+    public static String url = "https://opendart.fss.or.kr/api/corpCode.xml?crtfc_key=" + DartKey.DART_CRTFC_KRY;
 
     /**
      * DART API로 코드 파일 받아서 DB 업데이트
@@ -98,7 +98,7 @@ public class DartCorpCodeApi {
      */
     public void parse( File file ) {
 
-        ArrayList<DartCompany> DartCompanyList = new ArrayList<DartCompany>();
+        ArrayList<Company> companyList = new ArrayList<Company>();
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -113,21 +113,21 @@ public class DartCorpCodeApi {
                 if ( node.getNodeType() == Node.ELEMENT_NODE ) {
 
                     Element element = (Element) node;
-                    DartCompany DartCompany = new DartCompany();
+                    Company Company = new Company();
 
                     Node childNode = element.getElementsByTagName("corp_code").item(0);
-                    DartCompany.setCorpCode( childNode.getChildNodes().item(0).getNodeValue() );
+                    Company.setCompanyCode( childNode.getChildNodes().item(0).getNodeValue() );
 
                     childNode = element.getElementsByTagName("corp_name").item(0);
-                    DartCompany.setCompanyName( childNode.getChildNodes().item(0).getNodeValue() );
+                    Company.setCompanyName( childNode.getChildNodes().item(0).getNodeValue() );
 
                     childNode = element.getElementsByTagName("stock_code").item(0);
-                    DartCompany.setStockCode( childNode.getChildNodes().item(0).getNodeValue().trim() );
+                    Company.setStockCode( childNode.getChildNodes().item(0).getNodeValue().trim() );
 
                     childNode = element.getElementsByTagName("modify_date").item(0);
-                    DartCompany.setModifyDate( childNode.getChildNodes().item(0).getNodeValue() );
+                    Company.setModifyDate( childNode.getChildNodes().item(0).getNodeValue() );
 
-                    DartCompanyList.add( DartCompany );
+                    companyList.add(Company);
                 }
             }
 
@@ -136,7 +136,7 @@ public class DartCorpCodeApi {
             throw new ApplicationRuntimeException("DART 고유번호 XML 파일을 읽는 중 오류가 발생했습니다.");
         }
 
-        for ( DartCompany DartCompany : DartCompanyList ) {
+        for ( Company Company : companyList) {
             /*
             try {
                 log.debug(DartCompany.toString());
@@ -147,9 +147,9 @@ public class DartCorpCodeApi {
             */
 
             try {
-                log.debug(DartCompany.toString());
-                if ( DartCompanyDao.updateDartCompany( DartCompany ) == 0 ) {
-                    DartCompanyDao.insertDartCompany( DartCompany );
+                log.debug(Company.toString());
+                if ( companyDao.updateCompany(Company) == 0 ) {
+                    companyDao.insertCompany(Company);
                 };
             } catch ( Exception e ) {
 

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.glog.domain.stock.mapper.CompanyMapper">
+
+    <insert id="insertCompany" parameterType="company" keyProperty="companyCode">
+        INSERT INTO company
+            ( companyCode, companyName, companyNameEng, stockName, stockCode, ceoName, companyClass, companyNo, businessNo, address, homepage, ir, phone, fax, industryCode, establishDate, accountsMonth, modifyDate, insertTime, updateTime )
+        VALUES
+            ( #{companyCode}, #{companyName}, #{companyNameEng}, #{stockName}, #{stockCode}, #{ceoName}, #{companyClass}, #{companyNo}, #{businessNo}, #{address}, #{homepage}, #{ir}, #{phone}, #{fax}, #{industryCode}, #{establishDate}, #{accountsMonth}, #{modifyDate}, now(), now() )
+    </insert>
+
+    <insert id="insertscompany" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="sotckId" keyProperty="companyCode">
+        INSERT INTO company
+        ( companyCode, companyName, companyNameEng, stockName, stockCode, ceoName, companyClass, companyNo, businessNo, address, homepage, ir, phone, fax, industryCode, establishDate, accountsMonth, modifyDate, insertTime, updateTime )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," open="" close="">
+            ( #{item.companyCode}, #{item.companyName}, #{item.companyNameEng}, #{item.stockName}, #{item.stockCode}, #{item.ceoName}, #{item.companyClass}, #{item.companyNo}, #{item.businessNo}, #{item.address}, #{item.homepage}, #{item.ir}, #{item.phone}, #{item.fax}, #{item.industryCode}, #{item.establishDate}, #{item.accountsMonth}, #{item.modifyDate}, now(), now() )
+        </foreach>
+    </insert>
+
+    <update id="updateCompany" parameterType="company">
+        UPDATE 	company
+        SET
+        <trim prefix="" suffixOverrides=",">
+            <if test="companyName != null">companyName = #{companyName},</if>
+            <if test="companyNameEng != null">companyNameEng = #{companyNameEng},</if>
+            <if test="stockName != null">stockName = #{stockName},</if>
+            <if test="stockCode != null">stockCode = #{stockCode},</if>
+            <if test="ceoName != null">ceoName = #{ceoName},</if>
+            <if test="companyClass != null">companyClass = #{companyClass},</if>
+            <if test="companyNo != null">companyNo = #{companyNo},</if>
+            <if test="businessNo != null">businessNo = #{businessNo},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="homepage != null">homepage = #{homepage},</if>
+            <if test="ir != null">ir = #{ir},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="fax != null">fax = #{fax},</if>
+            <if test="industryCode != null">industryCode = #{industryCode},</if>
+            <if test="establishDate != null">establishDate = #{establishDate},</if>
+            <if test="accountsMonth != null">accountsMonth = #{accountsMonth},</if>
+            <if test="modifyDate != null">modifyDate = #{modifyDate},</if>
+            updateTime = now()
+        </trim>
+        WHERE company.companyCode=#{companyCode}
+    </update>
+
+    <delete id="deleteCompany" parameterType="company">
+        DELETE FROM company
+        WHERE 	companyCode=#{companyCode}
+    </delete>
+
+    <select id="selectCompanyList" parameterType="companyParam" resultType="companyResult" >
+        SELECT 	company.*
+        FROM 	company
+        <include refid="whereCompany" ></include>
+        <include refid="orderCompany" ></include>
+    </select>
+
+    <select id="selectCompanyListCount" parameterType="companyParam" resultType="java.lang.Integer">
+        SELECT 	COUNT(*)
+        FROM   	company
+        <include refid="whereCompany" ></include>
+    </select>
+
+    <sql id="whereCompany">
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="companyCode != null and companyCode != ''">AND company.companyCode=#{companyCode}</if>
+                <if test="companyName != null and companyName != ''">AND company.companyName=#{companyName}</if>
+                <if test="companyNameEng != null and companyNameEng != ''">AND company.companyNameEng=#{companyNameEng}</if>
+                <if test="stockName != null and stockName != ''">AND company.stockName=#{stockName}</if>
+                <if test="stockCode != null and stockCode != ''">AND company.stockCode=#{stockCode}</if>
+                <if test="ceoName != null and ceoName != ''">AND company.ceoName=#{ceoName}</if>
+                <if test="companyClass != null and companyClass != ''">AND company.companyClass=#{companyClass}</if>
+                <if test="companyNo != null and companyNo != ''">AND company.companyNo=#{companyNo}</if>
+                <if test="businessNo != null and businessNo != ''">AND company.businessNo=#{businessNo}</if>
+                <if test="address != null and address != ''">AND company.address=#{address}</if>
+                <if test="homepage != null and homepage != ''">AND company.homepage=#{homepage}</if>
+                <if test="ir != null and ir != ''">AND company.ir=#{ir}</if>
+                <if test="phone != null and phone != ''">AND company.phone=#{phone}</if>
+                <if test="fax != null and fax != ''">AND company.fax=#{fax}</if>
+                <if test="industryCode != null and industryCode != ''">AND company.industryCode=#{industryCode}</if>
+                <if test="establishDate != null and establishDate != ''">AND company.establishDate=#{establishDate}</if>
+                <if test="accountsMonth != null and accountsMonth != ''">AND company.accountsMonth=#{accountsMonth}</if>
+                <if test="modifyDate != null and modifyDate != ''">AND company.modifyDate=#{modifyDate}</if>
+                <if test="hasStockCode != null and hasStockCode != ''">AND ( stockCode is not null AND stockCode !='' )</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND company.corpName like CONCAT('%',#{pagingParam.filter},'%')</if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="orderCompany">
+        <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
+            <choose>
+                <when test="pagingParam.sortIndex eq 'companyCode'">companyCode</when>
+                <when test="pagingParam.sortIndex eq 'companyName'">companyName</when>
+                <when test="pagingParam.sortIndex eq 'companyNameEng'">companyNameEng</when>
+                <when test="pagingParam.sortIndex eq 'stockName'">stockName</when>
+                <when test="pagingParam.sortIndex eq 'stockCode'">stockCode</when>
+                <when test="pagingParam.sortIndex eq 'ceoName'">ceoName</when>
+                <when test="pagingParam.sortIndex eq 'comapnyClass'">companyClass</when>
+                <when test="pagingParam.sortIndex eq 'companyNo'">companyNo</when>
+                <when test="pagingParam.sortIndex eq 'businessNo'">businessNo</when>
+                <when test="pagingParam.sortIndex eq 'address'">address</when>
+                <when test="pagingParam.sortIndex eq 'homepage'">homepage</when>
+                <when test="pagingParam.sortIndex eq 'ir'">ir</when>
+                <when test="pagingParam.sortIndex eq 'phone'">phone</when>
+                <when test="pagingParam.sortIndex eq 'fax'">fax</when>
+                <when test="pagingParam.sortIndex eq 'industryCode'">industryCode</when>
+                <when test="pagingParam.sortIndex eq 'establishDate'">establishDate</when>
+                <when test="pagingParam.sortIndex eq 'accountsMonth'">accountsMonth</when>
+                <when test="pagingParam.sortIndex eq 'modifyDate'">modifyDate</when>
+                <otherwise>companyCode</otherwise>
+            </choose>
+            <choose>
+                <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
+                <otherwise>ASC</otherwise>
+            </choose>
+        </if>
+        <if test="pagingParam.rows gt 0">
+            LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}
+        </if>
+    </sql>
+    
+</mapper>

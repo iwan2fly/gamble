@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.glog.domain.stock.mapper.CompanyFinancialInfoMapper">
+
+    <insert id="insertCompanyFinancialInfo" parameterType="CompanyFinancialInfo" keyProperty="receiptNumber">
+        INSERT INTO companyFinancialInfo
+            ( receiptNumber, companyCode, reportCode, year, subjectDiv, subjectName, accountId, accountName, accountDetail, kiName, kiAmount, prevKiName, prevKiAmount, prev2KiName, prev2KiAmount, infoOrder, currency, insertTime, updateTime )
+        VALUES
+            ( #{receiptNumber}, #{companyCode}, #{reportCode}, #{year}, #{subjectDiv}, #{subjectName}, #{accountId}, #{accountName}, #{accountDetail}, #{kiName}, #{kiAmount}, #{prevKiName}, #{prevKiAmount}, #{prev2KiName}, #{prev2KiAmount}, #{infoOrder}, #{currency}, now(), now() )
+    </insert>
+
+    <insert id="insertsCompanyFinancialInfo" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="sotckId" keyProperty="CompanyFinancialInfoCode">
+        INSERT INTO companyFinancialInfo
+            ( receiptNumber, companyCode, reportCode, year, subjectDiv, subjectName, accountId, accountName, accountDetail, kiName, kiAmount, prevKiName, prevKiAmount, prev2KiName, prev2KiAmount, infoOrder, currency, insertTime, updateTime )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," open="" close="">
+            ( #{item.receiptNumber}, #{item.companyCode}, #{item.reportCode}, #{item.year}, #{item.subjectDiv}, #{item.subjectName}, #{item.accountId}, #{item.accountName}, #{item.accountDetail}, #{item.kiName}, #{item.kiAmount}, #{item.prevKiName}, #{item.prevKiAmount}, #{item.prev2KiName}, #{item.prev2KiAmount}, #{item.infoOrder}, #{item.currency}, now(), now() )
+        </foreach>
+    </insert>
+
+    <update id="updateCompanyFinancialInfo" parameterType="CompanyFinancialInfo">
+        UPDATE 	companyFinancialInfo
+        SET
+        <trim prefix="" suffixOverrides=",">
+            <if test="companyCode != null">companyCode = #{companyCode},</if>
+            <if test="reportCode != null">reportCode = #{reportCode},</if>
+            <if test="year != null">year = #{year},</if>
+            <if test="subjectDiv != null">subjectDiv = #{subjectDiv},</if>
+            <if test="subjectName != null">subjectName = #{subjectName},</if>
+            <if test="accountId != null">accountId = #{accountId},</if>
+            <if test="accountName != null">accountName = #{accountName},</if>
+            <if test="accountDetail != null">accountDetail = #{accountDetail},</if>
+            <if test="kiName != null">kiName = #{kiName},</if>
+            <if test="kiAmount != null">kiAmount = #{kiAmount},</if>
+            <if test="prevKiName != null">prevKiName = #{prevKiName},</if>
+            <if test="prevKiAmount != null">prevKiAmount = #{prevKiAmount},</if>
+            <if test="prev2KiName != null">prev2KiName = #{prev2KiName},</if>
+            <if test="prev2KiAmount != null">prev2KiAmount = #{prev2KiAmount},</if>
+            <if test="infoOrder != null">infoOrder = #{infoOrder},</if>
+            <if test="currency != null">currency = #{currency},</if>
+            updateTime = now()
+        </trim>
+        WHERE companyFinancialInfo.companyCode=#{companyCode}
+        AND   companyFinancialInfo.reportCode=#{reportCode}
+        AND   companyFinancialInfo.year=#{year}
+        AND   companyFinancialInfo.subjectDiv=#{subjectDiv}
+        AND   companyFinancialInfo.accountName=#{accountName}
+    </update>
+
+    <delete id="deleteCompanyFinancialInfo" parameterType="CompanyFinancialInfo">
+        DELETE FROM companyFinancialInfo
+        WHERE companyFinancialInfo.companyCode=#{companyCode}
+          AND   companyFinancialInfo.reportCode=#{reportCode}
+          AND   companyFinancialInfo.year=#{year}
+          AND   companyFinancialInfo.subjectDiv=#{subjectDiv}
+          AND   companyFinancialInfo.accountName=#{accountName}
+    </delete>
+
+    <select id="selectCompanyFinancialInfoList" parameterType="CompanyFinancialInfoParam" resultType="CompanyFinancialInfoResult" >
+        SELECT 	companyFinancialInfo.*
+        FROM 	companyFinancialInfo
+        <include refid="whereCompanyFinancialInfo" ></include>
+        <include refid="orderCompanyFinancialInfo" ></include>
+    </select>
+
+    <select id="selectCompanyFinancialInfoListCount" parameterType="CompanyFinancialInfoParam" resultType="java.lang.Integer">
+        SELECT 	COUNT(*)
+        FROM   	companyFinancialInfo
+        <include refid="whereCompanyFinancialInfo" ></include>
+    </select>
+
+    <sql id="whereCompanyFinancialInfo">
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="receiptNumber != null and receiptNumber != ''">AND companyFinancialInfo.receiptNumber=#{receiptNumber}</if>
+                <if test="companyCode != null and companyCode != ''">AND companyFinancialInfo.companyCode=#{companyCode}</if>
+                <if test="reportCode != null and reportCode != ''">AND companyFinancialInfo.reportCode=#{reportCode}</if>
+                <if test="year != null and year != ''">AND companyFinancialInfo.year=#{year}</if>
+                <if test="subjectDiv != null and subjectDiv != ''">AND companyFinancialInfo.subjectDiv=#{subjectDiv}</if>
+                <if test="subjectName != null and subjectName != ''">AND companyFinancialInfo.subjectName=#{subjectName}</if>
+                <if test="accountId != null and accountId != ''">AND companyFinancialInfo.accountId=#{accountId}</if>
+                <if test="accountName != null and accountName != ''">AND companyFinancialInfo.accountName=#{accountName}</if>
+                <if test="accountDetail != null and accountDetail != ''">AND companyFinancialInfo.accountDetail=#{accountDetail}</if>
+                <if test="kiName != null and kiName != ''">AND companyFinancialInfo.kiName=#{kiName}</if>
+                <if test="kiAmount != null and kiAmount != ''">AND companyFinancialInfo.kiAmount=#{kiAmount}</if>
+                <if test="prevKiName != null and prevKiName != ''">AND companyFinancialInfo.prevKiName=#{prevKiName}</if>
+                <if test="prevKiAmount != null and prevKiAmount != ''">AND companyFinancialInfo.prevKiAmount=#{prevKiAmount}</if>
+                <if test="prev2KiName != null and prev2KiName != ''">AND companyFinancialInfo.prev2KiName=#{prev2KiName}</if>
+                <if test="prev2KiAmount != null and prev2KiAmount != ''">AND companyFinancialInfo.prev2KiAmount=#{prev2KiAmount}</if>
+                <if test="infoOrder != null and infoOrder != ''">AND companyFinancialInfo.infoOrder=#{infoOrder}</if>
+                <if test="currency != null and currency != ''">AND companyFinancialInfo.currency=#{currency}</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND companyFinancialInfo.companyCode like CONCAT('%',#{pagingParam.filter},'%')</if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="orderCompanyFinancialInfo">
+        <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
+            <choose>
+                <when test="pagingParam.sortIndex eq 'receiptNumber'">receiptNumber</when>
+                <when test="pagingParam.sortIndex eq 'companyCode'">companyCode</when>
+                <when test="pagingParam.sortIndex eq 'reportCode'">reportCode</when>
+                <when test="pagingParam.sortIndex eq 'year'">year</when>
+                <when test="pagingParam.sortIndex eq 'subjectDiv'">subjectDiv</when>
+                <when test="pagingParam.sortIndex eq 'subjectName'">subjectName</when>
+                <when test="pagingParam.sortIndex eq 'accountId'">accountId</when>
+                <when test="pagingParam.sortIndex eq 'accountName'">accountName</when>
+                <when test="pagingParam.sortIndex eq 'accountDetail'">accountDetail</when>
+                <when test="pagingParam.sortIndex eq 'kiName'">kiName</when>
+                <when test="pagingParam.sortIndex eq 'kiAmount'">kiAmount</when>
+                <when test="pagingParam.sortIndex eq 'prevKiName'">prevKiName</when>
+                <when test="pagingParam.sortIndex eq 'prevKiAmount'">prevKiAmount</when>
+                <when test="pagingParam.sortIndex eq 'prev2KiName'">prev2KiName</when>
+                <when test="pagingParam.sortIndex eq 'prev2KiAmount'">prev2KiAmount</when>
+                <when test="pagingParam.sortIndex eq 'infoOrder'">infoOrder</when>
+                <when test="pagingParam.sortIndex eq 'currency'">currency</when>
+                <otherwise>receiptNumber</otherwise>
+            </choose>
+            <choose>
+                <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
+                <otherwise>ASC</otherwise>
+            </choose>
+        </if>
+        <if test="pagingParam.rows gt 0">
+            LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}
+        </if>
+    </sql>
+    
+</mapper>

@@ -3,22 +3,22 @@ package kr.co.glog.batch;
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
-import kr.co.glog.domain.stock.dao.DartCompanyDao;
+import kr.co.glog.domain.stock.dao.CompanyDao;
+import kr.co.glog.domain.stock.dao.CompanyFinancialInfoDao;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.model.*;
 import kr.co.glog.external.dartApi.DartCompanyApi;
 import kr.co.glog.external.dartApi.DartCorpCodeApi;
+import kr.co.glog.external.dartApi.DartFinancialAllApi;
 import kr.co.glog.external.datagokr.seibro.GetShortnByMartN1;
 import kr.co.glog.external.datagokr.seibro.GetStkIsinByShortIsinN1;
-import kr.co.glog.external.datagokr.seibro.model.GetShortByMartN1Result;
 import kr.co.glog.external.daumFinance.DaumDailyInvestorScrapper;
 import kr.co.glog.external.daumFinance.DaumDailyStockScrapper;
 import kr.co.glog.external.daumFinance.StockRankingScrapper;
 import kr.co.glog.external.naverStock.NaverDailyStockPriceScrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.nodes.Document;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -35,11 +35,13 @@ public class getStockDailyPriceScheduler {
     private final DaumDailyInvestorScrapper daumDailyInvestorScrapper;
     private final StockDao stockDao;
     private final StockDailyDao stockDailyDao;
-    private final DartCompanyDao dartCompanyDao;
+    private final CompanyDao companyDao;
     private final DartCorpCodeApi dartCorpCodeApi;
     private final DartCompanyApi dartCompanyApi;
     private final GetShortnByMartN1 getShorByMartN1;
     private final GetStkIsinByShortIsinN1 getStkIsinByShortIsinN1;
+    private final DartFinancialAllApi dartFinancialAllApi;
+    private final CompanyFinancialInfoDao companyFinancialInfoDao;
 
     //스프링 스케줄러 / 쿼츠 크론 표현식
     //초		분		시		일			월		요일			연도
@@ -174,7 +176,7 @@ public class getStockDailyPriceScheduler {
 
 
     // 다음 증권 일별가격 첫 페이지 ( 10개 ) 만 Upsert
-    @Scheduled(cron = "0 46 15 * * *")
+    @Scheduled(cron = "0 04 21 * * *")
     public void stockDailyDataUpsert() throws InterruptedException {
 
         log.info( "다음증권 일별 데이터 전 종목 첫페이지 Upsert 시작 ");
@@ -214,6 +216,7 @@ public class getStockDailyPriceScheduler {
                     daumDailyStockScrapper.upsertDailyStock(stockResult.getStockCode());
                     isSuccess = true;
                 } catch ( Exception e ) {
+                    e.printStackTrace();
                     isSuccess = false;
                 }
 
@@ -230,6 +233,7 @@ public class getStockDailyPriceScheduler {
                     daumDailyInvestorScrapper.upsertDailyStock( stockResult.getStockCode() );
                     isSuccess = true;
                 } catch ( Exception e ) {
+                    e.printStackTrace();
                     isSuccess = false;
                 }
 
@@ -267,19 +271,19 @@ public class getStockDailyPriceScheduler {
      * @throws InterruptedException
      */
     @Scheduled(cron = "0 16 14 04 * * ")
-    public void updateDartCompany() throws InterruptedException {
+    public void updateCompany() throws InterruptedException {
 
         log.info( "corpCodeApi START" );
         try {
-            DartCompanyParam dartCompanyParam = new DartCompanyParam();
-            dartCompanyParam.setHasStockCode( true );
-            ArrayList<DartCompanyResult> dartCompanyList = dartCompanyDao.getDartCompanyList( dartCompanyParam );
+            CompanyParam CompanyParam = new CompanyParam();
+            CompanyParam.setHasStockCode( true );
+            ArrayList<CompanyResult> CompanyList = companyDao.getCompanyList( CompanyParam );
             int index=0;
 
-            for ( DartCompanyResult dartCorpResult : dartCompanyList ) {
+            for ( CompanyResult dartCorpResult : CompanyList ) {
                 index++;
                 log.debug( index + " :" + dartCorpResult.toString() );
-                dartCompanyApi.updateDartCompany(dartCorpResult.getCorpCode());
+                dartCompanyApi.updateCompany(dartCorpResult.getCompanyCode());
                 Thread.sleep( 100 );        // DART 의 경우 1분에 1000회 이상 호출할경우 24시간 IP 차단 방지
             }
 
@@ -307,4 +311,49 @@ public class getStockDailyPriceScheduler {
         log.info( "coprCodeApi END" );
 
     }
+
+
+    /**
+     *  DART 의 고유번호로 전체 재무정보 가져와서 있는 건 업데이트하고, 없는 건 등록
+     * @throws InterruptedException
+     */
+    @Scheduled(cron = "0 34 13 13 * * ")
+    public void updateCompanyFinancialInfo() throws InterruptedException {
+
+        log.info( "dartFinancialApi START" );
+        try {
+            CompanyParam CompanyParam = new CompanyParam();
+            CompanyParam.setHasStockCode( true );
+            ArrayList<CompanyResult> companyList = companyDao.getCompanyList( CompanyParam );
+
+            for ( int i = companyList.size()-1; i >= 0; i-- ) {
+                CompanyResult companyResult = companyList.get(i);
+
+                // 이미 한개라도 재무정보가 들어가 있으면 패스
+                CompanyFinancialInfoParam companyFinancialInfoParam = new CompanyFinancialInfoParam();
+                companyFinancialInfoParam.setCompanyCode( companyResult.getCompanyCode() );
+                ArrayList<CompanyFinancialInfoResult> financialList = companyFinancialInfoDao.getCompanyFinancialInfoList( companyFinancialInfoParam );
+                if ( financialList != null && financialList.size() > 0 ) continue;
+            //for ( CompanyResult companyResult : companyList ) {
+
+                log.debug( companyResult.getCompanyCode() + " : " + companyResult.getCompanyName() + " : " + companyResult.getStockCode() );
+                if ( companyResult.getStockCode() == null || companyResult.getStockCode().trim().equals("") ) {
+                    log.debug( "NO StockCode" );
+                    continue;
+                }
+
+                dartFinancialAllApi.updateCompanyFinancialInfo(  companyResult.getCompanyCode(), "2020", "11011", "OFS"  );
+                dartFinancialAllApi.updateCompanyFinancialInfo(  companyResult.getCompanyCode(), "2020", "11011", "CFS"  );
+
+                Thread.sleep( 100 );
+
+            }
+
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
+        log.info( "dartFinancialApi END" );
+
+    }
+
 }

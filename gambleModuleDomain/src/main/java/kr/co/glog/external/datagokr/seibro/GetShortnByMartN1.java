@@ -3,12 +3,9 @@ package kr.co.glog.external.datagokr.seibro;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.domain.service.StockService;
-import kr.co.glog.domain.stock.dao.DartCompanyDao;
-import kr.co.glog.domain.stock.dao.StockDao;
-import kr.co.glog.domain.stock.entity.DartCompany;
+import kr.co.glog.domain.stock.dao.CompanyDao;
 import kr.co.glog.domain.stock.entity.Stock;
 import kr.co.glog.external.datagokr.seibro.model.GetShortByMartN1Result;
-import kr.co.glog.external.daumFinance.model.IncludedStock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -25,7 +22,7 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class GetShortnByMartN1 {
 
-    private final DartCompanyDao dartCompanyDao;
+    private final CompanyDao companyDao;
     private final StockService stockService;
 
     // 기본 URL
@@ -99,7 +96,7 @@ public class GetShortnByMartN1 {
         Document document   = null;
 
         try {
-            String replacedUrl = url.replaceAll( "##serviceKey##", Seibro.SERVICE_KEY );
+            String replacedUrl = url.replaceAll( "##serviceKey##", SeibroKey.SEIBRO_SERVICE_KEY );
             replacedUrl = replacedUrl.replaceAll( "##martTpcd##", martTpcd );
             replacedUrl = replacedUrl.replaceAll( "##pageNo##", ""+pageNo );
             replacedUrl = replacedUrl.replaceAll( "##numOfRows##", ""+numOfRows );

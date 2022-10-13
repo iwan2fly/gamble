@@ -9,9 +9,9 @@ import org.apache.ibatis.type.Alias;
 @Getter
 @Setter
 @ToString(callSuper=false)
-@Alias("DartCompany")
-public class DartCompany extends EntityModel {
-    String  corpCode;               // dart corp_code
+@Alias("Company")
+public class Company extends EntityModel {
+    String  companyCode;               // dart corp_code
     String  companyName;           // 정식회사명칭
     String  companyNameEng;        // 영문정식회사명칭
     String  stockName;          // 종목명(상장사) 또는 약식명칭(기타법인)

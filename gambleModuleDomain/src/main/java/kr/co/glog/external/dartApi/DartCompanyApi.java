@@ -1,8 +1,8 @@
 package kr.co.glog.external.dartApi;
 
 import kr.co.glog.common.exception.ApplicationRuntimeException;
-import kr.co.glog.domain.stock.dao.DartCompanyDao;
-import kr.co.glog.domain.stock.entity.DartCompany;
+import kr.co.glog.domain.stock.dao.CompanyDao;
+import kr.co.glog.domain.stock.entity.Company;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -19,34 +19,31 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DartCompanyApi {
 
-    private final DartCompanyDao dartCompanyDao;
+    private final CompanyDao companyDao;
 
     // 기본 URL
-    public static String url = "https://opendart.fss.or.kr/api/company.json?crtfc_key=4324bafbe5c2c9436bc1bdc4ccb907adc3c41110&corp_code=##corpCode##";
+    public static String url = "https://opendart.fss.or.kr/api/company.json?crtfc_key=" + DartKey.DART_CRTFC_KRY + "&corp_code=##companyCode##";
 
     /**
      * DART 기업개황 받아서 있으면 업데이트, 없으면 인서트
      */
-    public void updateDartCompany( String corpCode ) {
-        DartCompany dartCompany = getDartCompany( getCompanyDocument( corpCode ) );
-        dartCompany.setCorpCode( corpCode );
-
-        if ( dartCompanyDao.updateDartCompany( dartCompany ) == 0 ) {
-            dartCompanyDao.insertDartCompany( dartCompany );
-        }
+    public void updateCompany( String companyCode ) {
+        Company company = getCompany( getDocument( companyCode ) );
+        company.setCompanyCode( companyCode );
+        companyDao.updateInsetCompany( company );
     }
 
     /**
-     * corpCode 로 회사 기본정보 가져옴
-     * @param corpCode
+     * companyCode 로 회사 기본정보 가져옴
+     * @param companyCode
      * @return
      */
-    public Document getCompanyDocument(String corpCode ) {
+    public Document getDocument(String companyCode ) {
 
         Document document   = null;
 
         try {
-            String replacedUrl = url.replaceAll( "##corpCode##", corpCode );
+            String replacedUrl = url.replaceAll( "##companyCode##", companyCode );
             log.debug( replacedUrl );
             document = Jsoup.connect(replacedUrl).ignoreContentType(true).get();
 
@@ -67,9 +64,9 @@ public class DartCompanyApi {
      * @param document
      * @return
      */
-    public DartCompany getDartCompany( Document document ) {
+    public Company getCompany(Document document ) {
 
-        DartCompany dartCompany = null;
+        Company company = null;
 
         try {
             JSONParser jsonParser = new JSONParser();
@@ -78,23 +75,23 @@ public class DartCompanyApi {
             String message = jsonObject.get("message").toString();
 
             if ( status.equals("000") ) {
-                dartCompany = new DartCompany();
-                dartCompany.setCompanyName(jsonObject.get("corp_name").toString());
-                dartCompany.setCompanyNameEng(jsonObject.get("corp_name_eng").toString());
-                dartCompany.setStockName(jsonObject.get("stock_name").toString());
-                dartCompany.setStockCode(jsonObject.get("stock_code").toString());
-                dartCompany.setCeoName(jsonObject.get("ceo_nm").toString());
-                dartCompany.setCompanyClass(jsonObject.get("corp_cls").toString());
-                dartCompany.setCompanyNo(jsonObject.get("jurir_no").toString());
-                dartCompany.setBusinessNo(jsonObject.get("bizr_no").toString().replaceAll("-", ""));
-                dartCompany.setAddress(jsonObject.get("adres").toString());
-                dartCompany.setHomepage(jsonObject.get("hm_url").toString());
-                dartCompany.setIr(jsonObject.get("ir_url").toString());
-                dartCompany.setPhone(jsonObject.get("phn_no").toString().replaceAll("-", "").replaceAll(".", "").replaceAll("\\(", "").replaceAll( "\\)", ""));
-                dartCompany.setFax(jsonObject.get("fax_no").toString().replaceAll("-", "").replaceAll(".", "").replaceAll("\\(", "").replaceAll( "\\)", ""));
-                dartCompany.setIndustryCode(jsonObject.get("induty_code").toString());
-                dartCompany.setEstablishDate(jsonObject.get("est_dt").toString());
-                dartCompany.setAccountsMonth(jsonObject.get("acc_mt").toString());
+                company = new Company();
+                company.setCompanyName(jsonObject.get("corp_name").toString());
+                company.setCompanyNameEng(jsonObject.get("corp_name_eng").toString());
+                company.setStockName(jsonObject.get("stock_name").toString());
+                company.setStockCode(jsonObject.get("stock_code").toString());
+                company.setCeoName(jsonObject.get("ceo_nm").toString());
+                company.setCompanyClass(jsonObject.get("corp_cls").toString());
+                company.setCompanyNo(jsonObject.get("jurir_no").toString());
+                company.setBusinessNo(jsonObject.get("bizr_no").toString().replaceAll("-", ""));
+                company.setAddress(jsonObject.get("adres").toString());
+                company.setHomepage(jsonObject.get("hm_url").toString());
+                company.setIr(jsonObject.get("ir_url").toString());
+                company.setPhone(jsonObject.get("phn_no").toString().replaceAll("-", "").replaceAll(".", "").replaceAll("\\(", "").replaceAll( "\\)", ""));
+                company.setFax(jsonObject.get("fax_no").toString().replaceAll("-", "").replaceAll(".", "").replaceAll("\\(", "").replaceAll( "\\)", ""));
+                company.setIndustryCode(jsonObject.get("induty_code").toString());
+                company.setEstablishDate(jsonObject.get("est_dt").toString());
+                company.setAccountsMonth(jsonObject.get("acc_mt").toString());
             } else {
                 throw new ApplicationRuntimeException( "회사 기본정보 파싱 중 오류가 발생했습니다. [" + status + "] " + message );
             }
@@ -104,7 +101,7 @@ public class DartCompanyApi {
             throw new ApplicationRuntimeException( "회사 기본정보 파싱 중 오류가 발생했습니다.");
         }
 
-        return dartCompany;
+        return company;
     }
 
 

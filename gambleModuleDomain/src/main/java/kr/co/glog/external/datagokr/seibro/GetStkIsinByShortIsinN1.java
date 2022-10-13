@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.exception.UnexpectedDataException;
 import kr.co.glog.domain.service.StockService;
-import kr.co.glog.domain.stock.dao.DartCompanyDao;
+import kr.co.glog.domain.stock.dao.CompanyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.Stock;
 import kr.co.glog.domain.stock.model.StockParam;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class GetStkIsinByShortIsinN1 {
 
-    private final DartCompanyDao dartCompanyDao;
+    private final CompanyDao companyDao;
     private final StockService stockService;
     private final StockDao stockDao;
 
@@ -122,7 +122,7 @@ public class GetStkIsinByShortIsinN1 {
         Document document   = null;
 
         try {
-            String replacedUrl = url.replaceAll( "##serviceKey##", Seibro.SERVICE_KEY );
+            String replacedUrl = url.replaceAll( "##serviceKey##", SeibroKey.SEIBRO_SERVICE_KEY );
             replacedUrl = replacedUrl.replaceAll( "##shortIsin##", shortIsin );
             replacedUrl = replacedUrl.replaceAll( "##pageNo##", ""+pageNo );
             replacedUrl = replacedUrl.replaceAll( "##numOfRows##", ""+numOfRows );
