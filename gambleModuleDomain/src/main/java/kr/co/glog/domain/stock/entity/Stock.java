@@ -13,12 +13,15 @@ import org.apache.ibatis.type.Alias;
 public class Stock extends EntityModel {
 
     String  stockCode;                  // 종목코드
+    String  companyCode;                // DART 회사코드
     String  isin;                       // SEIBRO 표준코드
     String  stockName;                  // 종목명
+    String  delistingYn;                // 상폐여부
+    String  suspendYn;                  // 거래정지여부
+    String  lastTradeDate;              // 마지막거래일
     Integer currentPrice;               // 현재가
     String  stockTypeCode;              // 주식종류코드 ( 보통주, 우선주 )
     String  marketTypeCode;             // 시장구분코드 ( KOSPI, KOSDAQ, KOTC, KONEX, ETC
-
     Long    stockCount;                 // 상장주식수
     String  issueDate;                  // 상장일
     Integer facePrice;                  // 액면가

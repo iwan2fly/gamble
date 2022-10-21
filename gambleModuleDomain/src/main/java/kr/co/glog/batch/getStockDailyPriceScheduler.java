@@ -176,7 +176,7 @@ public class getStockDailyPriceScheduler {
 
 
     // 다음 증권 일별가격 첫 페이지 ( 10개 ) 만 Upsert
-    @Scheduled(cron = "0 04 21 * * *")
+    @Scheduled(cron = "0 06 16 * * *")
     public void stockDailyDataUpsert() throws InterruptedException {
 
         log.info( "다음증권 일별 데이터 전 종목 첫페이지 Upsert 시작 ");
@@ -317,10 +317,21 @@ public class getStockDailyPriceScheduler {
      *  DART 의 고유번호로 전체 재무정보 가져와서 있는 건 업데이트하고, 없는 건 등록
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 34 13 13 * * ")
+    @Scheduled(cron = "0 30 15 21 * * ")
     public void updateCompanyFinancialInfo() throws InterruptedException {
 
+         /*
+                1분기보고서 : 11013
+                반기보고서 : 11012
+                3분기보고서 : 11014
+                사업보고서 : 11011\\
+        */
+
         log.info( "dartFinancialApi START" );
+        String year = "2018";
+        String reportCode = "11014";
+
+
         try {
             CompanyParam CompanyParam = new CompanyParam();
             CompanyParam.setHasStockCode( true );
@@ -332,9 +343,10 @@ public class getStockDailyPriceScheduler {
                 // 이미 한개라도 재무정보가 들어가 있으면 패스
                 CompanyFinancialInfoParam companyFinancialInfoParam = new CompanyFinancialInfoParam();
                 companyFinancialInfoParam.setCompanyCode( companyResult.getCompanyCode() );
+                companyFinancialInfoParam.setYear( year );
+                companyFinancialInfoParam.setReportCode( reportCode );
                 ArrayList<CompanyFinancialInfoResult> financialList = companyFinancialInfoDao.getCompanyFinancialInfoList( companyFinancialInfoParam );
                 if ( financialList != null && financialList.size() > 0 ) continue;
-            //for ( CompanyResult companyResult : companyList ) {
 
                 log.debug( companyResult.getCompanyCode() + " : " + companyResult.getCompanyName() + " : " + companyResult.getStockCode() );
                 if ( companyResult.getStockCode() == null || companyResult.getStockCode().trim().equals("") ) {
@@ -342,8 +354,9 @@ public class getStockDailyPriceScheduler {
                     continue;
                 }
 
-                dartFinancialAllApi.updateCompanyFinancialInfo(  companyResult.getCompanyCode(), "2020", "11011", "OFS"  );
-                dartFinancialAllApi.updateCompanyFinancialInfo(  companyResult.getCompanyCode(), "2020", "11011", "CFS"  );
+
+                dartFinancialAllApi.updateCompanyFinancialInfo(  companyResult.getCompanyCode(), year, reportCode, "OFS"  );
+                dartFinancialAllApi.updateCompanyFinancialInfo(  companyResult.getCompanyCode(), year, reportCode, "CFS"  );
 
                 Thread.sleep( 100 );
 
@@ -352,7 +365,11 @@ public class getStockDailyPriceScheduler {
         } catch ( Exception e ) {
             e.printStackTrace();
         }
+
+        log.info( "====================" );
         log.info( "dartFinancialApi END" );
+        log.info( "====================" );
+
 
     }
 

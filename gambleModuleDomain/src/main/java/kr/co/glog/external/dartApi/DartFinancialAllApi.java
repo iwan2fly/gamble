@@ -124,12 +124,12 @@ public class DartFinancialAllApi {
             } else if ( status.equals("013") ) {
                 // 013 : 조회된 데이터가 없습니다.
             } else {
-                throw new ApplicationRuntimeException( "재무정보 파싱 중 오류가 발생했습니다. [" + status + "] " + message );
+                throw new ApplicationRuntimeException( "단일회사 전체 재무제표 파싱 중 오류가 발생했습니다. [" + status + "] " + message );
             }
 
         } catch ( Exception e ) {
             e.printStackTrace();
-            throw new ApplicationRuntimeException( "재무정보 중 오류가 발생했습니다.");
+            throw new ApplicationRuntimeException( "단일회사 전체 재무제표 중 오류가 발생했습니다.");
         }
 
         return companyFinancialInfoList;
