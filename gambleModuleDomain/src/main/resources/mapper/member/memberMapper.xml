@@ -50,6 +50,7 @@
                 <if test="memberId != null and memberId != ''">AND member.memberId=#{memberId}</if>
                 <if test="memberName != null and memberName != ''">AND member.memberName=#{memberName}</if>
                 <if test="pwd != null and pwd != ''">AND member.pwd=#{pwd}</if>
+                <if test="email != null and email != ''">AND member.email=#{email}</if>
                 <if test="lastLoginTime != null and lastLoginTime != ''">AND member.lastLoginTime=#{lastLoginTime}</if>
                 <if test="lastLogoutTime != null and lastLogoutTime != ''">AND member.lastLogoutTime=#{lastLogoutTime}</if>
                 <if test="lastPwdUpdateTime != null and lastPwdUpdateTime != ''">AND member.lastPwdUpdateTime=#{lastPwdUpdateTime}</if>

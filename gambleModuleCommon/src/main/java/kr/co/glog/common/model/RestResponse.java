@@ -3,6 +3,7 @@ package kr.co.glog.common.model;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.http.HttpStatus;
 
@@ -12,6 +13,7 @@ import java.util.Map;
 @Getter
 @Setter
 @ToString
+@Accessors(chain = true)
 public class RestResponse {
 
 	// HTTP ResponseCdoe
@@ -29,12 +31,11 @@ public class RestResponse {
 	// Service Response Data
 	private Map<String, Object> object;
 
-
-	public void putData(String name, Object obj) {
+	public RestResponse putData(String name, Object obj) {
 		if( MapUtils.isEmpty(this.object) ) {
-			this.object = new HashMap<String, Object>();
+			this.object = new HashMap<>();
 		}
 		this.object.put(name, obj);
+		return this;
 	}
-
 }

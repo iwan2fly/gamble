@@ -21,17 +21,17 @@ public class AuthController {
 
     // 회원가입
     @PostMapping("/register")
-    public RestResponse register(@RequestBody Member member ) {
+    public RestResponse register(@RequestBody Member member) {
         RestResponse restResponse = new RestResponse();
 
-        member = memberService.registerMember( member );
+        member = memberService.registerMember(member);
 
-        restResponse.putData( "member", member );
+        restResponse.putData("member", member);
         return restResponse;
     }
 
     // 로그인
-    @PostMapping("/login")
+    /*@PostMapping("/login")
     public RestResponse login(@RequestBody Member member) {
         log.debug( member.toString() );
         RestResponse restResponse = new RestResponse();
@@ -41,7 +41,7 @@ public class AuthController {
 
         restResponse.putData( "token", token );
         return restResponse;
-    }
+    }*/
 
     /*
     // * AccessToken이 만료되었을 때 토큰(AccessToken , RefreshToken)재발급해주는 메서드

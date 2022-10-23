@@ -26,6 +26,7 @@ public class JwtTokenProvider {
 
     // 토큰 유효시간 30분
     private long tokenValidTime = 30 * 60 * 1000L;
+    // private long tokenValidTime = 3000; // 3초 - 토큰 만료 테스트
 
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -37,9 +38,11 @@ public class JwtTokenProvider {
     }
 
     // JWT 토큰 생성
-    public String createToken(Long memberId, String roles) {
+    public String createToken(Long memberId, String email, String roles) {
         log.debug( "---- JwtTokenProvider.createToken()");
-        Claims claims = Jwts.claims().setSubject(""+memberId); // JWT payload 에 저장되는 정보단위
+        Claims claims = Jwts.claims(); // JWT payload 에 저장되는 정보단위
+        claims.put("username", email); // 정보는 key / value 쌍으로 저장된다.
+        claims.put("memberId", memberId); // 정보는 key / value 쌍으로 저장된다.
         claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.
         Date now = new Date();
         return Jwts.builder()
@@ -54,15 +57,24 @@ public class JwtTokenProvider {
     // JWT 토큰에서 인증 정보 조회
     public Authentication getAuthentication(String token) {
         log.debug( "---- JwtTokenProvider.getAuthentication()");
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserPk(token));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUsername(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     // 토큰에서 회원 정보 추출
-    public String getUserPk(String token) {
-        log.debug( "---- JwtTokenProvider.getUserPk()");
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().getSubject();
+    public String getMemeberId(String token) {
+        Claims body = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        return body.get("memberId").toString();
+    }
 
+    public String getUsername(String token) {
+        Claims body = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        return body.get("username").toString();
+    }
+
+    public String getRoles(String token) {
+        Claims body = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        return body.get("roles").toString();
     }
 
     // Request의 Header에서 token 값을 가져옵니다. "X-AUTH-TOKEN" : "TOKEN값'

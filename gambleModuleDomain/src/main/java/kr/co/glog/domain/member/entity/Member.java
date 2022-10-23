@@ -8,8 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Getter @Setter
-@ToString(callSuper=true)
+@Getter
+@Setter
+@ToString(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Alias("Member")
@@ -18,19 +19,18 @@ public class Member {
     private String memberName;
     private String pwd;
     private String email;
-    private String roles;
+    private String roles = "ROLE_USER";
     private Timestamp lastLoginTime;
     private Timestamp lastLogoutTime;
     private Timestamp lastPwdUpdateTime;
     private Short authFailCount;
-    private String memberStatusCode ;
+    private String memberStatusCode;
 
-    public ArrayList<String> getRoleList() {
-        ArrayList<String> roleList = new ArrayList<String>();
-        if ( this.roles != null ) {
-            roleList = (ArrayList)Arrays.asList(this.roles.split(",") );
+    public List<String> getRoleList() {
+        List<String> roleList = new ArrayList<>();
+        if (this.roles != null && !this.roles.isBlank()) {
+            roleList = Arrays.asList(this.roles.split(","));
         }
-
         return roleList;
     }
 }
