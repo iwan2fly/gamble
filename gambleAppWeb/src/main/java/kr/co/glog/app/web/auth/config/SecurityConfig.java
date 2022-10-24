@@ -9,6 +9,7 @@ import kr.co.glog.app.web.auth.service.UserDetailsServiceImpl;
 import kr.co.glog.domain.member.dao.MemberDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -57,8 +58,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // 정적 자원에 대해서는 Security 설정을 적용하지 않음.
     @Override
     public void configure(WebSecurity web) {
-        log.debug( "::: SecurityConfig.configure WebSecurity" );
-        web.ignoring().antMatchers("/resources/**");
+        web.ignoring()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                .antMatchers("/js/**", "/lib/**");
     }
 
     @Override
@@ -79,6 +81,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests() // 요청에 대한 사용권한 체크
                 .mvcMatchers(HttpMethod.POST, LOGIN_API).permitAll()
+                .mvcMatchers(HttpMethod.GET, "/auth/login").permitAll()
                 .antMatchers("/m/**").hasRole("ADMIN")
                 .antMatchers("**/tx/**").hasRole("USER")
                 .anyRequest().authenticated()

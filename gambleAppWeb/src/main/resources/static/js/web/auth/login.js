@@ -10,18 +10,23 @@ const obj = {
         password: '123456789',
     },
     methods: {
-        submit: function() {
-            console.log( "submit" );
+        async submit() {
+            console.log("submit");
 
             let param = {
-                email : this.email,
-                pwd : this.password
+                email: this.email,
+                pwd: this.password
             };
 
-            _post( '/rest/auth/login', param, function(json, args) {
+            /*_post( '/rest/auth/login', param, function(json, args) {
                 console.log( json );
-            }, null );
+            }, null );*/
 
+            const loginResponse = await axios.post(`/rest/auth/login`, {
+                email: this.email,
+                pwd: this.password,
+            });
+            console.log('# loginResponse: ', loginResponse);
 
             return false;
         }

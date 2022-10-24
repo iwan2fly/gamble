@@ -2,6 +2,7 @@ package kr.co.glog.app.web.ui;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -38,6 +39,9 @@ public class SvcController {
 		return url;
 	}
 
-
+	public static void main(String[] args) {
+		String encode = new BCryptPasswordEncoder().encode("123456789");
+		System.out.println("encode = " + encode);
+	}
 
 }
