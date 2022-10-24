@@ -57,8 +57,8 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
         response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken);
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-        user.setPwd(null);
-        response.getOutputStream().write(objectMapper.writeValueAsBytes(new RestResponse().putData("member", user.getMemberResult())));
+        memberResult.setPwd(null);
+        response.getOutputStream().write(objectMapper.writeValueAsBytes(new RestResponse().putData("member", memberResult)));
     }
 
     @Override
