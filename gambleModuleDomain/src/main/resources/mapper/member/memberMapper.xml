@@ -4,9 +4,9 @@
 
     <insert id="insertMember" parameterType="Member" useGeneratedKeys="true" keyProperty="memberId">
         INSERT INTO member
-            ( memberName, pwd, email, lastLoginTime, lastLogoutTime, lastPwdUpdateTime, authFailCount, memberStatusCode, insertTime, updateTime )
+            ( memberName, pwd, email, roles, lastLoginTime, lastLogoutTime, lastPwdUpdateTime, authFailCount, memberStatusCode, insertTime, updateTime )
         VALUES
-            ( #{memberName}, #{pwd}, #{email}, #{lastLoginTime}, #{lastLogoutTime}, #{lastPwdUpdateTime}, #{authFailCount}, #{memberStatusCode}, now(), now() )
+            ( #{memberName}, #{pwd}, #{email}, #{roles}, #{lastLoginTime}, #{lastLogoutTime}, #{lastPwdUpdateTime}, #{authFailCount}, #{memberStatusCode}, now(), now() )
     </insert>
 
     <update id="updateMember" parameterType="Member">
@@ -16,6 +16,7 @@
             <if test="memberName != null">memberName = #{memberName},</if>
             <if test="pwd != null">pwd = #{pwd},</if>
             <if test="email != null">email = #{email},</if>
+            <if test="roles != null">roles = #{roles},</if>
             <if test="lastLoginTime != null">lastLoginTime = #{lastLoginTime},</if>
             <if test="lastLogoutTime != null">lastLogoutTime = #{lastLogoutTime},</if>
             <if test="lastPwdUpdateTime != null">lastPwdUpdateTime = #{lastPwdUpdateTime},</if>
@@ -51,6 +52,7 @@
                 <if test="memberName != null and memberName != ''">AND member.memberName=#{memberName}</if>
                 <if test="pwd != null and pwd != ''">AND member.pwd=#{pwd}</if>
                 <if test="email != null and email != ''">AND member.email=#{email}</if>
+                <if test="roles != null and roles != ''">AND member.roles=#{roles}</if>
                 <if test="lastLoginTime != null and lastLoginTime != ''">AND member.lastLoginTime=#{lastLoginTime}</if>
                 <if test="lastLogoutTime != null and lastLogoutTime != ''">AND member.lastLogoutTime=#{lastLogoutTime}</if>
                 <if test="lastPwdUpdateTime != null and lastPwdUpdateTime != ''">AND member.lastPwdUpdateTime=#{lastPwdUpdateTime}</if>

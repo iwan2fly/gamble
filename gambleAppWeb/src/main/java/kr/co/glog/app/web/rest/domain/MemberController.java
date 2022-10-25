@@ -1,6 +1,5 @@
 package kr.co.glog.app.web.rest.domain;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import kr.co.glog.common.model.RestResponse;
 import kr.co.glog.domain.member.dao.MemberDao;
 import kr.co.glog.domain.member.entity.Member;
@@ -9,13 +8,14 @@ import kr.co.glog.domain.member.model.MemberResult;
 import kr.co.glog.domain.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-
+import javax.validation.Valid;
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -27,33 +27,40 @@ public class MemberController {
     private final MemberDao memberDao;
 
     // 특정 데이터 리턴
-    @GetMapping("/get")
-    public RestResponse get(Long memberId, @AuthenticationPrincipal Member currentUser) throws JsonProcessingException {
+    @GetMapping("/{memberId}")
+    public ResponseEntity getMember(@PathVariable Long memberId, @AuthenticationPrincipal Member currentUser) {
         log.debug("### currentUser: {}", currentUser);
-
-        MemberResult memberResult = memberDao.getMember(memberId);
-        return new RestResponse().putData("member", memberResult);
+        MemberResult member = memberDao.getMember(memberId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(RestResponse.success(member));
     }
 
 
     // 목록 데이터 리턴
-    @GetMapping("/getList")
-    public RestResponse getList(MemberParam memberParam) throws JsonProcessingException {
-        ArrayList<MemberResult> memberList = memberDao.getMemberList(memberParam);
-        return new RestResponse().putData("memberList", memberList);
+    @GetMapping
+    public ResponseEntity getMemberList(MemberParam memberParam, @AuthenticationPrincipal Member currentUser) {
+        log.debug("### currentUser: {}", currentUser);
+        List<MemberResult> memberList = memberDao.getMemberList(memberParam);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(RestResponse.success(Collections.singletonMap("list", memberList)));
     }
 
     // 데이터 변경
-    @PostMapping("/save")
-    public RestResponse save(@RequestBody Member member) throws JsonProcessingException {
-        Member savedMember = memberDao.saveMember(member);
-        return new RestResponse().putData("member", savedMember);
+    @PostMapping
+    public ResponseEntity saveMember(@Valid @RequestBody Member member, @AuthenticationPrincipal Member currentUser) {
+        log.debug("### currentUser: {}", currentUser);
+        log.debug("### member: {}", member);
+        Member savedMember = memberService.registerMember(member);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(RestResponse.success(savedMember));
     }
 
     // 데이터 삭제
-    @PostMapping("/delete")
-    public RestResponse delete(Long memberId) throws JsonProcessingException {
+    @DeleteMapping("/{memberId}")
+    public ResponseEntity deleteMember(@PathVariable Long memberId, @AuthenticationPrincipal Member currentUser) {
+        log.debug("### currentUser: {}", currentUser);
         memberDao.deleteMember(memberId);
-        return new RestResponse();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(RestResponse.success());
     }
 }

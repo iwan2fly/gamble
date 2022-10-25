@@ -3,6 +3,7 @@ package kr.co.glog.app.web.auth.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.glog.app.web.auth.CustomUserDetails;
 import kr.co.glog.app.web.auth.config.JwtTokenProvider;
+import kr.co.glog.common.exception.ErrorCode;
 import kr.co.glog.common.model.RestResponse;
 import kr.co.glog.domain.member.model.MemberParam;
 import kr.co.glog.domain.member.model.MemberResult;
@@ -58,30 +59,15 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         memberResult.setPwd(null);
-        response.getOutputStream().write(objectMapper.writeValueAsBytes(new RestResponse().putData("member", memberResult)));
+        response.getOutputStream().write(objectMapper.writeValueAsBytes(RestResponse.success(memberResult)));
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        System.out.println("인증실패 - 에러를 리턴하자");
-        // TODO 에러를 리턴하자
+        // TODO 회원이 없는 경우에도 이곳을 타므로 그런거 나중에 처리해줘야 함
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        response.getOutputStream().write(objectMapper.writeValueAsBytes(RestResponse.fail(ErrorCode.COMMON_UNAUTHORIZED)));
     }
-
-    /*@Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-
-        // 헤더에서 JWT 를 받아옵니다.
-        String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
-
-        // 유효한 토큰인지 확인합니다.
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            // 토큰이 유효하면 토큰으로부터 유저 정보를 받아옵니다.
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            // SecurityContext 에 Authentication 객체를 저장합니다.
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-
-        chain.doFilter(request, response);
-    }*/
-
 }

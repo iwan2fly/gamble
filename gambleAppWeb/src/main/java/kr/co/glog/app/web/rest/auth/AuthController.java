@@ -7,7 +7,12 @@ import kr.co.glog.domain.member.model.MemberResult;
 import kr.co.glog.domain.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 
 @Slf4j
 @RestController
@@ -21,13 +26,31 @@ public class AuthController {
 
     // 회원가입
     @PostMapping("/register")
-    public RestResponse register(@RequestBody Member member) {
-        RestResponse restResponse = new RestResponse();
+    public ResponseEntity register(@RequestBody Member member) {
+        Member savedMember = memberService.registerMember(member);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(RestResponse.success(savedMember));
+    }
 
-        member = memberService.registerMember(member);
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin")
+    public ResponseEntity onlyAdmin() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(RestResponse.success(Collections.singletonMap("who", "ADMIN 만 호출이 가능합니다.")));
+    }
 
-        restResponse.putData("member", member);
-        return restResponse;
+    @PreAuthorize("hasRole('MANAGER')")
+    @GetMapping("/manager")
+    public ResponseEntity onlyManager() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(RestResponse.success(Collections.singletonMap("who", "MANAGER 만 호출이 가능합니다.")));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/user")
+    public ResponseEntity onlyUser() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(RestResponse.success(Collections.singletonMap("who", "USER 만 호출이 가능합니다.")));
     }
 
     // 로그인

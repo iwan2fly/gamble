@@ -2,13 +2,12 @@ package kr.co.glog.app.web.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.glog.app.web.auth.config.JwtTokenProvider;
+import kr.co.glog.common.exception.ErrorCode;
 import kr.co.glog.common.model.RestResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -46,7 +45,7 @@ public class AuthCheckFilter extends BasicAuthenticationFilter {
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-            response.getOutputStream().write(objectMapper.writeValueAsBytes(new RestResponse().setHttpStatus(HttpStatus.UNAUTHORIZED)));
+            response.getOutputStream().write(objectMapper.writeValueAsBytes(RestResponse.fail(ErrorCode.COMMON_UNAUTHORIZED)));
         }
     }
 }

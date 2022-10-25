@@ -1,0 +1,383 @@
+{
+	"info": {
+		"_postman_id": "c6b18fbe-7b7e-467e-8e94-08343346cac6",
+		"name": "[Gamble]",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4819278"
+	},
+	"item": [
+		{
+			"name": "[Auth]",
+			"item": [
+				{
+					"name": "회원 인증",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (!responseHeaders.Authorization) {",
+									"    pm.collectionVariables.set(\"authToken\", \"\");",
+									"} else {",
+									"    pm.collectionVariables.set(\"authToken\", responseHeaders.Authorization.substring(7, responseHeaders.Authorization.length));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"ds@email.com\",\n    \"pwd\":\"1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/rest/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"rest",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "회원 가입",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"memberName\": \"{{$randomWord}}\",\n    \"pwd\": \"1234\",\n    \"email\": \"{{$randomWord}}@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/rest/auth/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"rest",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "[권한테스트]",
+			"item": [
+				{
+					"name": "ADMIN 만 호출가능",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/rest/auth/admin",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"rest",
+								"auth",
+								"admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MANAGER 만 호출가능",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/rest/auth/manager",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"rest",
+								"auth",
+								"manager"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "USER 만 호출가능",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/rest/auth/user",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"rest",
+								"auth",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{authToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "[Member]",
+			"item": [
+				{
+					"name": "회원 단건조회",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/rest/domain/member/3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"rest",
+								"domain",
+								"member",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "회원 목록조회",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/rest/domain/member",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"rest",
+								"domain",
+								"member"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "회원 단건등록",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"memberName\": \"{{$randomWord}}\",\n    \"pwd\": \"1234\",\n    \"email\": \"{{$randomWord}}@example.com\",\n    \"roles\": \"MANAGER,USER\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/rest/domain/member",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"rest",
+								"domain",
+								"member"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "회원 단건삭제",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/rest/domain/member/24",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"rest",
+								"domain",
+								"member",
+								"24"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{authToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "authToken",
+			"value": ""
+		}
+	]
+}

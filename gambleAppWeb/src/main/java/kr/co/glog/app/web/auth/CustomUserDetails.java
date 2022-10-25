@@ -1,13 +1,14 @@
 package kr.co.glog.app.web.auth;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.co.glog.domain.member.model.MemberResult;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Data
 public class CustomUserDetails extends MemberResult implements UserDetails {
@@ -24,11 +25,16 @@ public class CustomUserDetails extends MemberResult implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        memberResult.getRoleList().forEach(r -> {
-            authorities.add(() -> r);
-        });
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        memberResult.getRoleList().forEach(role -> addAuthority(authorities, role));
         return authorities;
+    }
+
+    private static void addAuthority(List<GrantedAuthority> authorities, String role) {
+        if (role != null && !role.startsWith("ROLE_")) {
+            role = "ROLE_" + role;
+        }
+        authorities.add(new SimpleGrantedAuthority(role));
     }
 
     @Override

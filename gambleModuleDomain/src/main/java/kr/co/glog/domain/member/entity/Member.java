@@ -19,7 +19,7 @@ public class Member {
     private String memberName;
     private String pwd;
     private String email;
-    private String roles = "ROLE_USER";
+    private String roles;
     private Timestamp lastLoginTime;
     private Timestamp lastLogoutTime;
     private Timestamp lastPwdUpdateTime;

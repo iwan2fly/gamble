@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 
 /**
- *  회원 관련 서비스
+ * 회원 관련 서비스
  */
 @Slf4j
 @Service
@@ -27,41 +27,46 @@ public class MemberService {
     /**
      * 회원아이디로 회원이 존재하는지 여부 체크
      * * @param memberId
+     *
      * @return
      */
-    public boolean isExistMember( Long memberId ) {
+    public boolean isExistMember(Long memberId) {
 
-        boolean result  = false;
+        boolean result = false;
 
-        MemberResult memberResult = memberDao.getMember( memberId );
-        if ( memberResult != null )  result = true;
+        MemberResult memberResult = memberDao.getMember(memberId);
+        if (memberResult != null) result = true;
 
         return result;
     }
 
     /**
      * 회원 등록
+     *
      * @param member
      */
-    public Member registerMember( Member member ) {
-
-        member.setPwd( passwordEncoder.encode( member.getPwd() ) );
-        member.setRoles("ROLE_USER");
-        return memberDao.saveMember( member );
-
+    public Member registerMember(Member member) {
+        if (member.getRoles() == null || member.getRoles().isBlank()) {
+            member.setRoles("USER");
+        }
+        member.setPwd(passwordEncoder.encode(member.getPwd()));
+        Member saveMember = memberDao.saveMember(member);
+        saveMember.setPwd(null);
+        return saveMember;
     }
 
     /**
-     *  회원 로그인
+     * 회원 로그인
+     *
      * @param email
      * @param password
      * @return
      */
-    public MemberResult loginMember( String email, String password ) {
-        MemberResult memberResult = memberDao.getMember( email );
-        if ( memberResult == null ) throw new UnregisteredEmailException();
+    public MemberResult loginMember(String email, String password) {
+        MemberResult memberResult = memberDao.getMember(email);
+        if (memberResult == null) throw new UnregisteredEmailException();
 
-        if ( !passwordEncoder.matches( password, memberResult.getPwd() ) ) {
+        if (!passwordEncoder.matches(password, memberResult.getPwd())) {
             throw new InvalidPasswordException();
         }
 

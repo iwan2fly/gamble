@@ -17,6 +17,9 @@ spring:
       max-file-size: 5MB
       max-request-size: 5MB
 
+  jackson:
+    default-property-inclusion: non_null
+
 # JWT 설정
 jwt:
   header: Authorization
