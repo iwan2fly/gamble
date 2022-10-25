@@ -26,9 +26,22 @@ const obj = {
                 email: this.email,
                 pwd: this.password,
             });
-            console.log('# loginResponse: ', loginResponse);
 
-            return false;
+            const authorization = loginResponse.headers.authorization;
+            let accessToken = authorization.substring('Bearer '.length, authorization.length);
+            console.log('# accessToken: ', accessToken);
+            console.log('# responseBody: ', loginResponse.data);
+
+            /**
+             * TODO 토큰을 일일이 세팅해야하므로
+             * TODO Axios 인터셉터로 토큰을 저장하는 로직을 넣어야 함
+             */
+            localStorage.gambleAt = accessToken;
+
+            if (loginResponse.data.httpStatus === RestResponseStatus.OK) {
+                //window.location.href = 'https://google.com';
+                console.log('# 메인페이지로 ㄱㄱ');
+            }
         }
     }
 }
