@@ -20,6 +20,7 @@ import java.io.IOException;
 
 @Slf4j
 public class AuthCheckFilter extends BasicAuthenticationFilter {
+    private static final String TOKEN_PREFIX = "Bearer ";
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
 
@@ -32,11 +33,11 @@ public class AuthCheckFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (bearer == null || !bearer.startsWith("Bearer")) {
+        if (bearer == null || !bearer.startsWith(TOKEN_PREFIX)) {
             chain.doFilter(request, response);
             return;
         }
-        String token = bearer.substring("Bearer ".length());
+        String token = bearer.substring(TOKEN_PREFIX.length());
         boolean tokenIsValid = jwtTokenProvider.validateToken(token);
         if (tokenIsValid) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);

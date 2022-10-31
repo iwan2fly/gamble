@@ -24,8 +24,11 @@ public class JwtTokenProvider {
 
     private String SECRET_KEY = "32charormoreneeds32charormoreneeds";
 
-    // 토큰 유효시간 30분
-    private long tokenValidTime = 30 * 60 * 1000L;
+    // 액세스 토큰 유효시간 30분
+    private long accessTokenValidTime = 30 * 60 * 1000;
+
+    // 리프레시 토큰 유효시간 7일
+    private long refreshTokenValidTime = 60 * 60 * 1000 * 24 * 7;
     // private long tokenValidTime = 3000; // 3초 - 토큰 만료 테스트
 
     private final UserDetailsServiceImpl userDetailsService;
@@ -38,8 +41,8 @@ public class JwtTokenProvider {
     }
 
     // JWT 토큰 생성
-    public String createToken(Long memberId, String email, String roles) {
-        log.debug( "---- JwtTokenProvider.createToken()");
+    public String createAccessToken(Long memberId, String email, String roles) {
+        log.debug( "---- createAccessToken()");
         Claims claims = Jwts.claims(); // JWT payload 에 저장되는 정보단위
         claims.put("username", email); // 정보는 key / value 쌍으로 저장된다.
         claims.put("memberId", memberId); // 정보는 key / value 쌍으로 저장된다.
@@ -48,7 +51,23 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
                 .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + tokenValidTime)) // set Expire Time
+                .setExpiration(new Date(now.getTime() + accessTokenValidTime)) // set Expire Time
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)  // 사용할 암호화 알고리즘과
+                // signature 에 들어갈 secret값 세팅
+                .compact();
+    }
+
+    public String createRefreshToken(Long memberId, String email, String roles) {
+        log.debug( "---- createRefreshToken()");
+        Claims claims = Jwts.claims(); // JWT payload 에 저장되는 정보단위
+        claims.put("username", email); // 정보는 key / value 쌍으로 저장된다.
+        claims.put("memberId", memberId); // 정보는 key / value 쌍으로 저장된다.
+        claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.
+        Date now = new Date();
+        return Jwts.builder()
+                .setClaims(claims) // 정보 저장
+                .setIssuedAt(now) // 토큰 발행 시간 정보
+                .setExpiration(new Date(now.getTime() + refreshTokenValidTime)) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)  // 사용할 암호화 알고리즘과
                 // signature 에 들어갈 secret값 세팅
                 .compact();
@@ -82,8 +101,8 @@ public class JwtTokenProvider {
         log.debug( "---- JwtTokenProvider.resolveToken()");
         return request.getHeader("X-AUTH-TOKEN");
     }
-
     // 토큰의 유효성 + 만료일자 확인
+
     public boolean validateToken(String jwtToken) {
         log.debug( "---- JwtTokenProvider.validateToken()");
 

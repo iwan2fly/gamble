@@ -26,21 +26,19 @@ const obj = {
                 email: this.email,
                 pwd: this.password,
             });
-
-            const authorization = loginResponse.headers.authorization;
-            let accessToken = authorization.substring('Bearer '.length, authorization.length);
-            console.log('# accessToken: ', accessToken);
-            console.log('# responseBody: ', loginResponse.data);
+            console.log('# loginResponse: ', loginResponse);
 
             /**
              * TODO 토큰을 일일이 세팅해야하므로
              * TODO Axios 인터셉터로 토큰을 저장하는 로직을 넣어야 함
              */
-            localStorage.gambleAt = accessToken;
+            const { access_token, refresh_token } = loginResponse.headers;
+            localStorage.setItem('_gat', access_token);
+            localStorage.setItem('_grt', refresh_token);
 
             if (loginResponse.data.httpStatus === RestResponseStatus.OK) {
                 //window.location.href = 'https://google.com';
-                console.log('# 메인페이지로 ㄱㄱ');
+                alert('# 로그인 완료,, 메인페이지로,,');
             }
         }
     }

@@ -52,10 +52,12 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         CustomUserDetails user = (CustomUserDetails) authResult.getPrincipal();
         MemberResult memberResult = user.getMemberResult();
-        String jwtToken = jwtTokenProvider.createToken(memberResult.getMemberId(), memberResult.getEmail(), memberResult.getRoles());
+        String accessToken = jwtTokenProvider.createAccessToken(memberResult.getMemberId(), memberResult.getEmail(), memberResult.getRoles());
+        String refreshToken = jwtTokenProvider.createRefreshToken(memberResult.getMemberId(), memberResult.getEmail(), memberResult.getRoles());
 
         response.setStatus(HttpServletResponse.SC_OK);
-        response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken);
+        response.setHeader("access_token", accessToken);
+        response.setHeader("refresh_token", refreshToken);
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         memberResult.setPwd(null);
