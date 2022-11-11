@@ -2,7 +2,7 @@ package kr.co.glog.external.dartApi;
 
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.domain.stock.dao.CompanyFinancialInfoDao;
-import kr.co.glog.domain.stock.entity.CompanyFinancialInfo;
+import kr.co.glog.domain.stock.entity.DartCompanyFinancialInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -26,15 +26,17 @@ public class DartFinancialAllApi {
     private final CompanyFinancialInfoDao companyFinancialInfoDao;
 
     // 기본 URL
-    public static String url = "https://opendart.fss.or.kr/api/fnlttSinglAcntAll.json?crtfc_key=" + DartKey.DART_CRTFC_KRY + "&corp_code=##companyCode##&bsns_year=##bsnsYear##&&reprt_code=##reprtCode##&fs_div=##fsDiv##";
+
+    // public static String url = "https://opendart.fss.or.kr/api/fnlttSinglAcntAll.json?crtfc_key=" + DartKey.DART_CRTFC_KRY + "&corp_code=##companyCode##&bsns_year=##bsnsYear##&&reprt_code=##reprtCode##&fs_div=##fsDiv##";
+    public static String url = "https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=" + DartKey.DART_CRTFC_KRY + "&corp_code=##companyCode##&bsns_year=##bsnsYear##&&reprt_code=##reprtCode##&fs_div=##fsDiv##";
 
     /**
      * DART 단일회사 재무제표 업데이트, 없으면 인서트
      */
     public void updateCompanyFinancialInfo( String companyCode, String year, String reportCode, String fsDiv ) {
-        ArrayList<CompanyFinancialInfo> companyFinancialInfoList = getCompanyFinancialInfo( getDocument( companyCode, year, reportCode, fsDiv, 3 ) );
-        for ( CompanyFinancialInfo companyFinancialInfo : companyFinancialInfoList )
-            companyFinancialInfoDao.updateInsetCompanyFinancialInfo( companyFinancialInfo );
+        ArrayList<DartCompanyFinancialInfo> dartCompanyFinancialInfoList = getCompanyFinancialInfo( getDocument( companyCode, year, reportCode, fsDiv, 3 ) );
+        for ( DartCompanyFinancialInfo dartCompanyFinancialInfo : dartCompanyFinancialInfoList)
+            companyFinancialInfoDao.updateInsetCompanyFinancialInfo(dartCompanyFinancialInfo);
     }
 
     /**
@@ -86,9 +88,9 @@ public class DartFinancialAllApi {
      * @param document
      * @return
      */
-    public ArrayList<CompanyFinancialInfo> getCompanyFinancialInfo(Document document ) {
+    public ArrayList<DartCompanyFinancialInfo> getCompanyFinancialInfo(Document document ) {
 
-        ArrayList<CompanyFinancialInfo> companyFinancialInfoList = new ArrayList<CompanyFinancialInfo>();
+        ArrayList<DartCompanyFinancialInfo> dartCompanyFinancialInfoList = new ArrayList<DartCompanyFinancialInfo>();
 
         try {
             JSONParser jsonParser = new JSONParser();
@@ -101,25 +103,25 @@ public class DartFinancialAllApi {
                 for (int i = 0; i < jsonArray.size(); i++) {
                     jsonObject = (JSONObject) jsonArray.get(i);
 
-                    CompanyFinancialInfo companyFinancialInfo = new CompanyFinancialInfo();
-                    companyFinancialInfo.setReceiptNumber(jsonObject.get("rcept_no") == null ? null : jsonObject.get("rcept_no").toString());
-                    companyFinancialInfo.setCompanyCode(jsonObject.get("corp_code") == null ? null : jsonObject.get("corp_code").toString());
-                    companyFinancialInfo.setReportCode(jsonObject.get("reprt_code") == null ? null : jsonObject.get("reprt_code").toString());
-                    companyFinancialInfo.setYear(jsonObject.get("bsns_year") == null ? null : jsonObject.get("bsns_year").toString());
-                    companyFinancialInfo.setSubjectDiv(jsonObject.get("sj_div") == null ? null : jsonObject.get("sj_div").toString());
-                    companyFinancialInfo.setSubjectName(jsonObject.get("sj_nm") == null ? null : jsonObject.get("sj_nm").toString());
-                    companyFinancialInfo.setAccountId(jsonObject.get("account_id") == null ? null : jsonObject.get("account_id").toString());
-                    companyFinancialInfo.setAccountName(jsonObject.get("account_nm") == null ? null : jsonObject.get("account_nm").toString());
-                    companyFinancialInfo.setAccountDetail(jsonObject.get("account_detail") == null ? null : jsonObject.get("account_detail").toString());
-                    companyFinancialInfo.setKiName(jsonObject.get("thstrm_nm") == null ? null : jsonObject.get("thstrm_nm").toString());
-                    companyFinancialInfo.setKiAmount(jsonObject.get("thstrm_amount") == null ? null : jsonObject.get("thstrm_amount").toString());
-                    companyFinancialInfo.setPrevKiName(jsonObject.get("frmtrm_nm") == null ? null : jsonObject.get("frmtrm_nm").toString());
-                    companyFinancialInfo.setPrevKiAmount(jsonObject.get("frmtrm_amount") == null ? null : jsonObject.get("frmtrm_amount").toString());
-                    companyFinancialInfo.setPrev2KiName(jsonObject.get("bfefrmtrm_nm") == null ? null : jsonObject.get("bfefrmtrm_nm").toString());
-                    companyFinancialInfo.setPrev2KiAmount(jsonObject.get("bfefrmtrm_amount") == null ? null : jsonObject.get("bfefrmtrm_amount").toString());
-                    companyFinancialInfo.setInfoOrder(Integer.parseInt(jsonObject.get("ord") == null ? null : jsonObject.get("ord").toString()));
-                    companyFinancialInfo.setCurrency(jsonObject.get("currency") == null ? null : jsonObject.get("currency").toString());
-                    companyFinancialInfoList.add(companyFinancialInfo);
+                    DartCompanyFinancialInfo dartCompanyFinancialInfo = new DartCompanyFinancialInfo();
+                    dartCompanyFinancialInfo.setReceiptNumber(jsonObject.get("rcept_no") == null ? null : jsonObject.get("rcept_no").toString());
+                    dartCompanyFinancialInfo.setCompanyCode(jsonObject.get("corp_code") == null ? null : jsonObject.get("corp_code").toString());
+                    dartCompanyFinancialInfo.setReportCode(jsonObject.get("reprt_code") == null ? null : jsonObject.get("reprt_code").toString());
+                    dartCompanyFinancialInfo.setYear(jsonObject.get("bsns_year") == null ? null : jsonObject.get("bsns_year").toString());
+                    dartCompanyFinancialInfo.setSubjectDiv(jsonObject.get("sj_div") == null ? null : jsonObject.get("sj_div").toString());
+                    dartCompanyFinancialInfo.setSubjectName(jsonObject.get("sj_nm") == null ? null : jsonObject.get("sj_nm").toString());
+                    dartCompanyFinancialInfo.setAccountId(jsonObject.get("account_id") == null ? null : jsonObject.get("account_id").toString());
+                    dartCompanyFinancialInfo.setAccountName(jsonObject.get("account_nm") == null ? null : jsonObject.get("account_nm").toString());
+                    dartCompanyFinancialInfo.setAccountDetail(jsonObject.get("account_detail") == null ? null : jsonObject.get("account_detail").toString());
+                    dartCompanyFinancialInfo.setKiName(jsonObject.get("thstrm_nm") == null ? null : jsonObject.get("thstrm_nm").toString());
+                    dartCompanyFinancialInfo.setKiAmount(jsonObject.get("thstrm_amount") == null ? null : jsonObject.get("thstrm_amount").toString());
+                    dartCompanyFinancialInfo.setPrevKiName(jsonObject.get("frmtrm_nm") == null ? null : jsonObject.get("frmtrm_nm").toString());
+                    dartCompanyFinancialInfo.setPrevKiAmount(jsonObject.get("frmtrm_amount") == null ? null : jsonObject.get("frmtrm_amount").toString());
+                    dartCompanyFinancialInfo.setPrev2KiName(jsonObject.get("bfefrmtrm_nm") == null ? null : jsonObject.get("bfefrmtrm_nm").toString());
+                    dartCompanyFinancialInfo.setPrev2KiAmount(jsonObject.get("bfefrmtrm_amount") == null ? null : jsonObject.get("bfefrmtrm_amount").toString());
+                    dartCompanyFinancialInfo.setInfoOrder(Integer.parseInt(jsonObject.get("ord") == null ? null : jsonObject.get("ord").toString()));
+                    dartCompanyFinancialInfo.setCurrency(jsonObject.get("currency") == null ? null : jsonObject.get("currency").toString());
+                    dartCompanyFinancialInfoList.add(dartCompanyFinancialInfo);
                 }
             } else if ( status.equals("013") ) {
                 // 013 : 조회된 데이터가 없습니다.
@@ -132,7 +134,7 @@ public class DartFinancialAllApi {
             throw new ApplicationRuntimeException( "단일회사 전체 재무제표 중 오류가 발생했습니다.");
         }
 
-        return companyFinancialInfoList;
+        return dartCompanyFinancialInfoList;
     }
 
 

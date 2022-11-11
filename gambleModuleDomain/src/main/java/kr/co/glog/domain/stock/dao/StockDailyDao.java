@@ -19,6 +19,7 @@ public class StockDailyDao {
 
     private final StockDailyMapper stockDailyMapper;
 
+    // 키 SELECT
     public StockDailyResult getStockDaily(Long stockDailyId ) {
         if ( stockDailyId == null ) throw new ParameterMissingException( "stockDailyId" );
 
@@ -29,6 +30,21 @@ public class StockDailyDao {
         if ( stockDailyList != null && stockDailyList.size() > 0 ) stockDailyResult = stockDailyList.get(0);
         return stockDailyResult;
     }
+
+    // 유니크 SELECT
+    public StockDailyResult getStockDaily( String stockCode, String tradeDate ) {
+        if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
+        if ( tradeDate == null ) throw new ParameterMissingException( "tradeDate" );
+
+        StockDailyResult stockDailyResult = null;
+        StockDailyParam stockDailyParam = new StockDailyParam();
+        stockDailyParam.setStockCode( stockCode );
+        stockDailyParam.setTradeDate( tradeDate );
+        ArrayList<StockDailyResult> stockDailyList = stockDailyMapper.selectStockDailyList( stockDailyParam );
+        if ( stockDailyList != null && stockDailyList.size() > 0 ) stockDailyResult = stockDailyList.get(0);
+        return stockDailyResult;
+    }
+
 
     public ArrayList<StockDailyResult> getStockDailyList(StockDailyParam stockDailyParam ) {
         if ( stockDailyParam == null ) throw new ParameterMissingException( "stockDailyParam" );

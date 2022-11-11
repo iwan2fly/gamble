@@ -29,4 +29,7 @@ public class StockDaily extends EntityModel {
     Long	foreignerStockCount;		// 외인보유
     Float	foreignerHoldRate;	        // 외인보유율
 
+    public Integer getPriceYesterday() {
+        return getPriceFinal() - getPriceChange();
+    }
 }

@@ -86,7 +86,7 @@ public class CompanyDao {
         return companyMapper.updateCompany(company);
     }
 
-    public int updateInsetCompany( Company company ) {
+    public int updateInsertCompany( Company company ) {
         int result = updateCompany(company);
         if ( result == 0 ) {
             result = insertCompany(company);

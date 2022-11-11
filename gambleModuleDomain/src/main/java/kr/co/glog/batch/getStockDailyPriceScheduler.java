@@ -110,7 +110,7 @@ public class getStockDailyPriceScheduler {
 
     // 최초 증권종목 데이터 생성 시 1회만 사용하면 됨
     // 투자자별 거래 전체 데이터 업데이트
-    @Scheduled(cron = "0 11 15 05 * *")
+ //   @Scheduled(cron = "0 11 15 05 * *")
     public void allStockDailyInvestorUpdate() throws InterruptedException {
 
         PagingParam pagingParam = new PagingParam();
@@ -173,13 +173,11 @@ public class getStockDailyPriceScheduler {
 
 
 
+    // 당일 가격정보 업서트
+    @Scheduled(cron = "0 35 15 * * *")
+    public void stockDailyPriceUpsert() throws InterruptedException {
 
-
-    // 다음 증권 일별가격 첫 페이지 ( 10개 ) 만 Upsert
-    @Scheduled(cron = "0 06 16 * * *")
-    public void stockDailyDataUpsert() throws InterruptedException {
-
-        log.info( "다음증권 일별 데이터 전 종목 첫페이지 Upsert 시작 ");
+        log.info( "당일 가격 정보 업데이트 배치 처리 시작");
 
         PagingParam pagingParam = new PagingParam();
         pagingParam.setSortIndex( "stockCode" );
@@ -225,8 +223,46 @@ public class getStockDailyPriceScheduler {
 
             if ( !isSuccess ) throw new ApplicationRuntimeException( stockResult.getStockName() + "[" + stockResult.getStockCode() + "] 일별데이터 업서트 3회 시도 실패로 배치처리를 중지합니다.");
 
+        }
+
+        log.info( "당일 가격 정보 업데이트 배치 처리 정상 종료");
+    }
+
+    // 외인/기관 거래정보 업서트
+    @Scheduled(cron = "0 0 18 * * *")
+    public void stockDailyInvestorUpsert() throws InterruptedException {
+
+        log.info( "당일 외인기관 거래정보 업데이트 배치 처리");
+
+        PagingParam pagingParam = new PagingParam();
+        pagingParam.setSortIndex( "stockCode" );
+
+        // 코스피 전종목 조회
+        StockParam stockParam = new StockParam();
+        stockParam.setMarketTypeCode("kospi");
+        stockParam.setPagingParam( pagingParam );
+        ArrayList<StockResult> kospiList = stockDao.getStockList(stockParam);
+
+        // 코스닥
+        stockParam.setMarketTypeCode("kosdaq");
+        stockParam.setPagingParam( pagingParam );
+        ArrayList<StockResult> kosdaqList = stockDao.getStockList(stockParam);
+
+        // 코넥스
+        stockParam.setMarketTypeCode("konex");
+        stockParam.setPagingParam( pagingParam );
+        ArrayList<StockResult> konexList = stockDao.getStockList(stockParam);
+
+        ArrayList<StockResult> stockList = new ArrayList<StockResult>();
+        stockList.addAll( kospiList );
+        stockList.addAll( kosdaqList );
+        stockList.addAll( konexList );
+
+
+        for ( StockResult stockResult : stockList ) {
+
             // 투자자별데이터 업서트 최대 3번 시도
-            isSuccess = false;
+            boolean isSuccess = false;
             for ( int i = 0; i < 3; i++ ) {
 
                 try {
@@ -245,15 +281,17 @@ public class getStockDailyPriceScheduler {
 
         }
 
-        log.info( "다음증권 일별 데이터 전 종목 첫페이지 Upsert 정상종료 ");
+        log.info( "당일 외인기관 거래정보 업데이트 배치 처리 정상 종료");
     }
+
+
 
 
     /**
      * DART의 고유번호 파일 다운로드 받아서, 있는 건 업데이트하고, 없는 건 등록
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 11 14 07 * * ")
+//    @Scheduled(cron = "0 11 14 07 * * ")
     public void updateCorpCode() throws InterruptedException {
 
         log.info( "corpCodeApi START" );
@@ -270,7 +308,7 @@ public class getStockDailyPriceScheduler {
      *  DART 의 고유번호로 기업개황 가져와서 있는 건 업데이트하고, 없는 건 등록
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 16 14 04 * * ")
+  //  @Scheduled(cron = "0 16 14 04 * * ")
     public void updateCompany() throws InterruptedException {
 
         log.info( "corpCodeApi START" );
@@ -298,7 +336,7 @@ public class getStockDailyPriceScheduler {
      *  한국예탁결제원_주식정보서비스 : 시장별 단축코드 전체 조회
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 48 10 07 * * ")
+   // @Scheduled(cron = "0 48 10 07 * * ")
     public void getShortByMart() throws InterruptedException {
 
         log.info( "Seibro getShorTbyMartN1 START" );
@@ -317,19 +355,20 @@ public class getStockDailyPriceScheduler {
      *  DART 의 고유번호로 전체 재무정보 가져와서 있는 건 업데이트하고, 없는 건 등록
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 30 15 21 * * ")
+    @Scheduled(cron = "0 15 16 10 * * ")
     public void updateCompanyFinancialInfo() throws InterruptedException {
 
          /*
                 1분기보고서 : 11013
                 반기보고서 : 11012
                 3분기보고서 : 11014
-                사업보고서 : 11011\\
+                사업보고서 : 11011
         */
 
         log.info( "dartFinancialApi START" );
-        String year = "2018";
-        String reportCode = "11014";
+        String result = "SUCCESS";
+        String year = "2016";
+        String reportCode = "11011";
 
 
         try {
@@ -341,34 +380,36 @@ public class getStockDailyPriceScheduler {
                 CompanyResult companyResult = companyList.get(i);
 
                 // 이미 한개라도 재무정보가 들어가 있으면 패스
-                CompanyFinancialInfoParam companyFinancialInfoParam = new CompanyFinancialInfoParam();
-                companyFinancialInfoParam.setCompanyCode( companyResult.getCompanyCode() );
-                companyFinancialInfoParam.setYear( year );
-                companyFinancialInfoParam.setReportCode( reportCode );
-                ArrayList<CompanyFinancialInfoResult> financialList = companyFinancialInfoDao.getCompanyFinancialInfoList( companyFinancialInfoParam );
-                if ( financialList != null && financialList.size() > 0 ) continue;
+                DartCompanyFinancialInfoParam companyFinancialInfoParam = new DartCompanyFinancialInfoParam();
+                companyFinancialInfoParam.setCompanyCode(companyResult.getCompanyCode());
+                companyFinancialInfoParam.setYear(year);
+                companyFinancialInfoParam.setReportCode(reportCode);
+                ArrayList<DartCompanyFinancialInfoResult> financialList = companyFinancialInfoDao.getCompanyFinancialInfoList(companyFinancialInfoParam);
+                if (financialList != null && financialList.size() > 0) continue;
 
-                log.debug( companyResult.getCompanyCode() + " : " + companyResult.getCompanyName() + " : " + companyResult.getStockCode() );
-                if ( companyResult.getStockCode() == null || companyResult.getStockCode().trim().equals("") ) {
-                    log.debug( "NO StockCode" );
+                log.debug(companyResult.getCompanyCode() + " : " + companyResult.getCompanyName() + " : " + companyResult.getStockCode());
+                if (companyResult.getStockCode() == null || companyResult.getStockCode().trim().equals("")) {
+                    log.debug("NO StockCode");
                     continue;
                 }
 
-
-                dartFinancialAllApi.updateCompanyFinancialInfo(  companyResult.getCompanyCode(), year, reportCode, "OFS"  );
-                dartFinancialAllApi.updateCompanyFinancialInfo(  companyResult.getCompanyCode(), year, reportCode, "CFS"  );
+                dartFinancialAllApi.updateCompanyFinancialInfo(companyResult.getCompanyCode(), year, reportCode, "OFS");
+                dartFinancialAllApi.updateCompanyFinancialInfo(companyResult.getCompanyCode(), year, reportCode, "CFS");
 
                 Thread.sleep( 100 );
-
             }
 
         } catch ( Exception e ) {
             e.printStackTrace();
+            result = "FAIL";
         }
 
-        log.info( "====================" );
-        log.info( "dartFinancialApi END" );
-        log.info( "====================" );
+        log.info( "" );
+        log.info( "===========================================================================" );
+        log.info( "dartFinancialApi END " + result );
+        log.info( "===========================================================================" );
+        log.info( "" );
+
 
 
     }

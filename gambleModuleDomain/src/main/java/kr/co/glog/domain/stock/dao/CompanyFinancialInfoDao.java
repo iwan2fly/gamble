@@ -1,10 +1,10 @@
 package kr.co.glog.domain.stock.dao;
 
 import kr.co.glog.common.exception.ParameterMissingException;
-import kr.co.glog.domain.stock.entity.CompanyFinancialInfo;
-import kr.co.glog.domain.stock.mapper.CompanyFinancialInfoMapper;
-import kr.co.glog.domain.stock.model.CompanyFinancialInfoParam;
-import kr.co.glog.domain.stock.model.CompanyFinancialInfoResult;
+import kr.co.glog.domain.stock.entity.DartCompanyFinancialInfo;
+import kr.co.glog.domain.stock.mapper.DartCompanyFinancialInfoMapper;
+import kr.co.glog.domain.stock.model.DartCompanyFinancialInfoParam;
+import kr.co.glog.domain.stock.model.DartCompanyFinancialInfoResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -17,105 +17,105 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class CompanyFinancialInfoDao {
 
-    private final CompanyFinancialInfoMapper companyFinancialInfoMapper;
+    private final DartCompanyFinancialInfoMapper dartCompanyFinancialInfoMapper;
 
-    public CompanyFinancialInfoResult getCompanyFinancialInfo( String companyCode, String reportCode, String year, String subjectDiv, String accountName ) {
+    public DartCompanyFinancialInfoResult getCompanyFinancialInfo(String companyCode, String reportCode, String year, String subjectDiv, String accountName ) {
         if ( companyCode == null ) throw new ParameterMissingException( "companyCode" );
         if ( reportCode == null ) throw new ParameterMissingException( "reportCode" );
         if ( year == null ) throw new ParameterMissingException( "year" );
         if ( subjectDiv == null ) throw new ParameterMissingException( "subjectDiv" );
         if ( accountName == null ) throw new ParameterMissingException( "accountName" );
 
-        CompanyFinancialInfoResult CompanyFinancialInfoResult = null;
-        CompanyFinancialInfoParam CompanyFinancialInfoParam = new CompanyFinancialInfoParam();
+        DartCompanyFinancialInfoResult CompanyFinancialInfoResult = null;
+        DartCompanyFinancialInfoParam CompanyFinancialInfoParam = new DartCompanyFinancialInfoParam();
         CompanyFinancialInfoParam.setCompanyCode( companyCode );
         CompanyFinancialInfoParam.setReportCode( reportCode );
         CompanyFinancialInfoParam.setYear( year );
         CompanyFinancialInfoParam.setSubjectDiv( subjectDiv );
         CompanyFinancialInfoParam.setAccountName( accountName );
-        ArrayList<CompanyFinancialInfoResult> CompanyFinancialInfoList = companyFinancialInfoMapper.selectCompanyFinancialInfoList( CompanyFinancialInfoParam );
+        ArrayList<DartCompanyFinancialInfoResult> CompanyFinancialInfoList = dartCompanyFinancialInfoMapper.selectDartCompanyFinancialInfoList( CompanyFinancialInfoParam );
         if ( CompanyFinancialInfoList != null && CompanyFinancialInfoList.size() > 0 ) CompanyFinancialInfoResult = CompanyFinancialInfoList.get(0);
         return CompanyFinancialInfoResult;
     }
 
-    public ArrayList<CompanyFinancialInfoResult> getCompanyFinancialInfoList(CompanyFinancialInfoParam CompanyFinancialInfoParam ) {
+    public ArrayList<DartCompanyFinancialInfoResult> getCompanyFinancialInfoList(DartCompanyFinancialInfoParam CompanyFinancialInfoParam ) {
         if ( CompanyFinancialInfoParam == null ) throw new ParameterMissingException( "CompanyFinancialInfoParam" );
 
-        return companyFinancialInfoMapper.selectCompanyFinancialInfoList( CompanyFinancialInfoParam );
+        return dartCompanyFinancialInfoMapper.selectDartCompanyFinancialInfoList( CompanyFinancialInfoParam );
     }
 
-    public int insertCompanyFinancialInfo ( CompanyFinancialInfo companyFinancialInfo) {
-        return companyFinancialInfoMapper.insertCompanyFinancialInfo(companyFinancialInfo);
+    public int insertCompanyFinancialInfo ( DartCompanyFinancialInfo dartCompanyFinancialInfo) {
+        return dartCompanyFinancialInfoMapper.insertDartCompanyFinancialInfo(dartCompanyFinancialInfo);
     }
 
     /**
      * 한번에 종목 10개씩 insert
-     * @param companyFinancialInfoList
+     * @param dartCompanyFinancialInfoList
      * @return
      */
-    public int insertsCompanyFinancialInfo( ArrayList<CompanyFinancialInfo> companyFinancialInfoList) {
-        return insertsCompanyFinancialInfo(companyFinancialInfoList, 1000 );
+    public int insertsCompanyFinancialInfo( ArrayList<DartCompanyFinancialInfo> dartCompanyFinancialInfoList) {
+        return insertsCompanyFinancialInfo(dartCompanyFinancialInfoList, 1000 );
     }
 
     /**
      * 한번에 지정된 insert 개수만큼 insert
-     * @param companyFinancialInfoList
+     * @param dartCompanyFinancialInfoList
      * @param insertSize
      * @return
      */
-    public int insertsCompanyFinancialInfo(ArrayList<CompanyFinancialInfo> companyFinancialInfoList, int insertSize ) {
-        if ( companyFinancialInfoList == null ) throw new ParameterMissingException( "CompanyFinancialInfoList" );
+    public int insertsCompanyFinancialInfo(ArrayList<DartCompanyFinancialInfo> dartCompanyFinancialInfoList, int insertSize ) {
+        if ( dartCompanyFinancialInfoList == null ) throw new ParameterMissingException( "CompanyFinancialInfoList" );
 
         int insertCount = 0;
-        int remainSize = companyFinancialInfoList.size();
+        int remainSize = dartCompanyFinancialInfoList.size();
         int startIndex = 0;
         int endIndex = insertSize;
         while ( remainSize > insertSize ) {
 
-            ArrayList<CompanyFinancialInfo> subList = (ArrayList) companyFinancialInfoList.subList( startIndex, endIndex );
-            insertCount += companyFinancialInfoMapper.insertsCompanyFinancialInfo( subList );
+            ArrayList<DartCompanyFinancialInfo> subList = (ArrayList) dartCompanyFinancialInfoList.subList( startIndex, endIndex );
+            insertCount += dartCompanyFinancialInfoMapper.insertsDartCompanyFinancialInfo( subList );
             remainSize -= insertSize;           // insert 숫자만큼 남은 데이터 개수 줄임
             startIndex += insertSize;           // startIndex 를 다음으로
             endIndex += insertSize;             // endIndex를 다음으로
-            if ( endIndex > companyFinancialInfoList.size() ) endIndex = companyFinancialInfoList.size();     // 마지막 인덱스가 배열을 벗어나면 마지막 인덱스는 배열 마지막으로
+            if ( endIndex > dartCompanyFinancialInfoList.size() ) endIndex = dartCompanyFinancialInfoList.size();     // 마지막 인덱스가 배열을 벗어나면 마지막 인덱스는 배열 마지막으로
         }
 
-        if ( startIndex < companyFinancialInfoList.size() ) {
-            ArrayList<CompanyFinancialInfo> subList = (ArrayList) companyFinancialInfoList.subList(startIndex, endIndex);
-            insertCount += companyFinancialInfoMapper.insertsCompanyFinancialInfo(subList);
+        if ( startIndex < dartCompanyFinancialInfoList.size() ) {
+            ArrayList<DartCompanyFinancialInfo> subList = (ArrayList) dartCompanyFinancialInfoList.subList(startIndex, endIndex);
+            insertCount += dartCompanyFinancialInfoMapper.insertsDartCompanyFinancialInfo(subList);
         }
 
         return insertCount;
     }
 
-    public int updateCompanyFinancialInfo( CompanyFinancialInfo companyFinancialInfo) {
-        if ( companyFinancialInfo == null ) throw new ParameterMissingException( "CompanyFinancialInfo" );
-        if ( companyFinancialInfo.getCompanyCode() == null ) throw new ParameterMissingException( "companyCode" );
-        if ( companyFinancialInfo.getReportCode() == null ) throw new ParameterMissingException( "reportCode" );
-        if ( companyFinancialInfo.getYear() == null ) throw new ParameterMissingException( "year" );
-        if ( companyFinancialInfo.getSubjectDiv() == null ) throw new ParameterMissingException( "subjectDiv" );
-        if ( companyFinancialInfo.getAccountName() == null ) throw new ParameterMissingException( "accountName" );
+    public int updateCompanyFinancialInfo( DartCompanyFinancialInfo dartCompanyFinancialInfo) {
+        if ( dartCompanyFinancialInfo == null ) throw new ParameterMissingException( "CompanyFinancialInfo" );
+        if ( dartCompanyFinancialInfo.getCompanyCode() == null ) throw new ParameterMissingException( "companyCode" );
+        if ( dartCompanyFinancialInfo.getReportCode() == null ) throw new ParameterMissingException( "reportCode" );
+        if ( dartCompanyFinancialInfo.getYear() == null ) throw new ParameterMissingException( "year" );
+        if ( dartCompanyFinancialInfo.getSubjectDiv() == null ) throw new ParameterMissingException( "subjectDiv" );
+        if ( dartCompanyFinancialInfo.getAccountName() == null ) throw new ParameterMissingException( "accountName" );
 
-        return companyFinancialInfoMapper.updateCompanyFinancialInfo(companyFinancialInfo);
+        return dartCompanyFinancialInfoMapper.updateDartCompanyFinancialInfo(dartCompanyFinancialInfo);
     }
     
-    public int updateInsetCompanyFinancialInfo( CompanyFinancialInfo companyFinancialInfo ) {
-        int result = updateCompanyFinancialInfo(companyFinancialInfo);
+    public int updateInsetCompanyFinancialInfo( DartCompanyFinancialInfo dartCompanyFinancialInfo) {
+        int result = updateCompanyFinancialInfo(dartCompanyFinancialInfo);
         if ( result == 0 ) {
-            result = insertCompanyFinancialInfo(companyFinancialInfo);
+            result = insertCompanyFinancialInfo(dartCompanyFinancialInfo);
         }
         return result;
     }
 
-    public int deleteCompanyFinancialInfo( CompanyFinancialInfo companyFinancialInfo ) {
-        if ( companyFinancialInfo == null ) throw new ParameterMissingException( "CompanyFinancialInfo" );
-        if ( companyFinancialInfo.getCompanyCode() == null ) throw new ParameterMissingException( "companyCode" );
-        if ( companyFinancialInfo.getReportCode() == null ) throw new ParameterMissingException( "reportCode" );
-        if ( companyFinancialInfo.getYear() == null ) throw new ParameterMissingException( "year" );
-        if ( companyFinancialInfo.getSubjectDiv() == null ) throw new ParameterMissingException( "subjectDiv" );
-        if ( companyFinancialInfo.getAccountName() == null ) throw new ParameterMissingException( "accountName" );
+    public int deleteCompanyFinancialInfo( DartCompanyFinancialInfo dartCompanyFinancialInfo) {
+        if ( dartCompanyFinancialInfo == null ) throw new ParameterMissingException( "CompanyFinancialInfo" );
+        if ( dartCompanyFinancialInfo.getCompanyCode() == null ) throw new ParameterMissingException( "companyCode" );
+        if ( dartCompanyFinancialInfo.getReportCode() == null ) throw new ParameterMissingException( "reportCode" );
+        if ( dartCompanyFinancialInfo.getYear() == null ) throw new ParameterMissingException( "year" );
+        if ( dartCompanyFinancialInfo.getSubjectDiv() == null ) throw new ParameterMissingException( "subjectDiv" );
+        if ( dartCompanyFinancialInfo.getAccountName() == null ) throw new ParameterMissingException( "accountName" );
 
-        return companyFinancialInfoMapper.deleteCompanyFinancialInfo( companyFinancialInfo );
+        return dartCompanyFinancialInfoMapper.deleteDartCompanyFinancialInfo(dartCompanyFinancialInfo);
     }
 
 

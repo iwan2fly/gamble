@@ -229,7 +229,8 @@ public class DaumDailyStockScrapper {
                 if ( i == 0 ) {
                     Stock stock = new Stock();
                     stock.setStockCode( stockCode );
-                    stock.setCurrentPrice( stockDaily.getPriceFinal() );
+                    stock.setLastTradeDate( stockDaily.getTradeDate() );        // 마지막 거래일
+                    stock.setCurrentPrice( stockDaily.getPriceFinal() );        // 마지막 가격
                     stockDao.updateStock( stock );
                 }
                 stockDailyDao.saveStockDaily( stockDaily );

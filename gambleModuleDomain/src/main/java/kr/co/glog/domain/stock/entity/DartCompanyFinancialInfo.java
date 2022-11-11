@@ -9,8 +9,8 @@ import org.apache.ibatis.type.Alias;
 @Getter
 @Setter
 @ToString(callSuper=false)
-@Alias("CompanyFinancialInfo")
-public class CompanyFinancialInfo extends EntityModel {
+@Alias("DartCompanyFinancialInfo")
+public class DartCompanyFinancialInfo extends EntityModel {
     String  receiptNumber;          // 접수번호
     String  companyCode;            // 회사코드
     String  reportCode;             // 보고서코드 1분기 : 11013, 반기 : 11012, 3분기 : 11014, 사업 : 11011

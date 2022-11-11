@@ -23,7 +23,7 @@ const RestResponseStatus = {
 	INTERNAL_SERVER_WARN:"INTERNAL_SERVER_WARN",
 	DATA_NOT_FOUND:"DATA_NOT_FOUND",
 	DATABASE_ERROR:"DATABASE_ERROR",
-	UNKNOWN:"UNKNOWN",
+	UNEXPECTED:"UNEXPECTED",
 };
 
 //API 참고 URL : https://github.com/axios/axios#axiospatchurl-data-config
@@ -42,6 +42,16 @@ function _post( url, params, callback, args, object ) {
 //GET 일 경우, 무조건 query string 에 파라미터 세팅
 function _get( url, params, callback, args ) {
 	sendCommandAxios(AXIOS.METHOD.GET,  url, params, callback, args );
+}
+
+async function _aget( url, params ) {
+	try {
+		const response = await axios.get( url,  {params});
+		return response.data;
+	} catch ( error ) {
+		console.log( '#error : ' + error );
+	}
+
 }
 
 //Delete 일 경우, 무조건 body 에 파라미터 세팅

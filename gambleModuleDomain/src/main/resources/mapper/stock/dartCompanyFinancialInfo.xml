@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="kr.co.glog.domain.stock.mapper.CompanyFinancialInfoMapper">
+<mapper namespace="kr.co.glog.domain.stock.mapper.DartCompanyFinancialInfoMapper">
 
-    <insert id="insertCompanyFinancialInfo" parameterType="CompanyFinancialInfo" keyProperty="receiptNumber">
-        INSERT INTO companyFinancialInfo
+    <insert id="insertDartCompanyFinancialInfo" parameterType="DartCompanyFinancialInfo" keyProperty="receiptNumber">
+        INSERT INTO dartCompanyFinancialInfo
             ( receiptNumber, companyCode, reportCode, year, subjectDiv, subjectName, accountId, accountName, accountDetail, kiName, kiAmount, prevKiName, prevKiAmount, prev2KiName, prev2KiAmount, infoOrder, currency, insertTime, updateTime )
         VALUES
             ( #{receiptNumber}, #{companyCode}, #{reportCode}, #{year}, #{subjectDiv}, #{subjectName}, #{accountId}, #{accountName}, #{accountDetail}, #{kiName}, #{kiAmount}, #{prevKiName}, #{prevKiAmount}, #{prev2KiName}, #{prev2KiAmount}, #{infoOrder}, #{currency}, now(), now() )
     </insert>
 
-    <insert id="insertsCompanyFinancialInfo" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="sotckId" keyProperty="CompanyFinancialInfoCode">
-        INSERT INTO companyFinancialInfo
+    <insert id="insertsDartCompanyFinancialInfo" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="sotckId" keyProperty="DartCompanyFinancialInfoCode">
+        INSERT INTO dartCompanyFinancialInfo
             ( receiptNumber, companyCode, reportCode, year, subjectDiv, subjectName, accountId, accountName, accountDetail, kiName, kiAmount, prevKiName, prevKiAmount, prev2KiName, prev2KiAmount, infoOrder, currency, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
@@ -18,8 +18,8 @@
         </foreach>
     </insert>
 
-    <update id="updateCompanyFinancialInfo" parameterType="CompanyFinancialInfo">
-        UPDATE 	companyFinancialInfo
+    <update id="updateDartCompanyFinancialInfo" parameterType="DartCompanyFinancialInfo">
+        UPDATE 	dartCompanyFinancialInfo
         SET
         <trim prefix="" suffixOverrides=",">
             <if test="companyCode != null">companyCode = #{companyCode},</if>
@@ -40,61 +40,61 @@
             <if test="currency != null">currency = #{currency},</if>
             updateTime = now()
         </trim>
-        WHERE companyFinancialInfo.companyCode=#{companyCode}
-        AND   companyFinancialInfo.reportCode=#{reportCode}
-        AND   companyFinancialInfo.year=#{year}
-        AND   companyFinancialInfo.subjectDiv=#{subjectDiv}
-        AND   companyFinancialInfo.accountName=#{accountName}
+        WHERE dartCompanyFinancialInfo.companyCode=#{companyCode}
+        AND   dartCompanyFinancialInfo.reportCode=#{reportCode}
+        AND   dartCompanyFinancialInfo.year=#{year}
+        AND   dartCompanyFinancialInfo.subjectDiv=#{subjectDiv}
+        AND   dartCompanyFinancialInfo.accountName=#{accountName}
     </update>
 
-    <delete id="deleteCompanyFinancialInfo" parameterType="CompanyFinancialInfo">
-        DELETE FROM companyFinancialInfo
-        WHERE companyFinancialInfo.companyCode=#{companyCode}
-          AND   companyFinancialInfo.reportCode=#{reportCode}
-          AND   companyFinancialInfo.year=#{year}
-          AND   companyFinancialInfo.subjectDiv=#{subjectDiv}
-          AND   companyFinancialInfo.accountName=#{accountName}
+    <delete id="deleteDartCompanyFinancialInfo" parameterType="DartCompanyFinancialInfo">
+        DELETE FROM dartCompanyFinancialInfo
+        WHERE dartCompanyFinancialInfo.companyCode=#{companyCode}
+          AND   dartCompanyFinancialInfo.reportCode=#{reportCode}
+          AND   dartCompanyFinancialInfo.year=#{year}
+          AND   dartCompanyFinancialInfo.subjectDiv=#{subjectDiv}
+          AND   dartCompanyFinancialInfo.accountName=#{accountName}
     </delete>
 
-    <select id="selectCompanyFinancialInfoList" parameterType="CompanyFinancialInfoParam" resultType="CompanyFinancialInfoResult" >
-        SELECT 	companyFinancialInfo.*
-        FROM 	companyFinancialInfo
-        <include refid="whereCompanyFinancialInfo" ></include>
-        <include refid="orderCompanyFinancialInfo" ></include>
+    <select id="selectDartCompanyFinancialInfoList" parameterType="DartCompanyFinancialInfoParam" resultType="DartCompanyFinancialInfoResult" >
+        SELECT 	dartCompanyFinancialInfo.*
+        FROM 	dartCompanyFinancialInfo
+        <include refid="whereDartCompanyFinancialInfo" ></include>
+        <include refid="orderDartCompanyFinancialInfo" ></include>
     </select>
 
-    <select id="selectCompanyFinancialInfoListCount" parameterType="CompanyFinancialInfoParam" resultType="java.lang.Integer">
+    <select id="selectDartCompanyFinancialInfoListCount" parameterType="DartCompanyFinancialInfoParam" resultType="java.lang.Integer">
         SELECT 	COUNT(*)
-        FROM   	companyFinancialInfo
-        <include refid="whereCompanyFinancialInfo" ></include>
+        FROM   	dartCompanyFinancialInfo
+        <include refid="whereDartCompanyFinancialInfo" ></include>
     </select>
 
-    <sql id="whereCompanyFinancialInfo">
+    <sql id="whereDartCompanyFinancialInfo">
         <where>
             <trim prefixOverrides = "AND | OR">
-                <if test="receiptNumber != null and receiptNumber != ''">AND companyFinancialInfo.receiptNumber=#{receiptNumber}</if>
-                <if test="companyCode != null and companyCode != ''">AND companyFinancialInfo.companyCode=#{companyCode}</if>
-                <if test="reportCode != null and reportCode != ''">AND companyFinancialInfo.reportCode=#{reportCode}</if>
-                <if test="year != null and year != ''">AND companyFinancialInfo.year=#{year}</if>
-                <if test="subjectDiv != null and subjectDiv != ''">AND companyFinancialInfo.subjectDiv=#{subjectDiv}</if>
-                <if test="subjectName != null and subjectName != ''">AND companyFinancialInfo.subjectName=#{subjectName}</if>
-                <if test="accountId != null and accountId != ''">AND companyFinancialInfo.accountId=#{accountId}</if>
-                <if test="accountName != null and accountName != ''">AND companyFinancialInfo.accountName=#{accountName}</if>
-                <if test="accountDetail != null and accountDetail != ''">AND companyFinancialInfo.accountDetail=#{accountDetail}</if>
-                <if test="kiName != null and kiName != ''">AND companyFinancialInfo.kiName=#{kiName}</if>
-                <if test="kiAmount != null and kiAmount != ''">AND companyFinancialInfo.kiAmount=#{kiAmount}</if>
-                <if test="prevKiName != null and prevKiName != ''">AND companyFinancialInfo.prevKiName=#{prevKiName}</if>
-                <if test="prevKiAmount != null and prevKiAmount != ''">AND companyFinancialInfo.prevKiAmount=#{prevKiAmount}</if>
-                <if test="prev2KiName != null and prev2KiName != ''">AND companyFinancialInfo.prev2KiName=#{prev2KiName}</if>
-                <if test="prev2KiAmount != null and prev2KiAmount != ''">AND companyFinancialInfo.prev2KiAmount=#{prev2KiAmount}</if>
-                <if test="infoOrder != null and infoOrder != ''">AND companyFinancialInfo.infoOrder=#{infoOrder}</if>
-                <if test="currency != null and currency != ''">AND companyFinancialInfo.currency=#{currency}</if>
-                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND companyFinancialInfo.companyCode like CONCAT('%',#{pagingParam.filter},'%')</if>
+                <if test="receiptNumber != null and receiptNumber != ''">AND dartCompanyFinancialInfo.receiptNumber=#{receiptNumber}</if>
+                <if test="companyCode != null and companyCode != ''">AND dartCompanyFinancialInfo.companyCode=#{companyCode}</if>
+                <if test="reportCode != null and reportCode != ''">AND dartCompanyFinancialInfo.reportCode=#{reportCode}</if>
+                <if test="year != null and year != ''">AND dartCompanyFinancialInfo.year=#{year}</if>
+                <if test="subjectDiv != null and subjectDiv != ''">AND dartCompanyFinancialInfo.subjectDiv=#{subjectDiv}</if>
+                <if test="subjectName != null and subjectName != ''">AND dartCompanyFinancialInfo.subjectName=#{subjectName}</if>
+                <if test="accountId != null and accountId != ''">AND dartCompanyFinancialInfo.accountId=#{accountId}</if>
+                <if test="accountName != null and accountName != ''">AND dartCompanyFinancialInfo.accountName=#{accountName}</if>
+                <if test="accountDetail != null and accountDetail != ''">AND dartCompanyFinancialInfo.accountDetail=#{accountDetail}</if>
+                <if test="kiName != null and kiName != ''">AND dartCompanyFinancialInfo.kiName=#{kiName}</if>
+                <if test="kiAmount != null and kiAmount != ''">AND dartCompanyFinancialInfo.kiAmount=#{kiAmount}</if>
+                <if test="prevKiName != null and prevKiName != ''">AND dartCompanyFinancialInfo.prevKiName=#{prevKiName}</if>
+                <if test="prevKiAmount != null and prevKiAmount != ''">AND dartCompanyFinancialInfo.prevKiAmount=#{prevKiAmount}</if>
+                <if test="prev2KiName != null and prev2KiName != ''">AND dartCompanyFinancialInfo.prev2KiName=#{prev2KiName}</if>
+                <if test="prev2KiAmount != null and prev2KiAmount != ''">AND dartCompanyFinancialInfo.prev2KiAmount=#{prev2KiAmount}</if>
+                <if test="infoOrder != null and infoOrder != ''">AND dartCompanyFinancialInfo.infoOrder=#{infoOrder}</if>
+                <if test="currency != null and currency != ''">AND dartCompanyFinancialInfo.currency=#{currency}</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND dartCompanyFinancialInfo.companyCode like CONCAT('%',#{pagingParam.filter},'%')</if>
             </trim>
         </where>
     </sql>
 
-    <sql id="orderCompanyFinancialInfo">
+    <sql id="orderDartCompanyFinancialInfo">
         <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
             <choose>
                 <when test="pagingParam.sortIndex eq 'receiptNumber'">receiptNumber</when>

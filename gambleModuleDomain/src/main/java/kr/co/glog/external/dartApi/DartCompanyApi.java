@@ -30,7 +30,7 @@ public class DartCompanyApi {
     public void updateCompany( String companyCode ) {
         Company company = getCompany( getDocument( companyCode ) );
         company.setCompanyCode( companyCode );
-        companyDao.updateInsetCompany( company );
+        companyDao.updateInsertCompany( company );
     }
 
     /**
