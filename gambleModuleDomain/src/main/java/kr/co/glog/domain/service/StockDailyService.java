@@ -44,6 +44,8 @@ public class StockDailyService {
         stockDaily.setPriceHigh( daumDailyStock.getHighPrice() );
         stockDaily.setPriceLow( daumDailyStock.getLowPrice() );
         stockDaily.setVolume( daumDailyStock.getAccTradeVolume() );
+        stockDaily.setPriceTotal( daumDailyStock.getAccTradePrice() );
+        stockDaily.setVolume( daumDailyStock.getAccTradeVolume() );
         stockDaily.setRateChange( Float.parseFloat( daumDailyStock.getChangeRate() ) );
 
         /*

@@ -11,7 +11,6 @@
 <!-- Page Sidebar Ends-->
 <div class="page-body" id="main">
 
-
     <div class="container-fluid">
         <div class="page-header">
             <div class="row">
@@ -51,136 +50,54 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
-                    <div class="card-header pb-0">
-                        <h4>
-                            <span v-text="stock.stockName"></span>
-                            <span class="text-success" v-text="stockDaily.priceFinal"></span>
-                        </h4>
-                        <span class="badge text-bg-primary" v-text="stock.marketTypeCode"></span>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                            <tr>
+                                <th scope="col">
+                                    <span class="h4 text-primary" v-text="stock.stockName"></span>
+                                    <span class="h6 text-dark" v-text="stock.stockCode"></span>
+                                </th>
+                                <th scope="col"><span class="h4 pull-right" style="margin-bottom:0" v-text="stockDaily.priceFinal"></span></th>
+                            </tr>
+                            </thead>
+                        </table>
                     </div>
-                    <div class="card-body typography">
-                        <span class="text-end" v-text="stockDaily.stockCode"></span>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tbody>
+                            <tr>
+                                <th scope="col"><span>전일</span></th>
+                                <th scope="col"><span>시가</span></th>
+                                <th scope="col"><span>고가</span></th>
+                                <th scope="col"><span>저가</span></th>
+                            </tr>
+                            <tr>
+                                <td><span class="pull-right" v-text="stockDaily.priceYesterday"></span></td>
+                                <td><span class="pull-right" v-text="stockDaily.priceStart"></span></td>
+                                <td><span class="pull-right" v-text="stockDaily.priceHigh"></span></td>
+                                <td><span class="pull-right" v-text="stockDaily.priceLow"></span></td>
+                            </tr>
+
+                            <tr>
+                                <th scope="col"><span>거래량</span></th>
+                                <th scope="col"><span>거래대금</span></th>
+                                <th scope="col"><span>외국인</span></th>
+                                <th scope="col"><span>기관</span></th>
+                            </tr>
+                            <tr>
+                                <td><span class="pull-right" v-text="stockDaily.volume"></span></td>
+                                <td><span class="pull-right"></span></td>
+                                <td><span class="pull-right" v-text="stockDaily.volumeForeigner"></span></td>
+                                <td><span class="pull-right" v-text="stockDaily.volumeOrg"></span></td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-
-            <div class="col-xl-6 xl-50 box-col-12">
-                <div class="widget-joins card widget-arrow">
-                    <div class="row">
-                        <div class="col-sm-6 pe-0">
-                            <div class="media border-after-xs">
-                                <div class="align-self-center me-3 text-start"><!-- span class="widget-t mb-1">Sale</span-->
-                                    <h5 class="mb-0">전일</h5>
-                                </div>
-                                <div class="media-body align-self-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-down font-primary"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg></div>
-                                <div class="media-body">
-                                    <h5 class="mb-0"><span class="counter" v-text="stockDaily.priceYesterday"></span></h5><span class="mb-1">-$2658(36%)</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 ps-0">
-                            <div class="media">
-                                <div class="align-self-center me-3 text-start"><!-- span class="widget-t mb-1">Sale</span-->
-                                    <h5 class="mb-0">시가</h5>
-                                </div>
-                                <div class="media-body align-self-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up font-primary"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg></div>
-                                <div class="media-body ps-2">
-                                    <h5 class="mb-0"><span class="counter" v-text="stockDaily.priceStart"></span></h5><span class="mb-1">+$369(15%)</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 pe-0">
-                            <div class="media border-after-xs">
-                                <div class="align-self-center me-3 text-start"><!-- span class="widget-t mb-1">Sale</span-->
-                                    <h5 class="mb-0">고가</h5>
-                                </div>
-                                <div class="media-body align-self-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up font-primary"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg></div>
-                                <div class="media-body">
-                                    <h5 class="mb-0"><span class="counter" v-text="stockDaily.priceHigh"></span></h5><span class="mb-1">+$69(65%)</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 ps-0">
-                            <div class="media">
-                                <div class="align-self-center me-3 text-start"><!-- span class="widget-t mb-1">Sale</span-->
-                                    <h5 class="mb-0">저가</h5>
-                                </div>
-                                <div class="media-body align-self-center ps-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up font-primary"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg></div>
-                                <div class="media-body ps-2">
-                                    <h5 class="mb-0"><span class="counter" v-text="stockDaily.priceLow"></span></h5><span class="mb-1">+$3654(90%)          </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-6 xl-50 box-col-12">
-                <div class="widget-joins card">
-                    <div class="row">
-                        <div class="col-sm-6 pe-0">
-                            <div class="media border-after-xs">
-                                <div class="align-self-center me-3">68%<i class="fa fa-angle-up ms-2"></i></div>
-                                <div class="media-body details ps-3"><span class="mb-1">거래량</span>
-                                    <h5 class="mb-0 counter" v-text="stockDaily.volume"></h5>
-                                </div>
-                                <div class="media-body align-self-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-bag font-primary float-end ms-2">
-                                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                                        <path d="M16 10a4 4 0 0 1-8 0"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 ps-0">
-                            <div class="media">
-                                <div class="align-self-center me-3">12%<i class="fa fa-angle-down ms-2"></i></div>
-                                <div class="media-body details ps-3"><span class="mb-1">거래대금</span>
-                                    <h5 class="mb-0 counter">783</h5>
-                                </div>
-                                <div class="media-body align-self-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers font-primary float-end ms-3">
-                                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                                        <polyline points="2 17 12 22 22 17"></polyline>
-                                        <polyline points="2 12 12 17 22 12"></polyline>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 pe-0">
-                            <div class="media border-after-xs">
-                                <div class="align-self-center me-3">68%<i class="fa fa-angle-up ms-2"></i></div>
-                                <div class="media-body details ps-3 pt-0"><span class="mb-1">외국인</span>
-                                    <h5 class="mb-0 counter" v-text="stockDaily.volumeForeigner"></h5>
-                                </div>
-                                <div class="media-body align-self-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-cart font-primary float-end ms-2">
-                                        <circle cx="9" cy="21" r="1"></circle>
-                                        <circle cx="20" cy="21" r="1"></circle>
-                                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 ps-0">
-                            <div class="media">
-                                <div class="align-self-center me-3">68%<i class="fa fa-angle-up ms-2"></i></div>
-                                <div class="media-body details ps-3 pt-0"><span class="mb-1">기관</span>
-                                    <h5 class="mb-0 counter" v-text="stockDaily.volumeOrg"></h5>
-                                </div>
-                                <div class="media-body align-self-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign font-primary float-end ms-2">
-                                        <line x1="12" y1="1" x2="12" y2="23"></line>
-                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
     <!-- Container-fluid Ends-->
@@ -205,4 +122,5 @@
 <script src="/js/web/svc/krx/stocks/main.js"></script>
 
 {{>web/layouts/fullNavFooter}}
+
 

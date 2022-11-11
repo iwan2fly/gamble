@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.glog.domain.stock.mapper.CompanyFinanceMapper">
+
+    <insert id="insertCompanyFinance" parameterType="companyFinance" keyProperty="companyFinanceCode">
+        INSERT INTO companyFinance
+            ( companyCode, year, quarter, subject, account, amount, sortOrder, insertTime, updateTime)
+        VALUES
+            ( #{companyCode}, #{year}, #{quarter}, #{subject}, #{account}, #{amount}, #{sortOrder}, now(), now() )
+    </insert>
+
+    <insert id="insertsCompanyFinance" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="sotckId" keyProperty="companyFinanceCode">
+        INSERT INTO companyFinance
+        ( companyCode, year, quarter, subject, account, amount, sortOrder, insertTime, updateTime)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," open="" close="">
+            ( #{companyCode}, #{item.year}, #{item.quarter}, #{item.subject}, #{item.account}, #{item.amount}, #{item.sortOrder}, now(), now() )
+        </foreach>
+    </insert>
+
+    <delete id="deleteCompanyFinance" parameterType="companyFinance">
+        DELETE FROM companyFinance
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="companyCode != null and companyCode != ''">AND companyFinance.companyCode=#{companyCode}</if>
+                <if test="year != null and year != ''">AND companyFinance.year=#{year}</if>
+                <if test="quarter != null and quarter != ''">AND companyFinance.quarter=#{quarter}</if>
+            </trim>
+        </where>
+    </delete>
+
+    <select id="selectCompanyFinanceList" parameterType="companyFinanceParam" resultType="companyFinanceResult" >
+        SELECT 	companyFinance.*
+        FROM 	companyFinance
+        <include refid="whereCompanyFinance" ></include>
+        <include refid="orderCompanyFinance" ></include>
+    </select>
+
+    <select id="selectCompanyFinanceListCount" parameterType="companyFinanceParam" resultType="java.lang.Integer">
+        SELECT 	COUNT(*)
+        FROM   	companyFinance
+        <include refid="whereCompanyFinance" ></include>
+    </select>
+
+    <sql id="whereCompanyFinance">
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="companyCode != null and companyCode != ''">AND companyFinance.companyCode=#{companyCode}</if>
+                <if test="year != null and year != ''">AND companyFinance.year=#{year}</if>
+                <if test="quarter != null and quarter != ''">AND companyFinance.quarter=#{quarter}</if>
+                <if test="subject != null and subject != ''">AND companyFinance.subject=#{subject}</if>
+                <if test="account != null and account != ''">AND companyFinance.account=#{account}</if>
+                <if test="amount != null and amount != ''">AND companyFinance.amount=#{amount}</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND companyFinance.companyCode like CONCAT('%',#{pagingParam.filter},'%')</if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="orderCompanyFinance">
+        <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
+            <choose>
+                <when test="pagingParam.sortIndex eq 'companyCode'">companyCode</when>
+                <when test="pagingParam.sortIndex eq 'year'">year</when>
+                <when test="pagingParam.sortIndex eq 'quarter'">quarter</when>
+                <when test="pagingParam.sortIndex eq 'subject'">subject</when>
+                <when test="pagingParam.sortIndex eq 'account'">account</when>
+                <when test="pagingParam.sortIndex eq 'amount'">amount</when>
+                <otherwise>companyCode</otherwise>
+            </choose>
+            <choose>
+                <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
+                <otherwise>ASC</otherwise>
+            </choose>
+        </if>
+        <if test="pagingParam.rows gt 0">
+            LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}
+        </if>
+    </sql>
+    
+</mapper>

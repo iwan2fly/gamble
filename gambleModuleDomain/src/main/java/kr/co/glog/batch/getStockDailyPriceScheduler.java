@@ -174,7 +174,7 @@ public class getStockDailyPriceScheduler {
 
 
     // 당일 가격정보 업서트
-    @Scheduled(cron = "0 35 15 * * *")
+    @Scheduled(cron = "0 11 16 * * *")
     public void stockDailyPriceUpsert() throws InterruptedException {
 
         log.info( "당일 가격 정보 업데이트 배치 처리 시작");
@@ -355,7 +355,7 @@ public class getStockDailyPriceScheduler {
      *  DART 의 고유번호로 전체 재무정보 가져와서 있는 건 업데이트하고, 없는 건 등록
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 15 16 10 * * ")
+    @Scheduled(cron = "0 46 17 10 * * ")
     public void updateCompanyFinancialInfo() throws InterruptedException {
 
          /*
@@ -367,8 +367,8 @@ public class getStockDailyPriceScheduler {
 
         log.info( "dartFinancialApi START" );
         String result = "SUCCESS";
-        String year = "2016";
-        String reportCode = "11011";
+        String year = "2022";
+        String reportCode = "11014";
 
 
         try {

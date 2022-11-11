@@ -4,17 +4,17 @@
 
     <insert id="insertStockDaily" parameterType="StockDaily" useGeneratedKeys="true" keyProperty="stockDailyId">
         INSERT INTO stockDaily
-            ( stockCode, tradeDate, priceFinal, priceChange, priceStart, priceHigh, priceLow, volume, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
+            ( stockCode, tradeDate, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTotal, volume, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
         VALUES
-            ( #{stockCode}, #{tradeDate}, #{priceFinal}, #{priceChange}, #{priceStart}, #{priceHigh}, #{priceLow}, #{volume}, #{rateChange}, #{volumeOrg}, #{volumeForeigner}, #{foreignerStockCount}, #{foreignerHoldRate}, now(), now() )
+            ( #{stockCode}, #{tradeDate}, #{priceFinal}, #{priceChange}, #{priceStart}, #{priceHigh}, #{priceLow}, #{priceTotal}, #{volume}, #{rateChange}, #{volumeOrg}, #{volumeForeigner}, #{foreignerStockCount}, #{foreignerHoldRate}, now(), now() )
     </insert>
 
     <insert id="insertsStockDaily" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="stockDailyId" keyProperty="stockDailyId">
         INSERT INTO stock
-            ( stockCode, tradeDate, priceFinal, priceChange, priceStart, priceHigh, priceLow, volume, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
+            ( stockCode, tradeDate, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTotal, volume, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            ( #{item.stockCode}, #{item.tradeDate}, #{item.priceFinal}, #{item.priceChange}, #{item.priceStart}, #{item.priceHigh}, #{item.priceLow}, #{item.volume}, #{item.rateChange}, #{item.volumeOrg}, #{item.volumeForeigner}, #{item.foreignerStockCount}, #{item.foreignerHoldRate}, now(), now() )
+            ( #{item.stockCode}, #{item.tradeDate}, #{item.priceFinal}, #{item.priceChange}, #{item.priceStart}, #{item.priceHigh}, #{item.priceLow}, #{item.priceTotal}, #{item.volume}, #{item.rateChange}, #{item.volumeOrg}, #{item.volumeForeigner}, #{item.foreignerStockCount}, #{item.foreignerHoldRate}, now(), now() )
         </foreach>
     </insert>
 
@@ -27,6 +27,7 @@
             <if test="priceStart != null">priceStart = #{priceStart},</if>
             <if test="priceHigh != null">priceHigh = #{priceHigh},</if>
             <if test="priceLow != null">priceLow = #{priceLow},</if>
+            <if test="priceTotal != null">priceTotal = #{priceTotal},</if>
             <if test="volume != null">volume = #{volume},</if>
             <if test="rateChange != null">rateChange = #{rateChange},</if>
             <if test="volumeOrg != null">volumeOrg = #{volumeOrg},</if>
@@ -68,6 +69,7 @@
                 <if test="priceStart != null and priceStart != ''">AND stockDaily.priceStart=#{priceStart}</if>
                 <if test="priceHigh != null and priceHigh != ''">AND stockDaily.priceHigh=#{priceHigh}</if>
                 <if test="priceLow != null and priceLow != ''">AND stockDaily.priceLow=#{priceLow}</if>
+                <if test="priceTotal != null and priceTotal != ''">AND stockDaily.priceTotal=#{priceTotal}</if>
                 <if test="volume != null and volume != ''">AND stockDaily.volume=#{volume}</if>
                 <if test="volumeOrg != null and volumeOrg != ''">AND stockDaily.volumeOrg=#{volumeOrg}</if>
                 <if test="volumeForeigner != null and volumeForeigner != ''">AND stockDaily.volumeForeigner=#{volumeForeigner}</if>
@@ -89,6 +91,7 @@
                 <when test="pagingParam.sortIndex eq 'priceStart'">priceStart</when>
                 <when test="pagingParam.sortIndex eq 'priceHigh'">priceHigh</when>
                 <when test="pagingParam.sortIndex eq 'priceLow'">priceLow</when>
+                <when test="pagingParam.sortIndex eq 'priceTotal'">priceTotal</when>
                 <when test="pagingParam.sortIndex eq 'volume'">volume</when>
                 <when test="pagingParam.sortIndex eq 'volumeOrg'">volumeOrg</when>
                 <when test="pagingParam.sortIndex eq 'volumeForeigner'">volumeForeigner</when>
