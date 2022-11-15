@@ -115,7 +115,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/rest/auth/**").permitAll() // 회원 가입
                 .antMatchers("/m/**").hasRole("ADMIN")
                 .antMatchers("**/tx/**").hasRole("USER")
-                .anyRequest().authenticated()
+//                .anyRequest().authenticated()
+                .anyRequest().permitAll()
                 .expressionHandler(webExpressionHandler())
                 .and()
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)

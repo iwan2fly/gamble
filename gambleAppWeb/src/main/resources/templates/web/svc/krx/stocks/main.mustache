@@ -57,7 +57,7 @@
                             <tr>
                                 <th scope="col">
                                     <span class="h4 text-primary" v-text="stock.stockName"></span>
-                                    <span class="h6 text-dark" v-text="stock.stockCode"></span>
+                                    <span class="h6 text-light" v-text="stock.stockCode"></span>
                                 </th>
                                 <th scope="col"><span class="h4 pull-right" style="margin-bottom:0" v-text="stockDaily.priceFinal"></span></th>
                             </tr>
@@ -103,16 +103,49 @@
     <!-- Container-fluid Ends-->
 
 
-
-    <div class="container-fluid general-widget">
+    <!-- Container-fluid starts-->
+    <div class="container-fluid">
         <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header pb-0">
+                        <h5>최근 주요 재무정보</h5>
+                        <span>자료가 이상할 경우 신고 부탁드립니다.</span>
+                    </div>
 
+                    <div class="card-body">
 
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                <tr>
+                                    <th colspan="2"><span>최근년도</span></th>
+                                    <th colspan="2"><span>최근분기</span></th>
+                                </tr>
+                                <tr>
+                                    <td><span>항목</span></td>
+                                    <td><span>수치</span></td>
+                                    <td><span>항목</span></td>
+                                    <td><span>수치</span></td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><span class="pull-right" v-text="stockDaily.volume"></span></td>
+                                    <td><span class="pull-right"></span></td>
+                                    <td><span class="pull-right" v-text="stockDaily.volumeForeigner"></span></td>
+                                    <td><span class="pull-right" v-text="stockDaily.volumeOrg"></span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-
+    <!-- Container-fluid Ends-->
 
 
 
