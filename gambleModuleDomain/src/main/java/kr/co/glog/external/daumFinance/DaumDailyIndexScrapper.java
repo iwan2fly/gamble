@@ -47,12 +47,14 @@ public class DaumDailyIndexScrapper {
 
         Document document	= null;
         String url = "https://finance.daum.net/api/market_index/days?page=##page##&perPage=##perPage##&market=##marketTypeCode##&pagination=true";
-        url = url.replaceAll( "##marketTypeCode##", marketTypeCode );
+        url = url.replaceAll( "##marketTypeCode##", marketTypeCode.toUpperCase() );
         url = url.replaceAll( "##page##", ""+page );
         url = url.replaceAll( "##perPage##", ""+perPage );
 
+        log.debug( url );
         try {
             document = Jsoup.connect(url).header("referer", "https://finance.daum.net/domestic/" + marketTypeCode ).ignoreContentType(true).get();
+            log.debug( document.toString() );
         } catch (Exception e) {
             e.printStackTrace();
             throw new ApplicationRuntimeException( "다음 KRD 인덱스 데이터를 읽는 중 오류가 발생했습니다.");
@@ -63,7 +65,7 @@ public class DaumDailyIndexScrapper {
 
     /**
      * 목록의 전체 페이지 개수를 리턴합니다.
-     * @param stockCode
+     * @param marketTypeCode
      * @return
      * @throws ApplicationRuntimeException
      */
@@ -125,7 +127,7 @@ public class DaumDailyIndexScrapper {
 
     /**
      * 일자별 가격 데이터 목록을 가져옵니다.
-     * @param stockCode
+     * @param marketTypeCode
      * @param perPage
      * @param page
      * @return

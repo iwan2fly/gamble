@@ -19,6 +19,17 @@ public class CompanyDao {
 
     private final CompanyMapper companyMapper;
 
+    public CompanyResult getCompanyWithStockCode(String stockCode ) {
+        if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
+
+        CompanyResult CompanyResult = null;
+        CompanyParam CompanyParam = new CompanyParam();
+        CompanyParam.setStockCode( stockCode );
+        ArrayList<CompanyResult> CompanyList = companyMapper.selectCompanyList( CompanyParam );
+        if ( CompanyList != null && CompanyList.size() > 0 ) CompanyResult = CompanyList.get(0);
+        return CompanyResult;
+    }
+
     public CompanyResult getCompany(String companyCode ) {
         if ( companyCode == null ) throw new ParameterMissingException( "companyCode" );
 

@@ -11,15 +11,18 @@ import org.apache.ibatis.type.Alias;
 @ToString(callSuper=false)
 @Alias("DartCompanyFinancialInfo")
 public class DartCompanyFinancialInfo extends EntityModel {
-    String  receiptNumber;          // 접수번호
     String  companyCode;            // 회사코드
-    String  reportCode;             // 보고서코드 1분기 : 11013, 반기 : 11012, 3분기 : 11014, 사업 : 11011
+    String  receiptNumber;          // 접수번호
     String  year;                   // 사업연도
+    String  stockCode;              // 상장회사의 종목코드
+    String  reportCode;             // 보고서코드 1분기 : 11013, 반기 : 11012, 3분기 : 11014, 사업 : 11011
+    String  accountId;
+    String  accountName;            // 계정명
+    String  accountDetail;
+    String  fsDiv;                  // 개별/연결구분
+    String  fsName;                 // 개별/연결명
     String  subjectDiv;             // 재무제표구분
     String  subjectName;            // 재무제표명
-    String  accountId;              // 계정ID     XBRL 표준계정아이디
-    String  accountName;            // 계정명
-    String  accountDetail;          // 계정상세
     String  kiName;                 // 당기명
     String  kiDate;                 // 당기일자
     String    kiAmount;               // 당기금액

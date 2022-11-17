@@ -37,7 +37,7 @@ public class IndexDailyService {
         indexDaily.setTradeDate( daumDailyIndex.getDate().substring(0, 10).replaceAll("-", "") ) ;
         indexDaily.setPriceFinal( daumDailyIndex.getTradePrice() );
         indexDaily.setPriceChange( daumDailyIndex.getChangePrice() );
-        indexDaily.setRateChange( daumDailyIndex.getChangePrice() / ( daumDailyIndex.getTradePrice() + daumDailyIndex.getChangePrice() ) ) ;
+        indexDaily.setRateChange( daumDailyIndex.getChangePrice() / ( daumDailyIndex.getTradePrice() + daumDailyIndex.getChangePrice() ) * 100 ) ;
         indexDaily.setVolume( daumDailyIndex.getAccTradeVolume() );
         indexDaily.setPriceTotal( daumDailyIndex.getAccTradePrice() );
         indexDaily.setPriceTotalPerson( daumDailyIndex.getIndividualStraightPurchasePrice() );

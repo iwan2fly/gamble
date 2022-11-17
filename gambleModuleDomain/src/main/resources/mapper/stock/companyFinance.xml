@@ -61,7 +61,7 @@
             <choose>
                 <when test="pagingParam.sortIndex eq 'companyCode'">companyCode</when>
                 <when test="pagingParam.sortIndex eq 'year'">year</when>
-                <when test="pagingParam.sortIndex eq 'quarter'">quarter</when>
+                <when test="pagingParam.sortIndex eq 'quarter'">year desc, quarter</when>
                 <when test="pagingParam.sortIndex eq 'subject'">subject</when>
                 <when test="pagingParam.sortIndex eq 'account'">account</when>
                 <when test="pagingParam.sortIndex eq 'amount'">amount</when>

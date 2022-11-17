@@ -4,17 +4,17 @@
 
     <insert id="insertDartCompanyFinancialInfo" parameterType="DartCompanyFinancialInfo" keyProperty="receiptNumber">
         INSERT INTO dartCompanyFinancialInfo
-            ( receiptNumber, companyCode, reportCode, year, subjectDiv, subjectName, accountId, accountName, accountDetail, kiName, kiAmount, prevKiName, prevKiAmount, prev2KiName, prev2KiAmount, infoOrder, currency, insertTime, updateTime )
+            ( receiptNumber, companyCode, reportCode, year, subjectDiv, subjectName, accountName, stockCode, fsDiv, fsName, kiName, kiAmount, prevKiName, prevKiAmount, prev2KiName, prev2KiAmount, infoOrder, currency, insertTime, updateTime )
         VALUES
-            ( #{receiptNumber}, #{companyCode}, #{reportCode}, #{year}, #{subjectDiv}, #{subjectName}, #{accountId}, #{accountName}, #{accountDetail}, #{kiName}, #{kiAmount}, #{prevKiName}, #{prevKiAmount}, #{prev2KiName}, #{prev2KiAmount}, #{infoOrder}, #{currency}, now(), now() )
+            ( #{receiptNumber}, #{companyCode}, #{reportCode}, #{year}, #{subjectDiv}, #{subjectName}, #{accountName}, #{stockCode}, #{fsDiv}, #{fsName}, #{kiName}, #{kiAmount}, #{prevKiName}, #{prevKiAmount}, #{prev2KiName}, #{prev2KiAmount}, #{infoOrder}, #{currency}, now(), now() )
     </insert>
 
     <insert id="insertsDartCompanyFinancialInfo" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="sotckId" keyProperty="DartCompanyFinancialInfoCode">
         INSERT INTO dartCompanyFinancialInfo
-            ( receiptNumber, companyCode, reportCode, year, subjectDiv, subjectName, accountId, accountName, accountDetail, kiName, kiAmount, prevKiName, prevKiAmount, prev2KiName, prev2KiAmount, infoOrder, currency, insertTime, updateTime )
+        ( receiptNumber, companyCode, reportCode, year, subjectDiv, subjectName, accountName, stockCode, fsDiv, fsName, kiName, kiAmount, prevKiName, prevKiAmount, prev2KiName, prev2KiAmount, infoOrder, currency, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            ( #{item.receiptNumber}, #{item.companyCode}, #{item.reportCode}, #{item.year}, #{item.subjectDiv}, #{item.subjectName}, #{item.accountId}, #{item.accountName}, #{item.accountDetail}, #{item.kiName}, #{item.kiAmount}, #{item.prevKiName}, #{item.prevKiAmount}, #{item.prev2KiName}, #{item.prev2KiAmount}, #{item.infoOrder}, #{item.currency}, now(), now() )
+            ( #{item.receiptNumber}, #{item.companyCode}, #{item.reportCode}, #{item.year}, #{item.subjectDiv}, #{item.subjectName}, #{item.accountName}, #{item.stockCode}, #{item.fsDiv}, #{item.fsName}, #{item.kiName}, #{item.kiAmount}, #{item.prevKiName}, #{item.prevKiAmount}, #{item.prev2KiName}, #{item.prev2KiAmount}, #{item.infoOrder}, #{item.currency}, now(), now() )
         </foreach>
     </insert>
 
@@ -27,9 +27,10 @@
             <if test="year != null">year = #{year},</if>
             <if test="subjectDiv != null">subjectDiv = #{subjectDiv},</if>
             <if test="subjectName != null">subjectName = #{subjectName},</if>
-            <if test="accountId != null">accountId = #{accountId},</if>
             <if test="accountName != null">accountName = #{accountName},</if>
-            <if test="accountDetail != null">accountDetail = #{accountDetail},</if>
+            <if test="stockCode != null">stockCode = #{stockCode},</if>
+            <if test="fsDiv != null">fsDiv = #{fsDiv},</if>
+            <if test="fsName != null">fsName = #{fsName},</if>
             <if test="kiName != null">kiName = #{kiName},</if>
             <if test="kiAmount != null">kiAmount = #{kiAmount},</if>
             <if test="prevKiName != null">prevKiName = #{prevKiName},</if>
