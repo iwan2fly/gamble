@@ -1,4 +1,4 @@
-package kr.co.glog.batch;
+package kr.co.glog.app.web.batch.controller;
 
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.model.PagingParam;
@@ -114,7 +114,7 @@ public class getStockDailyPriceScheduler {
 
 
     // KOSPI, KOSDAQ INDEX 일별 데이터 전체 등록
-    @Scheduled(cron = "0 7 9 17 * *")
+    @Scheduled(cron = "0 35 15 * * *")
     public void allIndexDailyDataInsert() throws InterruptedException {
 
         long startTime = System.currentTimeMillis();
@@ -439,7 +439,7 @@ public class getStockDailyPriceScheduler {
      *  DART 의 고유번호로 특정회사 재무정보 가져와서 있는 건 업데이트하고, 없는 건 등록
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 55 13 17 * * ")
+    @Scheduled(cron = "0 5 16 22 * * ")
     public void updateCompanyFinancialInfo() throws InterruptedException {
 
          /*
@@ -451,8 +451,8 @@ public class getStockDailyPriceScheduler {
 
         log.info( "dartFinancialApi START" );
         String result = "SUCCESS";
-        String year = "2021";
-        String reportCode = "11013";
+        String year = "2019";
+        String reportCode = "11011";
         String companyCode = "00126380";
 
         try {

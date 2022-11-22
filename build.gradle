@@ -120,6 +120,13 @@ project(':gambleModuleDomain') {
 	}
 }
 
+project(':gambleServerAuth') {
+	dependencies {
+		implementation project(':gambleModuleCommon')
+		implementation project(':gambleModuleDomain')
+	}
+}
+
 project(':gambleAppWeb') {
 	dependencies {
 		implementation project(':gambleModuleCommon')
@@ -136,9 +143,18 @@ project(':gambleAppWeb') {
 	}
 }
 
-project(':gambleServerAuth') {
+project(':gambleBatch') {
 	dependencies {
 		implementation project(':gambleModuleCommon')
 		implementation project(':gambleModuleDomain')
+	}
+
+	sourceSets {
+		main {
+			resources {
+				srcDirs = ['src/main/java', 'src/main/resources']
+				include '**/**'
+			}
+		}
 	}
 }
