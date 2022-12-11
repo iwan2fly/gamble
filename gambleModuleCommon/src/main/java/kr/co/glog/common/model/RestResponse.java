@@ -1,9 +1,5 @@
 package kr.co.glog.common.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import kr.co.glog.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,15 +18,19 @@ import java.util.Map;
 public class RestResponse<T> {
 
 	// HTTP ResponseCdoe
+    @Builder.Default
 	private HttpStatus httpStatus = HttpStatus.OK;
 
 	// Service Response Code
+    @Builder.Default
 	private String responseCode = RestResponseCode.OK.getCode();
 
 	// Service Response Message
+    @Builder.Default
 	private String responseMessage = RestResponseCode.OK.getMessage();
 
 	// Service Debug Message
+    @Builder.Default
 	private String debugMessage = "";
 
     // Service Response Data

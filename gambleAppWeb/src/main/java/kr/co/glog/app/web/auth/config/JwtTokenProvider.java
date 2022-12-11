@@ -18,8 +18,8 @@ import java.util.Base64;
 import java.util.Date;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
 
     private String SECRET_KEY = "32charormoreneeds32charormoreneeds";
