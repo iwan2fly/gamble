@@ -33,8 +33,7 @@ public class ExceptionHandlerAdvice {
 
     /**
      * HttpStatus 400: FAILURE
-     * 시스템은 문제가 없지만, 비즈니스 로직에서 에러가 발생
-     * 얼른 찾아서 수정하자
+     * 비즈니스 로직에서 에러 발생 시 이걸 사용
      */
     @ExceptionHandler(ApplicationRuntimeException.class)
     public ResponseEntity onBaseException(ApplicationRuntimeException e) {

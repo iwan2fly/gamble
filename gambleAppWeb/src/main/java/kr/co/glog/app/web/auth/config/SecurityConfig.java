@@ -2,6 +2,7 @@ package kr.co.glog.app.web.auth.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.glog.AppConfig;
 import kr.co.glog.app.web.auth.CustomAuthenticationEntryPoint;
 import kr.co.glog.app.web.auth.filter.AuthCheckFilter;
 import kr.co.glog.app.web.auth.filter.AuthFilter;
@@ -42,6 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String LOGIN_API = "/rest/auth/login";
     private final JwtTokenProvider jwtTokenProvider;
+    private final AppConfig appConfig;
     private final UserDetailsServiceImpl userDetailsService;
     private final MemberDao memberDao;
 
@@ -86,7 +88,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) {
         web.ignoring()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-                .antMatchers("/js/**", "/lib/**")
+                .antMatchers("/lib/**", appConfig.getStaticPathPattern())
                 .and()
                 .expressionHandler(webExpressionHandler())
         ;
@@ -94,9 +96,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-
         log.debug( "::: SecurityConfig.configure HttpSerucity" );
-        // CustomAuthenticationFilter jwtAuthenticationFilter = new CustomAuthenticationFilter( jwtTokenProvider );
 
         ObjectMapper objectMapper = new ObjectMapper().setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         AuthFilter loginFilter = new AuthFilter(authenticationManagerBean(), jwtTokenProvider, objectMapper);
@@ -109,21 +109,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 토큰 기반 인증이므로 세션 역시 사용하지 않습니다.
                 .and()
                 .authorizeRequests() // 요청에 대한 사용권한 체크
-                .mvcMatchers(HttpMethod.GET, "/auth/login").permitAll() // 화면은 모두 open 되어야 할 것
+
+                // 허용할 화면
+                .mvcMatchers(HttpMethod.GET, "/", "/auth/**", "/svc/**").permitAll()
+                .mvcMatchers(HttpMethod.GET, "/adm/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/user/**").hasRole("USER")
+
+                // 허용할 API
                 .mvcMatchers(HttpMethod.POST, LOGIN_API).permitAll() // 회원 인증
                 .mvcMatchers(HttpMethod.POST, "/rest/auth/register").permitAll() // 회원 가입
-                .antMatchers("/rest/auth/**").permitAll() // 회원 가입
-                .antMatchers("/m/**").hasRole("ADMIN")
-                .antMatchers("**/tx/**").hasRole("USER")
-//                .anyRequest().authenticated()
-                .anyRequest().permitAll()
+
+                .anyRequest().authenticated()
+                //.anyRequest().permitAll()
                 .expressionHandler(webExpressionHandler())
                 .and()
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(loginCheckFilter, BasicAuthenticationFilter.class)
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(authenticationEntryPoint))
-                //.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣는다
         ;
     }
 }

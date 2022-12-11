@@ -39,6 +39,10 @@ spring:
     activate:
       on-profile: dev
 
+  # mustache 파일수정 후 저장 시 변경사항이 즉시적용됨.
+  mustache:
+    prefix: file:src/main/resources/templates/
+
 # 로그파일 위치
 logging.file.name: ./logs/${spring.jmx.default-domain}
 

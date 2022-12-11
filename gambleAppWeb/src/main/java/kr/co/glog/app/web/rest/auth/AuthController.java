@@ -1,15 +1,18 @@
 package kr.co.glog.app.web.rest.auth;
 
 import kr.co.glog.app.web.auth.config.JwtTokenProvider;
+import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.model.RestResponse;
 import kr.co.glog.domain.member.entity.Member;
 import kr.co.glog.domain.member.model.MemberResult;
 import kr.co.glog.domain.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -20,7 +23,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    //private final JwtTokenProvider jwtTokenProvider;
     private final MemberService memberService;
 
 
@@ -34,7 +37,8 @@ public class AuthController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin")
-    public ResponseEntity onlyAdmin() {
+    public ResponseEntity onlyAdmin(@RequestParam Boolean isAdmin) {
+        log.debug("### isAdmin: {}", isAdmin);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(RestResponse.success(Collections.singletonMap("who", "ADMIN 만 호출이 가능합니다.")));
     }

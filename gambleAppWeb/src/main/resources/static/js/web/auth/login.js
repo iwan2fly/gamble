@@ -1,45 +1,30 @@
-let v;
+let authVue;
 document.addEventListener("DOMContentLoaded", function () {
-    v = new Vue(obj);
+    authVue = new Vue(auth);
 });
 
-const obj = {
-    el: '#v',
-    data: {
-        email: 'iwan2fly@gmail.com',
-        password: '123456789',
+const auth = {
+    el: '#el-auth',
+    data() {
+        return {
+            email: 'iwan2fly@gmail.com',
+            password: '123456789',
+        }
+    },
+    created() {
+        log('# created auth vue');
     },
     methods: {
-        async submit() {
-            console.log("submit");
-
-            let param = {
+        async submitAuthForm() {
+            const getAuthResponse = await getAuth({
                 email: this.email,
                 pwd: this.password
-            };
-
-            /*_post( '/rest/auth/login', param, function(json, args) {
-                console.log( json );
-            }, null );*/
-
-            const loginResponse = await axios.post(`/rest/auth/login`, {
-                email: this.email,
-                pwd: this.password,
             });
-            console.log('# loginResponse: ', loginResponse);
+            log('# getAuthResponse: ', getAuthResponse);
 
-            /**
-             * TODO 토큰을 일일이 세팅해야하므로
-             * TODO Axios 인터셉터로 토큰을 저장하는 로직을 넣어야 함
-             */
-            const { access_token, refresh_token } = loginResponse.headers;
-            localStorage.setItem('_gat', access_token);
-            localStorage.setItem('_grt', refresh_token);
-
-            if (loginResponse.data.httpStatus === RestResponseStatus.OK) {
-                //window.location.href = 'https://google.com';
-                alert('# 로그인 완료,, 메인페이지로,,');
+            if (getAuthResponse.data.success) {
+                window.location.href = `/`;
             }
         }
     }
-}
+};

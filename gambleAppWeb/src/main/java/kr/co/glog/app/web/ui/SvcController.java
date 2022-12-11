@@ -1,7 +1,7 @@
 package kr.co.glog.app.web.ui;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.glog.AppConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Iterator;
 import java.util.Map;
 
 @Slf4j
@@ -22,6 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SvcController {
 
+	private final AppConfig appConfig;
 	private final String _ROOT = "web/svc";
 
 
@@ -34,7 +34,7 @@ public class SvcController {
 		if ( StringUtils.hasText( p1 ) )  url += "/" + p1;
 		if ( StringUtils.hasText( p2 ) )  url += "/" + p2;
 
-
+		commonAddAttribute(model);
 		return url;
 	}
 
@@ -50,8 +50,16 @@ public class SvcController {
 
 		// PARAMETER
 		model.addAttribute("serverParam", serverParam );
-
+		commonAddAttribute(model);
 		return url;
+	}
+
+	/**
+	 * view 단으로 넘겨 줄 어플리케이션 공통 변수
+	 */
+	private Model commonAddAttribute(Model model) {
+		model.addAttribute("appConfig", appConfig);
+		return model;
 	}
 
 	public static void main(String[] args) {

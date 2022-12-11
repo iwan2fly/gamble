@@ -1,7 +1,9 @@
-function goLoginPage() {
+const log = console.log;
+
+/*function goLoginPage() {
 	var prefix = location.href.substring(0, location.href.indexOf('/'+CONTEXT_ROOT+'/'));
 	location.href = prefix + CONTEXT_ROOT + '/login';	
-}
+}*/
 
 
 // Reload 방지
@@ -537,20 +539,20 @@ function toHangulDay(value) {
  * setCookie(변수명, 변수값, 기간(분단위));
  * setCookie("token", "cghnupctnh89pt3", 10);
  */
-function setCookie (key, value, minutes) {
+/*function setCookie (key, value, minutes) {
 	var date = new Date();
 	date.setTime(date.getTime() + 1000 * 60 * minutes);
 	document.cookie = key + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
-};
+};*/
 
-function getCookie (key) {
+/*function getCookie (key) {
 	var value = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
 	return value ? value[2] : null;
-};
+};*/
 
-function deleteCookie (key) {
+/*function deleteCookie (key) {
 	document.cookie = key + '=; expires=Thu, 01 Jan 1999 00:00:10 GMT;';
-}
+}*/
 
 /**
  * javascript function 주기적으로 호출하기 (특정 url에서만 동작)
