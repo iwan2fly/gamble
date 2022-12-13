@@ -1,4 +1,4 @@
-package kr.co.glog.app.batch;
+package kr.co.glog;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
