@@ -21,7 +21,7 @@ public class Stock extends EntityModel {
     String  lastTradeDate;              // 마지막거래일
     Integer currentPrice;               // 현재가
     String  stockTypeCode;              // 주식종류코드 ( 보통주, 우선주 )
-    String  marketTypeCode;             // 시장구분코드 ( KOSPI, KOSDAQ, KOTC, KONEX, ETC
+    String  marketCode;                 // 시장코드 ( KOSPI, KOSDAQ, KOTC, KONEX, ETC
     Long    stockCount;                 // 상장주식수
     String  issueDate;                  // 상장일
     Integer facePrice;                  // 액면가

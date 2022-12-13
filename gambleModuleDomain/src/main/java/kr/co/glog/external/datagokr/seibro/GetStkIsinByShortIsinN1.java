@@ -9,6 +9,7 @@ import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.Stock;
 import kr.co.glog.domain.stock.model.StockParam;
 import kr.co.glog.domain.stock.model.StockResult;
+import kr.co.glog.external.ExternalKey;
 import kr.co.glog.external.datagokr.seibro.model.GetStkIsinByShortIsinN1Result;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,7 @@ public class GetStkIsinByShortIsinN1 {
 
         // 코스피 시장의 종목들에 대해서
         StockParam stockParam = new StockParam();
-        stockParam.setMarketTypeCode("kospi");
+        stockParam.setMarketCode("kospi");
         stockList = stockDao.getStockList(stockParam );
         for ( StockResult stockResult : stockList ) {
 
@@ -66,7 +67,7 @@ public class GetStkIsinByShortIsinN1 {
             Thread.sleep(300);
         }
 
-        stockParam.setMarketTypeCode("kosdaq");
+        stockParam.setMarketCode("kosdaq");
         stockList = stockDao.getStockList(stockParam );
         for ( StockResult stockResult : stockList ) {
 
@@ -87,7 +88,7 @@ public class GetStkIsinByShortIsinN1 {
             Thread.sleep(300);
         }
 
-        stockParam.setMarketTypeCode("konex");
+        stockParam.setMarketCode("konex");
         stockList = stockDao.getStockList(stockParam );
         for ( StockResult stockResult : stockList ) {
 
@@ -122,7 +123,7 @@ public class GetStkIsinByShortIsinN1 {
         Document document   = null;
 
         try {
-            String replacedUrl = url.replaceAll( "##serviceKey##", SeibroKey.SEIBRO_SERVICE_KEY );
+            String replacedUrl = url.replaceAll( "##serviceKey##", ExternalKey.DATAGOKR_SERVICE_KEY);
             replacedUrl = replacedUrl.replaceAll( "##shortIsin##", shortIsin );
             replacedUrl = replacedUrl.replaceAll( "##pageNo##", ""+pageNo );
             replacedUrl = replacedUrl.replaceAll( "##numOfRows##", ""+numOfRows );

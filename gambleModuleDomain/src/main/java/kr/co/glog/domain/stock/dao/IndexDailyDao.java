@@ -32,13 +32,13 @@ public class IndexDailyDao {
     }
 
     // 유니크 SELECT
-    public IndexDailyResult getIndexDaily( String marketTypeCode, String tradeDate ) {
-        if ( marketTypeCode == null ) throw new ParameterMissingException( "marketTypeCode" );
+    public IndexDailyResult getIndexDaily( String marketCode, String tradeDate ) {
+        if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( tradeDate == null ) throw new ParameterMissingException( "tradeDate" );
 
         IndexDailyResult indexDailyResult = null;
         IndexDailyParam indexDailyParam = new IndexDailyParam();
-        indexDailyParam.setMarketTypeCode( marketTypeCode );
+        indexDailyParam.setMarketCode( marketCode );
         indexDailyParam.setTradeDate( tradeDate );
         ArrayList<IndexDailyResult> indexDailyList = indexDailyMapper.selectIndexDailyList( indexDailyParam );
         if ( indexDailyList != null && indexDailyList.size() > 0 ) indexDailyResult = indexDailyList.get(0);
@@ -98,14 +98,14 @@ public class IndexDailyDao {
 
     public IndexDaily updateIndexDaily( IndexDaily indexDaily ) {
         if ( indexDaily == null ) throw new ParameterMissingException( "IndexDaily" );
-        if ( indexDaily.getMarketTypeCode() == null || indexDaily.getTradeDate() == null ) throw new ParameterMissingException( "종목코드와 날짜는 필수값입니다.");
+        if ( indexDaily.getMarketCode() == null || indexDaily.getTradeDate() == null ) throw new ParameterMissingException( "종목코드와 날짜는 필수값입니다.");
         indexDailyMapper.updateIndexDaily(indexDaily);
         return indexDaily;
     }
 
     public IndexDaily saveIndexDaily(IndexDaily indexDaily) {
         if ( indexDaily == null ) throw new ParameterMissingException( "IndexDaily" );
-        if ( indexDaily.getMarketTypeCode() == null || indexDaily.getTradeDate() == null ) throw new ParameterMissingException( "종목코드와 날짜는 필수값입니다.");
+        if ( indexDaily.getMarketCode() == null || indexDaily.getTradeDate() == null ) throw new ParameterMissingException( "종목코드와 날짜는 필수값입니다.");
 
         if ( indexDaily.getIndexDailyId() == null ) {
             indexDailyMapper.insertIndexDaily(indexDaily);

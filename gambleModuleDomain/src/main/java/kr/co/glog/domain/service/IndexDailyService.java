@@ -25,7 +25,7 @@ public class IndexDailyService {
      * DaumDailyIndex -> IndexDaily
      * @param daumDailyIndex
      */
-    public IndexDaily getIndexDailyFromDaumDailyIndex( String marketTypeCode, DaumDailyIndex daumDailyIndex ) {
+    public IndexDaily getIndexDailyFromDaumDailyIndex( String marketCode, DaumDailyIndex daumDailyIndex ) {
 
         if ( daumDailyIndex == null ) throw new ParameterMissingException( "daumDailyIndex" );
 
@@ -33,7 +33,7 @@ public class IndexDailyService {
 
 
         IndexDaily indexDaily = new IndexDaily();
-        indexDaily.setMarketTypeCode( marketTypeCode );
+        indexDaily.setMarketCode( marketCode );
         indexDaily.setTradeDate( daumDailyIndex.getDate().substring(0, 10).replaceAll("-", "") ) ;
         indexDaily.setPriceFinal( daumDailyIndex.getTradePrice() );
         indexDaily.setPriceChange( daumDailyIndex.getChangePrice() );

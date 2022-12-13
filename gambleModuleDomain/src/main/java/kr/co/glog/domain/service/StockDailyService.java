@@ -3,12 +3,10 @@ package kr.co.glog.domain.service;
 
 import kr.co.glog.common.exception.ParameterMissingException;
 import kr.co.glog.domain.stock.dao.StockDao;
-import kr.co.glog.domain.stock.entity.Stock;
 import kr.co.glog.domain.stock.entity.StockDaily;
+import kr.co.glog.external.datagokr.fsc.model.GetPriceStockInfoResult;
 import kr.co.glog.external.daumFinance.model.DaumDailyStock;
 import kr.co.glog.external.daumFinance.model.DaumInvestorStock;
-import kr.co.glog.external.daumFinance.model.IncludedStock;
-import kr.co.glog.external.daumFinance.model.RankingStock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,8 +19,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class StockDailyService {
-
-    private final StockDao stockDao;
 
     /**
      * DaumDailyStock -> StockDaily
@@ -43,17 +39,9 @@ public class StockDailyService {
         stockDaily.setPriceStart( daumDailyStock.getOpeningPrice() );
         stockDaily.setPriceHigh( daumDailyStock.getHighPrice() );
         stockDaily.setPriceLow( daumDailyStock.getLowPrice() );
-        stockDaily.setVolume( daumDailyStock.getAccTradeVolume() );
-        stockDaily.setPriceTotal( daumDailyStock.getAccTradePrice() );
-        stockDaily.setVolume( daumDailyStock.getAccTradeVolume() );
-        stockDaily.setRateChange( Float.parseFloat( daumDailyStock.getChangeRate() ) );
-
-        /*
-        stockDaily.setVolumeOrg(0);
-        stockDaily.setVolumeForeigner(0);
-        stockDaily.setForeignerStockCount(0L);
-        stockDaily.setForeignerHoldRate(0.0F);
-        */
+        stockDaily.setVolumeTrade( daumDailyStock.getAccTradeVolume() );
+        stockDaily.setPriceTrade( daumDailyStock.getAccTradePrice() );
+        stockDaily.setRateChange( Float.parseFloat( daumDailyStock.getChangeRate() ) * 100 );
 
         if ( daumDailyStock.getChange() != null && daumDailyStock.getChange().equals("FALL") ) stockDaily.setPriceChange( -stockDaily.getPriceChange() );
 
@@ -74,8 +62,37 @@ public class StockDailyService {
         stockDaily.setVolumeOrg( daumInvestorStock.getInstitutionStraightPurchaseVolume() );
         stockDaily.setVolumeForeigner( daumInvestorStock.getForeignStraightPurchaseVolume() );
         stockDaily.setForeignerStockCount( daumInvestorStock.getForeignOwnShares() );
-        stockDaily.setForeignerHoldRate( daumInvestorStock.getForeignOwnSharesRate() );
+        stockDaily.setForeignerHoldRate( daumInvestorStock.getForeignOwnSharesRate() * 100 );
+
+        return stockDaily;
+    }
+
+    /**
+     * GetPriceStockInfoResult -> StockDaily
+     * @param getPriceStockInfoResult
+     */
+    public StockDaily getStockDailyFromFscStockInfo( GetPriceStockInfoResult getPriceStockInfoResult ) {
+
+        if ( getPriceStockInfoResult == null ) throw new ParameterMissingException( "getPriceStockInfoResult" );
+        log.debug( getPriceStockInfoResult.toString() );
+
+        StockDaily stockDaily = new StockDaily();
+        stockDaily.setIsin( getPriceStockInfoResult.getIsinCd() );                  // isin code
+        stockDaily.setTradeDate( getPriceStockInfoResult.getBasDt() ) ;             // 날짜
+        stockDaily.setStockCode( getPriceStockInfoResult.getSrtnCd() );             // 종목코드(6자리)
+        stockDaily.setStockName( getPriceStockInfoResult.getItmsNm() );             // 종목명
+        stockDaily.setPriceStart( getPriceStockInfoResult.getMkp() );               // 시가
+        stockDaily.setPriceHigh( getPriceStockInfoResult.getHipr() );               // 고가
+        stockDaily.setPriceLow( getPriceStockInfoResult.getLopr() );                // 저가
+        stockDaily.setPriceFinal( getPriceStockInfoResult.getClpr() );              // 종가
+        stockDaily.setPriceChange( getPriceStockInfoResult.getVs() );               // 대비
+        stockDaily.setRateChange( getPriceStockInfoResult.getFltRt() );             // 등락율
+        stockDaily.setVolumeTrade( getPriceStockInfoResult.getTrqu() );             // 거래량
+        stockDaily.setPriceTrade( getPriceStockInfoResult.getTrPrc() );             // 거래대금
+        stockDaily.setVolumeTotal( getPriceStockInfoResult.getLstgStCnt() );        // 주식수
+        stockDaily.setPriceTotal( getPriceStockInfoResult.getMrktTotAmt() );        // 시총
 
         return stockDaily;
     }
 }
+

@@ -13,7 +13,7 @@ import org.apache.ibatis.type.Alias;
 public class IndexDaily extends EntityModel {
 
     Long    indexDailyId;
-    String	marketTypeCode;
+    String	marketCode;
     String 	tradeDate;		            // 날짜
     Float	priceFinal;		            // 종가
     Float   priceChange;                // 변동금액

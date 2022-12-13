@@ -52,7 +52,11 @@ public class StockDailyDao {
         return stockDailyMapper.selectStockDailyList( stockDailyParam );
     }
 
-    public int insertStockDaily ( StockDaily stockDaily) {
+    public int insertStockDaily ( StockDaily stockDaily ) {
+
+        if ( stockDaily == null ) throw new ParameterMissingException( "StockDaily" );
+        if ( stockDaily.getStockCode() == null || stockDaily.getTradeDate() == null ) throw new ParameterMissingException( "종목코드와 날짜는 필수값입니다.");
+
         return stockDailyMapper.insertStockDaily(stockDaily);
     }
 
@@ -107,9 +111,9 @@ public class StockDailyDao {
         if ( stockDaily == null ) throw new ParameterMissingException( "StockDaily" );
         if ( stockDaily.getStockCode() == null || stockDaily.getTradeDate() == null ) throw new ParameterMissingException( "종목코드와 날짜는 필수값입니다.");
 
-        if ( stockDaily.getStockDailyId() == null ) {
+        try {
             stockDailyMapper.insertStockDaily(stockDaily);
-        } else {
+        } catch ( org.springframework.dao.DuplicateKeyException dke ) {
             stockDailyMapper.updateStockDaily(stockDaily);
         }
 

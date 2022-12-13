@@ -36,24 +36,24 @@ public class DaumDailyIndexScrapper {
 
     /**
      * 다음 주식에서 특정 종목의 일자별 가격 문서를 읽어옵니다.
-     * @param marketTypeCode
+     * @param marketCode
      * @param perPage
      * @param page
      * @return
      * @throws ApplicationRuntimeException
      */
-    private Document getDocument(String marketTypeCode, int perPage, int page ) throws ApplicationRuntimeException {
+    private Document getDocument(String marketCode, int perPage, int page ) throws ApplicationRuntimeException {
         if ( perPage > 100 ) perPage = 100;     // 페이지당 100개가 한계
 
         Document document	= null;
-        String url = "https://finance.daum.net/api/market_index/days?page=##page##&perPage=##perPage##&market=##marketTypeCode##&pagination=true";
-        url = url.replaceAll( "##marketTypeCode##", marketTypeCode.toUpperCase() );
+        String url = "https://finance.daum.net/api/market_index/days?page=##page##&perPage=##perPage##&market=##marketCode##&pagination=true";
+        url = url.replaceAll( "##marketCode##", marketCode.toUpperCase() );
         url = url.replaceAll( "##page##", ""+page );
         url = url.replaceAll( "##perPage##", ""+perPage );
 
         log.debug( url );
         try {
-            document = Jsoup.connect(url).header("referer", "https://finance.daum.net/domestic/" + marketTypeCode ).ignoreContentType(true).get();
+            document = Jsoup.connect(url).header("referer", "https://finance.daum.net/domestic/" + marketCode ).ignoreContentType(true).get();
             log.debug( document.toString() );
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,13 +65,13 @@ public class DaumDailyIndexScrapper {
 
     /**
      * 목록의 전체 페이지 개수를 리턴합니다.
-     * @param marketTypeCode
+     * @param marketCode
      * @return
      * @throws ApplicationRuntimeException
      */
-    public int getTotalPages( String marketTypeCode, int perPage ) throws ApplicationRuntimeException {
+    public int getTotalPages( String marketCode, int perPage ) throws ApplicationRuntimeException {
 
-        Document document = getDocument( marketTypeCode, perPage, 1);
+        Document document = getDocument( marketCode, perPage, 1);
         return  getTotalPages( document );            // 목록의 전체 페이지
 
     }
@@ -127,15 +127,15 @@ public class DaumDailyIndexScrapper {
 
     /**
      * 일자별 가격 데이터 목록을 가져옵니다.
-     * @param marketTypeCode
+     * @param marketCode
      * @param perPage
      * @param page
      * @return
      * @throws ApplicationRuntimeException
      */
-    public ArrayList<DaumDailyIndex> getDailyIndexList(String marketTypeCode, int perPage, int page ) throws ApplicationRuntimeException {
+    public ArrayList<DaumDailyIndex> getDailyIndexList(String marketCode, int perPage, int page ) throws ApplicationRuntimeException {
 
-        Document document	= getDocument( marketTypeCode, perPage, page);;
+        Document document	= getDocument( marketCode, perPage, page);;
         return  getDailyIndexList( document );
     }
 
@@ -143,23 +143,23 @@ public class DaumDailyIndexScrapper {
 
     /**
      * 전체 일별 데이터를 IndexDaily 테이블에 인서트
-     * @param marketTypeCode
+     * @param marketCode
      */
-    public void insertDailyIndexFullData( String marketTypeCode  ) {
+    public void insertDailyIndexFullData( String marketCode  ) {
 
         int perPage = 100;
 
         ArrayList<IndexDaily> indexDailyList = new ArrayList<IndexDaily>();
-        int totalPages = getTotalPages( marketTypeCode, perPage );
+        int totalPages = getTotalPages( marketCode, perPage );
 
         log.debug( "totalPages : " + totalPages );
 
         for ( int page = 1; page <= totalPages; page++ ) {
 
-            ArrayList<DaumDailyIndex> daumDailyStockList = getDailyIndexList( marketTypeCode, perPage, page );
+            ArrayList<DaumDailyIndex> daumDailyStockList = getDailyIndexList( marketCode, perPage, page );
 
             for ( DaumDailyIndex daumDailyIndex : daumDailyStockList ) {
-                IndexDaily indexDaily = indexDailyService.getIndexDailyFromDaumDailyIndex( marketTypeCode, daumDailyIndex );
+                IndexDaily indexDaily = indexDailyService.getIndexDailyFromDaumDailyIndex( marketCode, daumDailyIndex );
                 indexDailyList.add( indexDaily );
             }
 
@@ -185,9 +185,9 @@ public class DaumDailyIndexScrapper {
 
     /**
      * 일별 데이터 첫 페이지를 테이블에 업서트
-     * @param marketTypeCode
+     * @param marketCode
      */
-    public void upsertDailyStock( String marketTypeCode  ) throws InterruptedException {
+    public void upsertDailyIndex( String marketCode  ) throws InterruptedException {
 
         int perPage = 10;
 
@@ -200,7 +200,7 @@ public class DaumDailyIndexScrapper {
         while ( !isRead ) {
 
             try {
-                daumDailyIndexList = getDailyIndexList(marketTypeCode, perPage, 1);
+                daumDailyIndexList = getDailyIndexList(marketCode, perPage, 1);
                 isRead = true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -211,7 +211,7 @@ public class DaumDailyIndexScrapper {
 
         // 우리 DB에 맞게 컨버트
         for ( DaumDailyIndex daumDailyIndex : daumDailyIndexList ) {
-            IndexDaily indexDaily = indexDailyService.getIndexDailyFromDaumDailyIndex( marketTypeCode, daumDailyIndex );
+            IndexDaily indexDaily = indexDailyService.getIndexDailyFromDaumDailyIndex( marketCode, daumDailyIndex );
             indexDailyList.add( indexDaily );
         }
 

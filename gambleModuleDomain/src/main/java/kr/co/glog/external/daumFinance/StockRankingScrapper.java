@@ -168,7 +168,7 @@ public class StockRankingScrapper {
         }
 
         for ( Stock stock : stockList ) {
-            stock.setMarketTypeCode( market.toLowerCase() );
+            stock.setMarketCode( market.toLowerCase() );
             log.debug( stock.toString() );
             try {
                 stockDao.insertStock(stock);

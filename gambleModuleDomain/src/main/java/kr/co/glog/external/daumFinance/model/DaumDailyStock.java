@@ -21,8 +21,8 @@ public class DaumDailyStock {
     Integer highPrice;
     Integer lowPrice;
     Long    accTradePrice;
-    Integer accTradeVolume;
+    Long    accTradeVolume;
     Long    periodTradePrice;
-    Integer periodTradeVolume;
+    Long    periodTradeVolume;
     Integer listedSharesCount;
 }

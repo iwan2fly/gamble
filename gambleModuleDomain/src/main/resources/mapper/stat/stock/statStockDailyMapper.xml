@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="kr.co.glog.domain.stock.mapper.StockDailyMapper">
+<mapper namespace="kr.co.glog.domain.stat.stock.mapper.StatStockDailyMapper">
 
-    <insert id="insertStockDaily" parameterType="StockDaily" useGeneratedKeys="true" keyProperty="stockDailyId">
-        INSERT INTO stockDaily
+    <insert id="insertStatStockDaily" parameterType="StatStockDaily" useGeneratedKeys="true" keyProperty="statStockDailyId">
+        INSERT INTO statStockDaily
             ( isin, stockCode, tradeDate, stockName, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, priceTotal, volumeTotal, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
         VALUES
             ( #{isin}, #{stockCode}, #{tradeDate}, #{stockName}, #{priceFinal}, #{priceChange}, #{priceStart}, #{priceHigh}, #{priceLow}, #{priceTrade}, #{volumeTrade}, #{priceTotal}, #{volumeTotal}, #{rateChange}, #{volumeOrg}, #{volumeForeigner}, #{foreignerStockCount}, #{foreignerHoldRate}, now(), now() )
     </insert>
 
-    <insert id="insertsStockDaily" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="stockDailyId" keyProperty="stockDailyId">
+    <insert id="insertsStatStockDaily" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statStockDailyId" keyProperty="statStockDailyId">
         INSERT INTO stock
             ( isin, stockCode, tradeDate, stockName, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, priceTotal, volumeTotal, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
         VALUES
@@ -18,8 +18,8 @@
         </foreach>
     </insert>
 
-    <update id="updateStockDaily" parameterType="StockDaily">
-        UPDATE 	stockDaily
+    <update id="updateStatStockDaily" parameterType="StatStockDaily">
+        UPDATE 	statStockDaily
         SET
         <trim prefix="" suffixOverrides=",">
             <if test="isin != null">isin = #{isin},</if>
@@ -40,58 +40,58 @@
             <if test="foreignerHoldRate != null">foreignerHoldRate = #{foreignerHoldRate},</if>
             updateTime = now()
         </trim>
-        WHERE stockDaily.stockCode=#{stockCode}
-        AND stockDaily.tradeDate=#{tradeDate}
+        WHERE statStockDaily.stockCode=#{stockCode}
+        AND statStockDaily.tradeDate=#{tradeDate}
     </update>
 
-    <delete id="deleteStockDaily" parameterType="StockDaily">
-        DELETE FROM stockDaily
-        WHERE 	stockDailyId=#{stockDailyId}
+    <delete id="deleteStatStockDaily" parameterType="StatStockDaily">
+        DELETE FROM statStockDaily
+        WHERE 	statStockDailyId=#{statStockDailyId}
     </delete>
 
-    <select id="selectStockDailyList" parameterType="StockDailyParam" resultType="StockDailyResult" >
-        SELECT 	stockDaily.*
-        FROM 	stockDaily
-        <include refid="whereStockDaily" ></include>
-        <include refid="orderStockDaily" ></include>
+    <select id="selectStatStockDailyList" parameterType="StatStockDailyParam" resultType="StatStockDailyResult" >
+        SELECT 	statStockDaily.*
+        FROM 	statStockDaily
+        <include refid="whereStatStockDaily" ></include>
+        <include refid="orderStatStockDaily" ></include>
     </select>
 
-    <select id="selectStockDailyListCount" parameterType="StockDailyParam" resultType="java.lang.Integer">
+    <select id="selectStatStockDailyListCount" parameterType="StatStockDailyParam" resultType="java.lang.Integer">
         SELECT 	COUNT(*)
-        FROM   	stockDaily
-        <include refid="whereStockDaily" ></include>
+        FROM   	statStockDaily
+        <include refid="whereStatStockDaily" ></include>
     </select>
 
-    <sql id="whereStockDaily">
+    <sql id="whereStatStockDaily">
         <where>
             <trim prefixOverrides = "AND | OR">
-                <if test="stockDailyId != null and stockDailyId != ''">AND stockDaily.stockDailyId=#{stockDailyId}</if>
-                <if test="isin != null and isin != ''">AND stockDaily.isin=#{isin}</if>
-                <if test="stockCode != null and stockCode != ''">AND stockDaily.stockCode=#{stockCode}</if>
-                <if test="tradeDate != null and tradeDate != ''">AND stockDaily.tradeDate=#{tradeDate}</if>
-                <if test="stockName != null and stockName != ''">AND stockDaily.stockName=#{stockName}</if>
-                <if test="priceFinal != null and priceFinal != ''">AND stockDaily.priceFinal=#{priceFinal}</if>
-                <if test="priceChange != null and priceChange != ''">AND stockDaily.priceChange=#{priceChange}</if>
-                <if test="priceStart != null and priceStart != ''">AND stockDaily.priceStart=#{priceStart}</if>
-                <if test="priceHigh != null and priceHigh != ''">AND stockDaily.priceHigh=#{priceHigh}</if>
-                <if test="priceLow != null and priceLow != ''">AND stockDaily.priceLow=#{priceLow}</if>
-                <if test="priceTrade != null and priceTrade != ''">AND stockDaily.priceTrade=#{priceTrade}</if>
-                <if test="volumeTrade != null and volumeTrade != ''">AND stockDaily.volumeTrade=#{volumeTrade}</if>
-                <if test="priceTotal != null and priceTotal != ''">AND stockDaily.priceTotal=#{priceTotal}</if>
-                <if test="volumeTotal != null and volumeTotal != ''">AND stockDaily.volumeTotal=#{volumeTotal}</if>
-                <if test="volumeOrg != null and volumeOrg != ''">AND stockDaily.volumeOrg=#{volumeOrg}</if>
-                <if test="volumeForeigner != null and volumeForeigner != ''">AND stockDaily.volumeForeigner=#{volumeForeigner}</if>
-                <if test="foreignerStockCount != null and foreignerStockCount != ''">AND stockDaily.foreignerStockCount=#{foreignerStockCount}</if>
-                <if test="foreignerHoldRate != null and foreignerHoldRate != ''">AND stockDaily.foreignerHoldRate=#{foreignerHoldRate}</if>
-                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND stockDaily.dailyStockName like CONCAT('%',#{pagingParam.filter},'%')</if>
+                <if test="statStockDailyId != null and statStockDailyId != ''">AND statStockDaily.statStockDailyId=#{statStockDailyId}</if>
+                <if test="isin != null and isin != ''">AND statStockDaily.isin=#{isin}</if>
+                <if test="stockCode != null and stockCode != ''">AND statStockDaily.stockCode=#{stockCode}</if>
+                <if test="tradeDate != null and tradeDate != ''">AND statStockDaily.tradeDate=#{tradeDate}</if>
+                <if test="stockName != null and stockName != ''">AND statStockDaily.stockName=#{stockName}</if>
+                <if test="priceFinal != null and priceFinal != ''">AND statStockDaily.priceFinal=#{priceFinal}</if>
+                <if test="priceChange != null and priceChange != ''">AND statStockDaily.priceChange=#{priceChange}</if>
+                <if test="priceStart != null and priceStart != ''">AND statStockDaily.priceStart=#{priceStart}</if>
+                <if test="priceHigh != null and priceHigh != ''">AND statStockDaily.priceHigh=#{priceHigh}</if>
+                <if test="priceLow != null and priceLow != ''">AND statStockDaily.priceLow=#{priceLow}</if>
+                <if test="priceTrade != null and priceTrade != ''">AND statStockDaily.priceTrade=#{priceTrade}</if>
+                <if test="volumeTrade != null and volumeTrade != ''">AND statStockDaily.volumeTrade=#{volumeTrade}</if>
+                <if test="priceTotal != null and priceTotal != ''">AND statStockDaily.priceTotal=#{priceTotal}</if>
+                <if test="volumeTotal != null and volumeTotal != ''">AND statStockDaily.volumeTotal=#{volumeTotal}</if>
+                <if test="volumeOrg != null and volumeOrg != ''">AND statStockDaily.volumeOrg=#{volumeOrg}</if>
+                <if test="volumeForeigner != null and volumeForeigner != ''">AND statStockDaily.volumeForeigner=#{volumeForeigner}</if>
+                <if test="foreignerStockCount != null and foreignerStockCount != ''">AND statStockDaily.foreignerStockCount=#{foreignerStockCount}</if>
+                <if test="foreignerHoldRate != null and foreignerHoldRate != ''">AND statStockDaily.foreignerHoldRate=#{foreignerHoldRate}</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND statStockDaily.dailyStockName like CONCAT('%',#{pagingParam.filter},'%')</if>
             </trim>
         </where>
     </sql>
 
-    <sql id="orderStockDaily">
+    <sql id="orderStatStockDaily">
         <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
             <choose>
-                <when test="pagingParam.sortIndex eq 'stockDailyId'">stockDailyId</when>
+                <when test="pagingParam.sortIndex eq 'statStockDailyId'">statStockDailyId</when>
                 <when test="pagingParam.sortIndex eq 'isin'">isin</when>
                 <when test="pagingParam.sortIndex eq 'stockCode'">stockCode</when>
                 <when test="pagingParam.sortIndex eq 'tradeDate'">tradeDate</when>
@@ -109,7 +109,7 @@
                 <when test="pagingParam.sortIndex eq 'volumeForeigner'">volumeForeigner</when>
                 <when test="pagingParam.sortIndex eq 'foreignerStockCount'">foreignerStockCount</when>
                 <when test="pagingParam.sortIndex eq 'foreignerHoldRate'">foreignerHoldRate</when>
-                <otherwise>stockDailyId</otherwise>
+                <otherwise>statStockDailyId</otherwise>
             </choose>
             <choose>
                 <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>

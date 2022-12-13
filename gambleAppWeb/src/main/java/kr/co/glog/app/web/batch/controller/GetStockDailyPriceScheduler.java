@@ -1,5 +1,6 @@
 package kr.co.glog.app.web.batch.controller;
 
+import kr.co.glog.batch.service.StockDailyBatchService;
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
@@ -11,6 +12,7 @@ import kr.co.glog.domain.stock.model.*;
 import kr.co.glog.external.dartApi.DartCompanyApi;
 import kr.co.glog.external.dartApi.DartCorpCodeApi;
 import kr.co.glog.external.dartApi.DartFinancialApi;
+import kr.co.glog.external.datagokr.fsc.GetStockPriceInfo;
 import kr.co.glog.external.datagokr.seibro.GetShortnByMartN1;
 import kr.co.glog.external.datagokr.seibro.GetStkIsinByShortIsinN1;
 import kr.co.glog.external.daumFinance.DaumDailyIndexScrapper;
@@ -23,12 +25,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+
 import java.util.ArrayList;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class getStockDailyPriceScheduler {
+public class GetStockDailyPriceScheduler {
 
     private final NaverDailyStockPriceScrapper naverDailyStockPriceScrapper;
     private final StockRankingScrapper stockRankingScrapper;
@@ -45,6 +48,9 @@ public class getStockDailyPriceScheduler {
     private final CompanyFinancialInfoDao companyFinancialInfoDao;
 
     private final DaumDailyIndexScrapper daumDailyIndexScrapper;
+
+    private final GetStockPriceInfo getStockPriceInfo;
+    private final StockDailyBatchService stockDailyBatchService;
 
 
     //스프링 스케줄러 / 쿼츠 크론 표현식
@@ -139,16 +145,16 @@ public class getStockDailyPriceScheduler {
         // 코스피, 코스닥, 코넥스 전종목 조회
         StockParam stockParam = new StockParam();
         stockParam.setPagingParam( pagingParam );
-        stockParam.setMarketTypeCode("kospi");
+        stockParam.setMarketCode("kospi");
         stockParam.setStartStockCode("140700");
 
         ArrayList<StockResult> kospiList = stockDao.getStockList(stockParam);
         stockParam.setPagingParam( pagingParam );
-        stockParam.setMarketTypeCode("kosdaq");
+        stockParam.setMarketCode("kosdaq");
 
         ArrayList<StockResult> kosdaqList = stockDao.getStockList(stockParam);
         stockParam.setPagingParam( pagingParam );
-        stockParam.setMarketTypeCode("konex");
+        stockParam.setMarketCode("konex");
 
         ArrayList<StockResult> konexList = stockDao.getStockList(stockParam);
         ArrayList<StockResult> stockList = new ArrayList<StockResult>();
@@ -194,7 +200,7 @@ public class getStockDailyPriceScheduler {
 
 
     // 당일 가격정보 업서트
-    @Scheduled(cron = "0 11 16 * * *")
+    @Scheduled(cron = "0 0 16 * * *")
     public void stockDailyPriceUpsert() throws InterruptedException {
 
         log.info( "당일 가격 정보 업데이트 배치 처리 시작");
@@ -204,17 +210,17 @@ public class getStockDailyPriceScheduler {
 
         // 코스피 전종목 조회
         StockParam stockParam = new StockParam();
-        stockParam.setMarketTypeCode("kospi");
+        stockParam.setMarketCode("kospi");
         stockParam.setPagingParam( pagingParam );
         ArrayList<StockResult> kospiList = stockDao.getStockList(stockParam);
 
         // 코스닥
-        stockParam.setMarketTypeCode("kosdaq");
+        stockParam.setMarketCode("kosdaq");
         stockParam.setPagingParam( pagingParam );
         ArrayList<StockResult> kosdaqList = stockDao.getStockList(stockParam);
 
         // 코넥스
-        stockParam.setMarketTypeCode("konex");
+        stockParam.setMarketCode("konex");
         stockParam.setPagingParam( pagingParam );
         ArrayList<StockResult> konexList = stockDao.getStockList(stockParam);
 
@@ -249,7 +255,7 @@ public class getStockDailyPriceScheduler {
     }
 
     // 외인/기관 거래정보 업서트
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "0 0 20 * * *")
     public void stockDailyInvestorUpsert() throws InterruptedException {
 
         log.info( "당일 외인기관 거래정보 업데이트 배치 처리");
@@ -259,17 +265,17 @@ public class getStockDailyPriceScheduler {
 
         // 코스피 전종목 조회
         StockParam stockParam = new StockParam();
-        stockParam.setMarketTypeCode("kospi");
+        stockParam.setMarketCode("kospi");
         stockParam.setPagingParam( pagingParam );
         ArrayList<StockResult> kospiList = stockDao.getStockList(stockParam);
 
         // 코스닥
-        stockParam.setMarketTypeCode("kosdaq");
+        stockParam.setMarketCode("kosdaq");
         stockParam.setPagingParam( pagingParam );
         ArrayList<StockResult> kosdaqList = stockDao.getStockList(stockParam);
 
         // 코넥스
-        stockParam.setMarketTypeCode("konex");
+        stockParam.setMarketCode("konex");
         stockParam.setPagingParam( pagingParam );
         ArrayList<StockResult> konexList = stockDao.getStockList(stockParam);
 
@@ -439,7 +445,7 @@ public class getStockDailyPriceScheduler {
      *  DART 의 고유번호로 특정회사 재무정보 가져와서 있는 건 업데이트하고, 없는 건 등록
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 5 16 22 * * ")
+    @Scheduled(cron = "0 25 11 25 * * ")
     public void updateCompanyFinancialInfo() throws InterruptedException {
 
          /*
@@ -452,7 +458,7 @@ public class getStockDailyPriceScheduler {
         log.info( "dartFinancialApi START" );
         String result = "SUCCESS";
         String year = "2019";
-        String reportCode = "11011";
+        String reportCode = "11012";
         String companyCode = "00126380";
 
         try {
@@ -475,8 +481,18 @@ public class getStockDailyPriceScheduler {
         log.info( "dartFinancialApi END " + result );
         log.info( "===========================================================================" );
         log.info( "" );
+    }
 
 
+    // 코스피 코스닥 전 종목 조회 후 stock 테이블에 등록
+    @Scheduled(cron = "0 0 12 * * * ")
+    public void upsertFromKrxData10() throws InterruptedException {
+        stockDailyBatchService.upsertFromKrxData10();
+    }
+
+
+    @Scheduled(cron = "0 52 10 30 * * ")
+    public void test() throws InterruptedException {
 
     }
 }

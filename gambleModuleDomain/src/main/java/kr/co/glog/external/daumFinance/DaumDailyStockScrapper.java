@@ -14,7 +14,6 @@ import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.Stock;
 import kr.co.glog.domain.stock.entity.StockDaily;
 import kr.co.glog.external.daumFinance.model.DaumDailyStock;
-import kr.co.glog.external.daumFinance.model.RankingStock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;

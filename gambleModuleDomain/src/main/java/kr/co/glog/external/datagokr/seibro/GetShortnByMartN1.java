@@ -5,6 +5,7 @@ import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.domain.service.StockService;
 import kr.co.glog.domain.stock.dao.CompanyDao;
 import kr.co.glog.domain.stock.entity.Stock;
+import kr.co.glog.external.ExternalKey;
 import kr.co.glog.external.datagokr.seibro.model.GetShortByMartN1Result;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class GetShortnByMartN1 {
             Stock stock = new Stock();
             stock.setStockCode( result.getShotnIsin() );
             stock.setStockName( result.getKorSecnNm() );
-            stock.setMarketTypeCode("kospi");
+            stock.setMarketCode("kospi");
 
             stockService.updateInsert( stock );
         }
@@ -45,7 +46,7 @@ public class GetShortnByMartN1 {
             Stock stock = new Stock();
             stock.setStockCode( result.getShotnIsin() );
             stock.setStockName( result.getKorSecnNm() );
-            stock.setMarketTypeCode("kosdaq");
+            stock.setMarketCode("kosdaq");
 
             stockService.updateInsert( stock );
         }
@@ -56,7 +57,7 @@ public class GetShortnByMartN1 {
             Stock stock = new Stock();
             stock.setStockCode( result.getShotnIsin() );
             stock.setStockName( result.getKorSecnNm() );
-            stock.setMarketTypeCode("kotc");
+            stock.setMarketCode("kotc");
 
             stockService.updateInsert( stock );
         }
@@ -66,7 +67,7 @@ public class GetShortnByMartN1 {
             Stock stock = new Stock();
             stock.setStockCode( result.getShotnIsin() );
             stock.setStockName( result.getKorSecnNm() );
-            stock.setMarketTypeCode("konex");
+            stock.setMarketCode("konex");
 
             stockService.updateInsert( stock );
         }
@@ -76,7 +77,7 @@ public class GetShortnByMartN1 {
             Stock stock = new Stock();
             stock.setStockCode( result.getShotnIsin() );
             stock.setStockName( result.getKorSecnNm() );
-            stock.setMarketTypeCode("etc");
+            stock.setMarketCode("etc");
 
             stockService.updateInsert( stock );
         }
@@ -96,7 +97,7 @@ public class GetShortnByMartN1 {
         Document document   = null;
 
         try {
-            String replacedUrl = url.replaceAll( "##serviceKey##", SeibroKey.SEIBRO_SERVICE_KEY );
+            String replacedUrl = url.replaceAll( "##serviceKey##", ExternalKey.DATAGOKR_SERVICE_KEY);
             replacedUrl = replacedUrl.replaceAll( "##martTpcd##", martTpcd );
             replacedUrl = replacedUrl.replaceAll( "##pageNo##", ""+pageNo );
             replacedUrl = replacedUrl.replaceAll( "##numOfRows##", ""+numOfRows );
