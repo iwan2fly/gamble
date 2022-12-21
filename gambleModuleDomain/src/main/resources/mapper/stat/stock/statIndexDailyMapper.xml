@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="kr.co.glog.domain.stat.stock.mapper.StatStockDailyMapper">
+<mapper namespace="kr.co.glog.domain.stat.stock.mapper.StatIndexDailyMapper">
 
-    <insert id="insertStatStockDaily" parameterType="StatStockDaily" useGeneratedKeys="true" keyProperty="statStockDailyId">
+    <insert id="insertStatIndexDaily" parameterType="StatIndexDaily" useGeneratedKeys="true" keyProperty="statStockDailyId">
         INSERT INTO statStockDaily
-            (  stockCode, tradeDate, statNameCode, statDays, startDate, insertTime, updateTime )
+            (  marketCode, tradeDate, statNameCode, statDays, startDate, insertTime, updateTime )
         VALUES
-            (  #{stockCode}, #{tradeDate}, #{statNameCode}, #{statDays}, #{startDate}, now(), now() )
+            (  #{marketCode}, #{tradeDate}, #{statNameCode}, #{statDays}, #{startDate}, now(), now() )
     </insert>
 
-    <insert id="insertsStatStockDaily" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statStockDailyId" keyProperty="statStockDailyId">
+    <insert id="insertsStatIndexDaily" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statStockDailyId" keyProperty="statStockDailyId">
         INSERT INTO statStockDaily
-        (  stockCode, tradeDate, statNameCode, statDays, startDate, insertTime, updateTime )
+        (  marketCode, tradeDate, statNameCode, statDays, startDate, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            (  #{item.stockCode}, #{item.tradeDate}, #{item.statNameCode}, #{item.statDays}, #{item.startDate}, now(), now() )
+            (  #{item.marketCode}, #{item.tradeDate}, #{item.statNameCode}, #{item.statDays}, #{item.startDate}, now(), now() )
         </foreach>
     </insert>
 
-    <update id="updateStatStockDaily" parameterType="StatStockDaily">
+    <update id="updateStatIndexDaily" parameterType="StatIndexDaily">
         UPDATE 	statStockDaily
         SET
         <trim prefix="" suffixOverrides=",">
-            <if test="stockCode != null">stockCode = #{stockCode},</if>
+            <if test="marketCode != null">marketCode = #{marketCode},</if>
             <if test="tradeDate != null">tradeDate = #{tradeDate},</if>
             <if test="statNameCode != null">statNameCode = #{statNameCode},</if>
             <if test="statDays != null">statDays = #{statDays},</if>
@@ -32,29 +32,29 @@
         WHERE statStockDaily.stockDailyId=#{stockDailyId}
     </update>
 
-    <delete id="deleteStatStockDaily" parameterType="StatStockDaily">
+    <delete id="deleteStatIndexDaily" parameterType="StatIndexDaily">
         DELETE FROM statStockDaily
         WHERE 	statStockDailyId=#{statStockDailyId}
     </delete>
 
-    <select id="selectStatStockDailyList" parameterType="StatStockDailyParam" resultType="StatStockDailyResult" >
+    <select id="selectStatIndexDailyList" parameterType="StatIndexDailyParam" resultType="StatIndexDailyResult" >
         SELECT 	statStockDaily.*
         FROM 	statStockDaily
-        <include refid="whereStatStockDaily" ></include>
-        <include refid="orderStatStockDaily" ></include>
+        <include refid="whereStatIndexDaily" ></include>
+        <include refid="orderStatIndexDaily" ></include>
     </select>
 
-    <select id="selectStatStockDailyListCount" parameterType="StatStockDailyParam" resultType="java.lang.Integer">
+    <select id="selectStatIndexDailyListCount" parameterType="StatIndexDailyParam" resultType="java.lang.Integer">
         SELECT 	COUNT(*)
         FROM   	statStockDaily
-        <include refid="whereStatStockDaily" ></include>
+        <include refid="whereStatIndexDaily" ></include>
     </select>
 
-    <sql id="whereStatStockDaily">
+    <sql id="whereStatIndexDaily">
         <where>
             <trim prefixOverrides = "AND | OR">
                 <if test="statStockDailyId != null and statStockDailyId != ''">AND statStockDaily.statStockDailyId=#{statStockDailyId}</if>
-                <if test="stockCode != null and stockCode != ''">AND statStockDaily.stockCode=#{stockCode}</if>
+                <if test="marketCode != null and marketCode != ''">AND statStockDaily.marketCode=#{marketCode}</if>
                 <if test="tradeDate != null and tradeDate != ''">AND statStockDaily.tradeDate=#{tradeDate}</if>
                 <if test="statNameCode != null and statNameCode != ''">AND statStockDaily.statNameCode=#{statNameCode}</if>
                 <if test="statDays != null and statDays != ''">AND statStockDaily.statDays=#{statDays}</if>
@@ -64,11 +64,11 @@
         </where>
     </sql>
 
-    <sql id="orderStatStockDaily">
+    <sql id="orderStatIndexDaily">
         <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
             <choose>
                 <when test="pagingParam.sortIndex eq 'statStockDailyId'">statStockDailyId</when>
-                <when test="pagingParam.sortIndex eq 'stockCode'">stockCode</when>
+                <when test="pagingParam.sortIndex eq 'marketCode'">marketCode</when>
                 <when test="pagingParam.sortIndex eq 'tradeDate'">tradeDate</when>
                 <when test="pagingParam.sortIndex eq 'statNameCode'">statNameCode</when>
                 <when test="pagingParam.sortIndex eq 'statDays'">statDays</when>

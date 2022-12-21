@@ -35,18 +35,6 @@ public class StockService {
         stock.setStockName( includedStock.getName() );
         stock.setCurrentPrice( includedStock.getTradePrice() );
 
-        /*
-        stock.setStockTypeCode( includedStock.);
-        stock.setMarketTypeCode();
-
-        stock.setFaceValue( includedStock.get);
-        stock.setForeignersStockLimit();
-        stock.setForeignersStockCount();
-        stock.setForeignersHoldRate();
-        stock.setListedStockCount();
-        stock.setListedDate();
-
-        */
 
         return stock;
     }
@@ -65,19 +53,6 @@ public class StockService {
         stock.setStockName( rankingStock.getName() );
         stock.setCurrentPrice( rankingStock.getTradePrice() );
         stock.setStockCount( rankingStock.getListedShareCount() );
-
-        /*
-        stock.setStockTypeCode( includedStock.);
-        stock.setMarketTypeCode();
-
-        stock.setFaceValue( includedStock.get);
-        stock.setForeignersStockLimit();
-        stock.setForeignersStockCount();
-        stock.setForeignersHoldRate();
-        stock.setListedStockCount();
-        stock.setListedDate();
-
-        */
 
         return stock;
     }

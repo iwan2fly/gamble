@@ -4,17 +4,17 @@
 
     <insert id="insertIndexDaily" parameterType="IndexDaily" useGeneratedKeys="true" keyProperty="indexDailyId">
         INSERT INTO indexDaily
-            ( marketTypeCode, tradeDate, priceFinal, priceChange, rateChange, volume, priceTotal, priceTotalPerson, priceTotalForeigner, priceTotalOrg, insertTime, updateTime )
+            ( marketCode, tradeDate, priceFinal, priceChange, rateChange, volume, priceTotal, priceTotalPerson, priceTotalForeigner, priceTotalOrg, insertTime, updateTime )
         VALUES
-            ( #{marketTypeCode}, #{tradeDate}, #{priceFinal}, #{priceChange}, #{rateChange}, #{volume}, #{priceTotal}, #{priceTotalPerson}, #{priceTotalForeigner}, #{priceTotalOrg}, now(), now() )
+            ( #{marketCode}, #{tradeDate}, #{priceFinal}, #{priceChange}, #{rateChange}, #{volume}, #{priceTotal}, #{priceTotalPerson}, #{priceTotalForeigner}, #{priceTotalOrg}, now(), now() )
     </insert>
 
     <insert id="insertsIndexDaily" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="indexDailyId" keyProperty="indexDailyId">
         INSERT INTO stock
-            ( marketTypeCode, tradeDate, priceFinal, priceChange, rateChange, volume, priceTotal, priceTotalPerson, priceTotalForeigner, priceTotalOrg, insertTime, updateTime )
+            ( marketCode, tradeDate, priceFinal, priceChange, rateChange, volume, priceTotal, priceTotalPerson, priceTotalForeigner, priceTotalOrg, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            ( #{item.marketTypeCode}, #{item.tradeDate}, #{item.priceFinal}, #{item.priceChange}, #{item.rateChange}, #{item.volume}, #{item.priceTotal}, #{item.priceTotalPerson}, #{item.priceTotalForeigner}, #{item.priceTotalOrg}, now(), now() )
+            ( #{item.marketCode}, #{item.tradeDate}, #{item.priceFinal}, #{item.priceChange}, #{item.rateChange}, #{item.volume}, #{item.priceTotal}, #{item.priceTotalPerson}, #{item.priceTotalForeigner}, #{item.priceTotalOrg}, now(), now() )
         </foreach>
     </insert>
 
@@ -32,7 +32,7 @@
             <if test="priceTotalOrg != null">priceTotalOrg = #{priceTotalOrg},</if>
             updateTime = now()
         </trim>
-        WHERE indexDaily.marketTypeCode=#{marketTypeCode}
+        WHERE indexDaily.marketCode=#{marketCode}
         AND indexDaily.tradeDate=#{tradeDate}
     </update>
 
@@ -58,7 +58,7 @@
         <where>
             <trim prefixOverrides = "AND | OR">
                 <if test="indexDailyId != null and indexDailyId != ''">AND indexDaily.indexDailyId=#{indexDailyId}</if>
-                <if test="marketTypeCode != null and marketTypeCode != ''">AND indexDaily.marketTypeCode=#{marketTypeCode}</if>
+                <if test="marketCode != null and marketCode != ''">AND indexDaily.marketCode=#{marketCode}</if>
                 <if test="tradeDate != null and tradeDate != ''">AND indexDaily.tradeDate=#{tradeDate}</if>
                 <if test="priceFinal != null and priceFinal != ''">AND indexDaily.priceFinal=#{priceFinal}</if>
                 <if test="priceChange != null and priceChange != ''">AND indexDaily.priceChange=#{priceChange}</if>
@@ -75,7 +75,7 @@
         <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
             <choose>
                 <when test="pagingParam.sortIndex eq 'indexDailyId'">indexDailyId</when>
-                <when test="pagingParam.sortIndex eq 'marketTypeCode'">marketTypeCode</when>
+                <when test="pagingParam.sortIndex eq 'marketCode'">marketCode</when>
                 <when test="pagingParam.sortIndex eq 'tradeDate'">tradeDate</when>
                 <when test="pagingParam.sortIndex eq 'priceFinal'">priceFinal</when>
                 <when test="pagingParam.sortIndex eq 'priceChange'">priceChange</when>

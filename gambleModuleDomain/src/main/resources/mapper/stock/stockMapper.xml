@@ -4,17 +4,17 @@
 
     <insert id="insertStock" parameterType="Stock" keyProperty="stockCode">
         INSERT INTO stock
-            ( stockCode, companyCode, isin, stockName, delistingYn, suspendYn, lastTradeDate, currentPrice, stockTypeCode, marketTypeCode, stockCount, issueDate, facePrice, foreignersStockLimit, foreignersStockCount, foreignersHoldRate, insertTime, updateTime )
+            ( stockCode, companyCode, isin, stockName, delistingYn, suspendYn, lastTradeDate, currentPrice, stockTypeCode, marketCode, stockCount, issueDate, facePrice, foreignersStockLimit, foreignersStockCount, foreignersHoldRate, insertTime, updateTime )
         VALUES
-            ( #{stockCode}, #{companyCode}, #{isin}, #{stockName}, #{delistingYn}, #{suspendYn}, #{lastTradeDate}, #{currentPrice}, #{stockTypeCode}, #{marketTypeCode}, #{stockCount}, #{issueDate}, #{facePrice}, #{foreignersStockLimit}, #{foreignersStockCount}, #{foreignersHoldRate}, now(), now() )
+            ( #{stockCode}, #{companyCode}, #{isin}, #{stockName}, #{delistingYn}, #{suspendYn}, #{lastTradeDate}, #{currentPrice}, #{stockTypeCode}, #{marketCode}, #{stockCount}, #{issueDate}, #{facePrice}, #{foreignersStockLimit}, #{foreignersStockCount}, #{foreignersHoldRate}, now(), now() )
     </insert>
 
     <insert id="insertsStock" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="sotckId" keyProperty="stockCode">
         INSERT INTO stock
-            ( stockCode, companyCode, isin, stockName, delistingYn, suspendYn, lastTradeDate, stockTypeCode, marketTypeCode, stockCount, issueDate, facePrice, foreignersStockLimit, foreignersStockCount, foreignersHoldRate, insertTime, updateTime )
+            ( stockCode, companyCode, isin, stockName, delistingYn, suspendYn, lastTradeDate, stockTypeCode, marketCode, stockCount, issueDate, facePrice, foreignersStockLimit, foreignersStockCount, foreignersHoldRate, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            ( #{item.stockCode}, #{item.companyCode}, #{item.isin}, #{item.stockName}, #{item.delistingYn}, #{item.suspendYn}, #{item.lastTradeDate}, #{item.stockTypeCode}, #{item.marketTypeCode}, #{item.stockCount}, #{item.issueDate}, #{item.facePrice}, #{item.foreignersStockLimit}, #{item.foreignersStockCount}, #{item.foreignersHoldRate}, now(), now() )
+            ( #{item.stockCode}, #{item.companyCode}, #{item.isin}, #{item.stockName}, #{item.delistingYn}, #{item.suspendYn}, #{item.lastTradeDate}, #{item.stockTypeCode}, #{item.marketCode}, #{item.stockCount}, #{item.issueDate}, #{item.facePrice}, #{item.foreignersStockLimit}, #{item.foreignersStockCount}, #{item.foreignersHoldRate}, now(), now() )
         </foreach>
     </insert>
 
@@ -30,7 +30,7 @@
             <if test="lastTradeDate != null">lastTradeDate = #{lastTradeDate},</if>
             <if test="currentPrice != null">currentPrice = #{currentPrice},</if>
             <if test="stockTypeCode != null">stockTypeCode = #{stockTypeCode},</if>
-            <if test="marketTypeCode != null">marketTypeCode = #{marketTypeCode},</if>
+            <if test="marketCode != null">marketCode = #{marketCode},</if>
             <if test="stockCount != null">stockCount = #{stockCount},</if>
             <if test="issueDate != null">issueDate = #{issueDate},</if>
             <if test="facePrice != null">facePrice = #{facePrice},</if>
@@ -72,7 +72,7 @@
                 <if test="stockName != null and stockName != ''">AND stock.stockName=#{stockName}</if>
                 <if test="stockCode != null and stockCode != ''">AND stock.stockCode=#{stockCode}</if>
                 <if test="currentPrice != null and currentPrice != ''">AND stock.currentPrice=#{currentPrice}</if>
-                <if test="marketTypeCode != null and marketTypeCode != ''">AND stock.marketTypeCode=#{marketTypeCode}</if>
+                <if test="marketCode != null and marketCode != ''">AND stock.marketCode=#{marketCode}</if>
                 <if test="stockCount != null and stockCount != ''">AND stock.stockCount=#{stockCount}</if>
                 <if test="issueDate != null and issueDate != ''">AND stock.issueDate=#{issueDate}</if>
                 <if test="facePrice != null and facePrice != ''">AND stock.facePrice=#{facePrice}</if>
@@ -97,7 +97,7 @@
                 <when test="pagingParam.sortIndex eq 'stockName'">stockName</when>
                 <when test="pagingParam.sortIndex eq 'stockCode'">stockCode</when>
                 <when test="pagingParam.sortIndex eq 'currentPrice'">currentPrice</when>
-                <when test="pagingParam.sortIndex eq 'marketTypeCode'">marketTypeCode</when>
+                <when test="pagingParam.sortIndex eq 'marketCode'">marketCode</when>
                 <when test="pagingParam.sortIndex eq 'stockCount'">stockCount</when>
                 <when test="pagingParam.sortIndex eq 'issueDate'">issueDate</when>
                 <when test="pagingParam.sortIndex eq 'facePrice'">facePrice</when>

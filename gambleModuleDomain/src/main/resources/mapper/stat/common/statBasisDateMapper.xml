@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.glog.domain.stat.stock.mapper.StatBasisDateMapper">
+
+    <insert id="insertStatBasisDate" parameterType="StatBasisDate" useGeneratedKeys="true" keyProperty="statBasisDateId">
+        INSERT INTO statBasisDate
+            (  statDate, statDateName, statDateDesc, useYn, insertTime, updateTime )
+        VALUES
+            (  #{statDate}, #{statDateName}, #{statDateDesc}, #{useYn}, now(), now() )
+    </insert>
+
+    <insert id="insertsStatBasisDate" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statBasisDateId" keyProperty="statBasisDateId">
+        INSERT INTO statBasisDate
+        (  statDate, statDateName, statDateDesc, useYn, insertTime, updateTime )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," open="" close="">
+            (  #{item.statDate}, #{item.statDateName}, #{item.statDateDesc}, #{item.useYn}, now(), now() )
+        </foreach>
+    </insert>
+
+    <update id="updateStatBasisDate" parameterType="StatBasisDate">
+        UPDATE 	statBasisDate
+        SET
+        <trim prefix="" suffixOverrides=",">
+            <if test="statDateName != null">statDateName = #{statDateName},</if>
+            <if test="statDateDesc != null">statDateDesc = #{statDateDesc},</if>
+            updateTime = now()
+        </trim>
+        WHERE statBasisDate.statDate=#{statDate}
+    </update>
+
+    <delete id="deleteStatBasisDate" parameterType="StatBasisDate">
+        DELETE FROM statBasisDate
+        WHERE 	statBasisDate.statDate=#{statDate}
+    </delete>
+
+    <select id="selectStatBasisDateList" parameterType="StatBasisDateParam" resultType="StatBasisDateResult" >
+        SELECT 	statBasisDate.*
+        FROM 	statBasisDate
+        <include refid="whereStatBasisDate" ></include>
+        <include refid="orderStatBasisDate" ></include>
+    </select>
+
+    <select id="selectStatBasisDateListCount" parameterType="StatBasisDateParam" resultType="java.lang.Integer">
+        SELECT 	COUNT(*)
+        FROM   	statBasisDate
+        <include refid="whereStatBasisDate" ></include>
+    </select>
+
+    <sql id="whereStatBasisDate">
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="statDate != null and statDate != ''">AND statBasisDate.statDate=#{statDate}</if>
+                <if test="statDateName != null and statDateName != ''">AND statBasisDate.statDateName=#{statDateName}</if>
+                <if test="statDateDesc != null and statDateDesc != ''">AND statBasisDate.statDateDesc=#{statDateDesc}</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND statBasisDate.statDateName like CONCAT('%',#{pagingParam.filter},'%')</if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="orderStatBasisDate">
+        <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
+            <choose>
+                <when test="pagingParam.sortIndex eq 'statBasisDateId'">statDate</when>
+                <when test="pagingParam.sortIndex eq 'marketCode'">statDateName</when>
+                <when test="pagingParam.sortIndex eq 'tradeDate'">statDateDesc</when>
+                <otherwise>statDate</otherwise>
+            </choose>
+            <choose>
+                <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
+                <otherwise>ASC</otherwise>
+            </choose>
+        </if>
+        <if test="pagingParam.rows gt 0">
+            LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}
+        </if>
+    </sql>
+    
+</mapper>
