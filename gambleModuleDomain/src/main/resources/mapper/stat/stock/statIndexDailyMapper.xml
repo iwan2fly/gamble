@@ -2,15 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.glog.domain.stat.stock.mapper.StatIndexDailyMapper">
 
-    <insert id="insertStatIndexDaily" parameterType="StatIndexDaily" useGeneratedKeys="true" keyProperty="statStockDailyId">
-        INSERT INTO statStockDaily
+    <insert id="insertStatIndexDaily" parameterType="StatIndexDaily" useGeneratedKeys="true" keyProperty="statIndexDailyId">
+        INSERT INTO statIndexDaily
             (  marketCode, tradeDate, statNameCode, statDays, startDate, insertTime, updateTime )
         VALUES
             (  #{marketCode}, #{tradeDate}, #{statNameCode}, #{statDays}, #{startDate}, now(), now() )
     </insert>
 
-    <insert id="insertsStatIndexDaily" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statStockDailyId" keyProperty="statStockDailyId">
-        INSERT INTO statStockDaily
+    <insert id="insertsStatIndexDaily" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statIndexDailyId" keyProperty="statIndexDailyId">
+        INSERT INTO statIndexDaily
         (  marketCode, tradeDate, statNameCode, statDays, startDate, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
@@ -19,7 +19,7 @@
     </insert>
 
     <update id="updateStatIndexDaily" parameterType="StatIndexDaily">
-        UPDATE 	statStockDaily
+        UPDATE 	statIndexDaily
         SET
         <trim prefix="" suffixOverrides=",">
             <if test="marketCode != null">marketCode = #{marketCode},</if>
@@ -29,37 +29,37 @@
             <if test="startDate != null">startDate = #{startDate},</if>
             updateTime = now()
         </trim>
-        WHERE statStockDaily.stockDailyId=#{stockDailyId}
+        WHERE statIndexDaily.stockDailyId=#{stockDailyId}
     </update>
 
     <delete id="deleteStatIndexDaily" parameterType="StatIndexDaily">
-        DELETE FROM statStockDaily
-        WHERE 	statStockDailyId=#{statStockDailyId}
+        DELETE FROM statIndexDaily
+        WHERE 	statIndexDailyId=#{statIndexDailyId}
     </delete>
 
     <select id="selectStatIndexDailyList" parameterType="StatIndexDailyParam" resultType="StatIndexDailyResult" >
-        SELECT 	statStockDaily.*
-        FROM 	statStockDaily
+        SELECT 	statIndexDaily.*
+        FROM 	statIndexDaily
         <include refid="whereStatIndexDaily" ></include>
         <include refid="orderStatIndexDaily" ></include>
     </select>
 
     <select id="selectStatIndexDailyListCount" parameterType="StatIndexDailyParam" resultType="java.lang.Integer">
         SELECT 	COUNT(*)
-        FROM   	statStockDaily
+        FROM   	statIndexDaily
         <include refid="whereStatIndexDaily" ></include>
     </select>
 
     <sql id="whereStatIndexDaily">
         <where>
             <trim prefixOverrides = "AND | OR">
-                <if test="statStockDailyId != null and statStockDailyId != ''">AND statStockDaily.statStockDailyId=#{statStockDailyId}</if>
-                <if test="marketCode != null and marketCode != ''">AND statStockDaily.marketCode=#{marketCode}</if>
-                <if test="tradeDate != null and tradeDate != ''">AND statStockDaily.tradeDate=#{tradeDate}</if>
-                <if test="statNameCode != null and statNameCode != ''">AND statStockDaily.statNameCode=#{statNameCode}</if>
-                <if test="statDays != null and statDays != ''">AND statStockDaily.statDays=#{statDays}</if>
-                <if test="startDate != null and startDate != ''">AND statStockDaily.startDate=#{startDate}</if>
-                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND statStockDaily.statNameCode like CONCAT('%',#{pagingParam.filter},'%')</if>
+                <if test="statIndexDailyId != null and statIndexDailyId != ''">AND statIndexDaily.statIndexDailyId=#{statIndexDailyId}</if>
+                <if test="marketCode != null and marketCode != ''">AND statIndexDaily.marketCode=#{marketCode}</if>
+                <if test="tradeDate != null and tradeDate != ''">AND statIndexDaily.tradeDate=#{tradeDate}</if>
+                <if test="statNameCode != null and statNameCode != ''">AND statIndexDaily.statNameCode=#{statNameCode}</if>
+                <if test="statDays != null and statDays != ''">AND statIndexDaily.statDays=#{statDays}</if>
+                <if test="startDate != null and startDate != ''">AND statIndexDaily.startDate=#{startDate}</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND statIndexDaily.statNameCode like CONCAT('%',#{pagingParam.filter},'%')</if>
             </trim>
         </where>
     </sql>
@@ -67,13 +67,13 @@
     <sql id="orderStatIndexDaily">
         <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
             <choose>
-                <when test="pagingParam.sortIndex eq 'statStockDailyId'">statStockDailyId</when>
+                <when test="pagingParam.sortIndex eq 'statIndexDailyId'">statIndexDailyId</when>
                 <when test="pagingParam.sortIndex eq 'marketCode'">marketCode</when>
                 <when test="pagingParam.sortIndex eq 'tradeDate'">tradeDate</when>
                 <when test="pagingParam.sortIndex eq 'statNameCode'">statNameCode</when>
                 <when test="pagingParam.sortIndex eq 'statDays'">statDays</when>
                 <when test="pagingParam.sortIndex eq 'startDate'">startDate</when>
-                <otherwise>statStockDailyId</otherwise>
+                <otherwise>statIndexDailyId</otherwise>
             </choose>
             <choose>
                 <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>

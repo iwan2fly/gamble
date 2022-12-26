@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.glog.domain.stat.stock.mapper.StatIndexMapper">
+
+
+
+
+
+
+
+    <insert id="insertStatIndex" parameterType="StatIndex" useGeneratedKeys="true" keyProperty="statIndexId">
+        INSERT INTO statIndex
+            (  marketCode, periodCode, turn, startDate, endDate, priceLow, priceHigh, priceAverage, priceStandardDeviation, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
+        VALUES
+            (  #{marketCode}, #{periodCode}, #{turn}, #{startDate}, #{endDate}, #{priceLow}, #{priceHigh}, #{priceAverage}, #{priceStandardDeviation}, #{volumeLow}, #{volumeHigh}, #{volumeAverage}, #{volumeStandardDeviation}, #{priceLowDate}, #{priceHighDate}, #{volumeLowDate}, #{volumeHighDate}, now(), now() )
+    </insert>
+
+    <insert id="insertsStatIndex" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statIndexId" keyProperty="statIndexId">
+        INSERT INTO statIndex
+        (  marketCode, periodCode, turn, startDate, endDate, priceLow, priceHigh, priceAverage, priceStandardDeviation, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," open="" close="">
+            (  #{item.marketCode}, #{item.periodCode}, #{item.turn}, #{item.startDate}, #{item.endDate}, #{item.priceLow}, #{item.priceHigh}, #{item.priceAverage}, #{item.priceStandardDeviation}, #{item.volumeLow}, #{item.volumeHigh}, #{item.volumeAverage}, #{item.volumeStandardDeviation}, #{item.priceLowDate}, #{item.priceHighDate}, #{item.volumeLowDate}, #{item.volumeHighDate}, now(), now() )
+        </foreach>
+    </insert>
+
+    <update id="updateStatIndex" parameterType="StatIndex">
+        UPDATE 	statIndex
+        SET
+        <trim prefix="" suffixOverrides=",">
+            <if test="marketCode != null">marketCode = #{marketCode},</if>
+            <if test="periodCode != null">periodCode = #{periodCode},</if>
+            <if test="turn != null">turn = #{turn},</if>
+            <if test="startDate != null">startDate = #{startDate},</if>
+            <if test="endDate != null">endDate = #{endDate},</if>
+            <if test="priceLow != null">priceLow = #{priceLow},</if>
+            <if test="priceHigh != null">priceHigh = #{priceHigh},</if>
+            <if test="priceAverage != null">priceAverage = #{priceAverage},</if>
+            <if test="priceStandardDeviation != null">priceStandardDeviation = #{priceStandardDeviation},</if>
+            <if test="volumeLow != null">volumeLow = #{volumeLow},</if>
+            <if test="volumeHigh != null">volumeHigh = #{volumeHigh},</if>
+            <if test="volumeAverage != null">volumeAverage = #{volumeAverage},</if>
+            <if test="volumeStandardDeviation != null">volumeStandardDeviation = #{volumeStandardDeviation},</if>
+            <if test="priceLowDate != null">priceLowDate = #{priceLowDate},</if>
+            <if test="priceHighDate != null">priceHighDate = #{priceHighDate},</if>
+            <if test="volumeLowDate != null">volumeLowDate = #{volumeLowDate},</if>
+            <if test="volumeHighDate != null">volumeHighDate = #{volumeHighDate},</if>
+            updateTime = now()
+        </trim>
+        WHERE statIndex.stockId=#{stockId}
+    </update>
+
+    <delete id="deleteStatIndex" parameterType="StatIndex">
+        DELETE FROM statIndex
+        WHERE 	statIndexId=#{statIndexId}
+    </delete>
+
+    <select id="selectStatIndexList" parameterType="StatIndexParam" resultType="StatIndexResult" >
+        SELECT 	statIndex.*
+        FROM 	statIndex
+        <include refid="whereStatIndex" ></include>
+        <include refid="orderStatIndex" ></include>
+    </select>
+
+    <select id="selectStatIndexListCount" parameterType="StatIndexParam" resultType="java.lang.Integer">
+        SELECT 	COUNT(*)
+        FROM   	statIndex
+        <include refid="whereStatIndex" ></include>
+    </select>
+
+    <sql id="whereStatIndex">
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="statIndexId != null and statIndexId != ''">AND statIndex.statIndexId=#{statIndexId}</if>
+                <if test="marketCode != null and marketCode != ''">AND statIndex.marketCode=#{marketCode}</if>
+                <if test="preiodCode != null and preiodCode != ''">AND statIndex.preiodCode=#{preiodCode}</if>
+                <if test="turn != null and turn != ''">AND statIndex.turn=#{turn}</if>
+                <if test="startDate != null and startDate != ''">AND statIndex.startDate=#{startDate}</if>
+                <if test="endDate != null and endDate != ''">AND statIndex.endDate=#{endDate}</if>
+                <if test="priceLow != null and priceLow != ''">AND statIndex.priceLow=#{priceLow}</if>
+                <if test="priceHigh != null and priceHigh != ''">AND statIndex.priceHigh=#{priceHigh}</if>
+                <if test="priceAverage != null and priceAverage != ''">AND statIndex.priceAverage=#{priceAverage}</if>
+                <if test="priceStandardDeviation != null and priceStandardDeviation != ''">AND statIndex.priceStandardDeviation=#{priceStandardDeviation}</if>
+                <if test="volumeLow != null and volumeLow != ''">AND statIndex.volumeLow=#{volumeLow}</if>
+                <if test="volumeHigh != null and volumeHigh != ''">AND statIndex.volumeHigh=#{volumeHigh}</if>
+                <if test="volumeAverage != null and volumeAverage != ''">AND statIndex.volumeAverage=#{volumeAverage}</if>
+                <if test="volumeStandardDeviation != null and volumeStandardDeviation != ''">AND statIndex.volumeStandardDeviation=#{volumeStandardDeviation}</if>
+                <if test="priceLowDate != null and priceLowDate != ''">AND statIndex.priceLowDate=#{priceLowDate}</if>
+                <if test="priceHighDate != null and priceHighDate != ''">AND statIndex.priceHighDate=#{priceHighDate}</if>
+                <if test="volumeLowDate != null and volumeLowDate != ''">AND statIndex.volumeLowDate=#{volumeLowDate}</if>
+                <if test="volumeHighDate != null and volumeHighDate != ''">AND statIndex.volumeHighDate=#{volumeHighDate}</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND statIndex.statNameCode like CONCAT('%',#{pagingParam.filter},'%')</if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="orderStatIndex">
+        <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
+            <choose>
+                <when test="pagingParam.sortIndex eq 'statIndexId'">statIndexId</when>
+                <when test="pagingParam.sortIndex eq 'marketCode'">marketCode</when>
+                <when test="pagingParam.sortIndex eq 'periodCode'">periodCode</when>
+                <when test="pagingParam.sortIndex eq 'turn'">turn</when>
+                <when test="pagingParam.sortIndex eq 'startDate'">startDate</when>
+                <when test="pagingParam.sortIndex eq 'endDate'">endDate</when>
+                <when test="pagingParam.sortIndex eq 'priceLow'">priceLow</when>
+                <when test="pagingParam.sortIndex eq 'priceHigh'">priceHigh</when>
+                <when test="pagingParam.sortIndex eq 'priceAverage'">priceAverage</when>
+                <when test="pagingParam.sortIndex eq 'priceStandardDeviation'">priceStandardDeviation</when>
+                <when test="pagingParam.sortIndex eq 'volumeLow'">volumeLow</when>
+                <when test="pagingParam.sortIndex eq 'volumeHigh'">volumeHigh</when>
+                <when test="pagingParam.sortIndex eq 'volumeAverage'">volumeAverage</when>
+                <when test="pagingParam.sortIndex eq 'volumeStandardDeviation'">volumeStandardDeviation</when>
+                <when test="pagingParam.sortIndex eq 'priceLowDate'">priceLowDate</when>
+                <when test="pagingParam.sortIndex eq 'priceHighDate'">priceHighDate</when>
+                <when test="pagingParam.sortIndex eq 'volumeLowDate'">volumeLowDate</when>
+                <when test="pagingParam.sortIndex eq 'volumeHighDate'">volumeHighDate</when>
+                <otherwise>statIndexId</otherwise>
+            </choose>
+            <choose>
+                <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
+                <otherwise>ASC</otherwise>
+            </choose>
+        </if>
+        <if test="pagingParam.rows gt 0">
+            LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}
+        </if>
+    </sql>
+    
+</mapper>

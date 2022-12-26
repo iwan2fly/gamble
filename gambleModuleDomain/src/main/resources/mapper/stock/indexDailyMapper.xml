@@ -2,19 +2,51 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.glog.domain.stock.mapper.IndexDailyMapper">
 
+    <!-- 지수 특정 기간 동안의 최소, 최대, 거래일수, 평균 -->
+    <select id="selectStatIndexCommon" parameterType="IndexDailyParam" resultType="IndexDailyResult" >
+        SELECT  MIN(priceLow) minPrice, MAX(priceHigh) maxPrice, ROUND(SUM(priceFinal)/COUNT(*),2) averagePrice, COUNT(*) dataCount,
+                MIN(volumeTrade) minVolume, MAX(volumeTrade) maxVolume, ROUND(SUM(volumeTrade)/COUNT(*),2) averageVolume
+        FROM    indexDaily
+        WHERE   tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode}
+    </select>
+
+    <!-- 지수 가격 특정 기간 동안의 표준편차 -->
+    <select id="selectStatIndexPriceStdDev" parameterType="IndexDailyParam" resultType="IndexDailyResult" >
+        SELECT  ROUND( SQRT( SUM( POW( priceFinal - #{averagePrice}, 2 ) ) / #{dataCount} ), 2 ) standardDeviationPrice
+        FROM    indexDaily
+        WHERE   tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode}
+    </select>
+
+    <!-- 지수 거래량 특정 기간 동안의 표준편차 -->
+    <select id="selectStatIndexVolumeStdDev" parameterType="IndexDailyParam" resultType="IndexDailyResult" >
+        SELECT  ROUND( SQRT( SUM( POW( volumeTrade - #{averageVolume}, 2 ) ) / #{dataCount} ), 2 ) standardDeviationVolume
+        FROM    indexDaily
+        WHERE   tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode}
+    </select>
+
+
+
+
+
+
+
+
+
+
+
     <insert id="insertIndexDaily" parameterType="IndexDaily" useGeneratedKeys="true" keyProperty="indexDailyId">
         INSERT INTO indexDaily
-            ( marketCode, tradeDate, priceFinal, priceChange, rateChange, volume, priceTotal, priceTotalPerson, priceTotalForeigner, priceTotalOrg, insertTime, updateTime )
+            ( marketCode, tradeDate, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, rateChange, insertTime, updateTime )
         VALUES
-            ( #{marketCode}, #{tradeDate}, #{priceFinal}, #{priceChange}, #{rateChange}, #{volume}, #{priceTotal}, #{priceTotalPerson}, #{priceTotalForeigner}, #{priceTotalOrg}, now(), now() )
+            ( #{marketCode}, #{tradeDate}, #{priceFinal}, #{priceChange}, #{priceStart}, #{priceHigh}, #{priceLow}, #{priceTrade}, #{volumeTrade}, #{rateChange}, now(), now() )
     </insert>
 
     <insert id="insertsIndexDaily" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="indexDailyId" keyProperty="indexDailyId">
         INSERT INTO stock
-            ( marketCode, tradeDate, priceFinal, priceChange, rateChange, volume, priceTotal, priceTotalPerson, priceTotalForeigner, priceTotalOrg, insertTime, updateTime )
+            ( marketCode, tradeDate, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, rateChange, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            ( #{item.marketCode}, #{item.tradeDate}, #{item.priceFinal}, #{item.priceChange}, #{item.rateChange}, #{item.volume}, #{item.priceTotal}, #{item.priceTotalPerson}, #{item.priceTotalForeigner}, #{item.priceTotalOrg}, now(), now() )
+            ( #{item.marketCode}, #{item.tradeDate}, #{item.priceFinal}, #{item.priceChange}, #{item.priceStart}, #{item.priceHigh}, #{item.priceLow}, #{item.priceTrade}, #{item.volumeTrade}, #{item.rateChange}, now(), now() )
         </foreach>
     </insert>
 
@@ -24,12 +56,12 @@
         <trim prefix="" suffixOverrides=",">
             <if test="priceFinal != null">priceFinal = #{priceFinal},</if>
             <if test="priceChange != null">priceChange = #{priceChange},</if>
+            <if test="priceStart != null">priceStart = #{priceStart},</if>
+            <if test="priceHigh != null">priceHigh = #{priceHigh},</if>
+            <if test="priceLow != null">priceLow = #{priceLow},</if>
+            <if test="priceTrade != null">priceTrade = #{priceTrade},</if>
+            <if test="volumeTrade != null">volumeTrade = #{volumeTrade},</if>
             <if test="rateChange != null">rateChange = #{rateChange},</if>
-            <if test="volume != null">volume = #{volume},</if>
-            <if test="priceTotal != null">priceTotal = #{priceTotal},</if>
-            <if test="priceTotalPerson != null">priceTotalPerson = #{priceTotalPerson},</if>
-            <if test="priceTotalForeigner != null">priceTotalForeigner = #{priceTotalForeigner},</if>
-            <if test="priceTotalOrg != null">priceTotalOrg = #{priceTotalOrg},</if>
             updateTime = now()
         </trim>
         WHERE indexDaily.marketCode=#{marketCode}
@@ -62,11 +94,12 @@
                 <if test="tradeDate != null and tradeDate != ''">AND indexDaily.tradeDate=#{tradeDate}</if>
                 <if test="priceFinal != null and priceFinal != ''">AND indexDaily.priceFinal=#{priceFinal}</if>
                 <if test="priceChange != null and priceChange != ''">AND indexDaily.priceChange=#{priceChange}</if>
-                <if test="volume != null and volume != ''">AND indexDaily.volume=#{volume}</if>
-                <if test="priceTotal != null and priceTotal != ''">AND indexDaily.priceTotal=#{priceTotal}</if>
-                <if test="priceTotalPerson != null and priceTotalPerson != ''">AND indexDaily.priceTotalPerson=#{priceTotalPerson}</if>
-                <if test="priceTotalForeigner != null and priceTotalForeigner != ''">AND indexDaily.priceTotalForeigner=#{priceTotalForeigner}</if>
-                <if test="priceTotalOrg != null and priceTotalOrg != ''">AND indexDaily.priceTotalOrg=#{priceTotalOrg}</if>
+                <if test="priceStart != null and priceStart != ''">AND indexDaily.priceStart=#{priceStart}</if>
+                <if test="priceHigh != null and priceHigh != ''">AND indexDaily.priceHigh=#{priceHigh}</if>
+                <if test="priceLow != null and priceLow != ''">AND indexDaily.priceLow=#{priceLow}</if>
+                <if test="priceTrade != null and priceTrade != ''">AND indexDaily.priceTrade=#{priceTrade}</if>
+                <if test="volumeTrade != null and volumeTrade != ''">AND indexDaily.volumeTrade=#{volumeTrade}</if>
+                <if test="rateChange != null and rateChange != ''">AND indexDaily.rateChange=#{rateChange}</if>
             </trim>
         </where>
     </sql>
@@ -79,12 +112,12 @@
                 <when test="pagingParam.sortIndex eq 'tradeDate'">tradeDate</when>
                 <when test="pagingParam.sortIndex eq 'priceFinal'">priceFinal</when>
                 <when test="pagingParam.sortIndex eq 'priceChange'">priceChange</when>
-                <when test="pagingParam.sortIndex eq 'volume'">volume</when>
-                <when test="pagingParam.sortIndex eq 'priceTotal'">priceTotal</when>
-                <when test="pagingParam.sortIndex eq 'priceTotalPerson'">priceTotalPerson</when>
-                <when test="pagingParam.sortIndex eq 'priceTotalForeigner'">priceTotalForeigner</when>
-                <when test="pagingParam.sortIndex eq 'priceTotalOrg'">priceTotalOrg</when>
-                <when test="pagingParam.sortIndex eq 'volumeOrg'">volumeOrg</when>
+                <when test="pagingParam.sortIndex eq 'priceStart'">priceStart</when>
+                <when test="pagingParam.sortIndex eq 'priceHigh'">priceHigh</when>
+                <when test="pagingParam.sortIndex eq 'priceLow'">priceLow</when>
+                <when test="pagingParam.sortIndex eq 'priceTrade'">priceTrade</when>
+                <when test="pagingParam.sortIndex eq 'volumeTrade'">volumeTrade</when>
+                <when test="pagingParam.sortIndex eq 'rateChange'">rateChange</when>
                 <otherwise>indexDailyId</otherwise>
             </choose>
             <choose>

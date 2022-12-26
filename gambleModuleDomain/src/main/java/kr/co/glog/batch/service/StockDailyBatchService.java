@@ -6,14 +6,12 @@ import kr.co.glog.domain.service.StockDailyService;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
 import kr.co.glog.domain.stock.entity.StockDaily;
 import kr.co.glog.external.datagokr.fsc.GetStockPriceInfo;
-import kr.co.glog.external.datagokr.fsc.model.GetPriceStockInfoResult;
-import kr.co.glog.external.daumFinance.DaumDailyIndexScrapper;
+import kr.co.glog.external.datagokr.fsc.model.GetStockPriceInfoResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 @Slf4j
@@ -21,7 +19,7 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class StockDailyBatchService {
 
-    private final GetStockPriceInfo getStockPriceInfo;
+    private final GetStockPriceInfo getStockPriceInfo;          // 일별 주식 시세 - 금융위원회
     private final StockDailyService stockDailyService;
     private final StockDailyDao stockDailyDao;
 
@@ -41,10 +39,10 @@ public class StockDailyBatchService {
 
             // 한 방에 전체 목록 가져옴
             Document document = getStockPriceInfo.getDocument( "", "", yyyymmdd, "", "", 1, 10000 );
-            ArrayList<GetPriceStockInfoResult> list = getStockPriceInfo.getStockPriceInfoList( document );
+            ArrayList<GetStockPriceInfoResult> list = getStockPriceInfo.getStockPriceInfoList( document );
 
             // StockDaily 형태로 변환
-            for ( GetPriceStockInfoResult result : list ) {
+            for ( GetStockPriceInfoResult result : list ) {
                 StockDaily stockDaily = stockDailyService.getStockDailyFromFscStockInfo( result );
                 stockDailyList.add( stockDaily );
             }
@@ -83,13 +81,13 @@ public class StockDailyBatchService {
             // 삼성전자 데이터로, 모든 날짜 목록을 만들자
             Document document = getStockPriceInfo.getDocument( "", "KR7005930003", "", "20200124", "20210107", 1, 10000 );
             // Document document = getStockPriceInfo.getDocument( "", "KR7005930003", "20220124", "", "", 1, 10000 );
-            ArrayList<GetPriceStockInfoResult> samsungList = getStockPriceInfo.getStockPriceInfoList( document );
+            ArrayList<GetStockPriceInfoResult> samsungList = getStockPriceInfo.getStockPriceInfoList( document );
 
             time = System.currentTimeMillis();
             log.debug( batch + "삼성전자 데이터로 모든 날짜 목록 확보완료 : " + time);
 
             // 날짜 하나하나씩, 전체 종목 데이터를 조회하자
-            for ( GetPriceStockInfoResult samsungResult : samsungList ) {
+            for ( GetStockPriceInfoResult samsungResult : samsungList ) {
 
                 // 목록 초기화
                 ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
@@ -113,12 +111,12 @@ public class StockDailyBatchService {
                 time = System.currentTimeMillis();
                 log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 조회 종료 : " + time);
 
-                ArrayList<GetPriceStockInfoResult> list = getStockPriceInfo.getStockPriceInfoList( document );
+                ArrayList<GetStockPriceInfoResult> list = getStockPriceInfo.getStockPriceInfoList( document );
 
                 // StockDaily 형태로 변환
                 time = System.currentTimeMillis();
                 log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 변환 시작 : " + time);
-                for ( GetPriceStockInfoResult result : list ) {
+                for ( GetStockPriceInfoResult result : list ) {
                     StockDaily stockDaily = stockDailyService.getStockDailyFromFscStockInfo( result );
                     stockDailyList.add( stockDaily );
                 }
@@ -167,13 +165,13 @@ public class StockDailyBatchService {
 
             // 삼성전자 데이터로, 모든 최근 10일 목록을 만들자
             Document document = getStockPriceInfo.getDocument( "", "KR7005930003", "", beginDate, endDate, 1, 10000 );
-            ArrayList<GetPriceStockInfoResult> samsungList = getStockPriceInfo.getStockPriceInfoList( document );
+            ArrayList<GetStockPriceInfoResult> samsungList = getStockPriceInfo.getStockPriceInfoList( document );
 
             time = System.currentTimeMillis();
             log.debug( batch + "삼성전자 데이터로 10일 목록 확보완료 : " + time);
 
             // 날짜 하나하나씩, 전체 종목 데이터를 조회하자
-            for ( GetPriceStockInfoResult samsungResult : samsungList ) {
+            for ( GetStockPriceInfoResult samsungResult : samsungList ) {
 
                 // 목록 초기화
                 ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
@@ -197,12 +195,12 @@ public class StockDailyBatchService {
                 time = System.currentTimeMillis();
                 log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 조회 종료 : " + time);
 
-                ArrayList<GetPriceStockInfoResult> list = getStockPriceInfo.getStockPriceInfoList( document );
+                ArrayList<GetStockPriceInfoResult> list = getStockPriceInfo.getStockPriceInfoList( document );
 
                 // StockDaily 형태로 변환
                 time = System.currentTimeMillis();
                 log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 변환 시작 : " + time);
-                for ( GetPriceStockInfoResult result : list ) {
+                for ( GetStockPriceInfoResult result : list ) {
                     StockDaily stockDaily = stockDailyService.getStockDailyFromFscStockInfo( result );
                     stockDailyList.add( stockDaily );
                 }

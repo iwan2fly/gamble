@@ -17,12 +17,12 @@ public class IndexDaily extends EntityModel {
     String 	tradeDate;		            // 날짜
     Float	priceFinal;		            // 종가
     Float   priceChange;                // 변동금액
+    Float   priceStart;                 // 시가
+    Float   priceHigh;                  // 고가
+    Float   priceLow;                   // 저가
+    Long    priceTrade;                 // 거래대금
+    Long	volumeTrade;		        // 거래량
     Float 	rateChange;			        // 변동비
-    Long	volume;		                // 거래량
-    Long    priceTotal;                 // 거래대금
-    Long    priceTotalPerson;           // 거래대금 - 개인
-    Long    priceTotalForeigner;        // 거래대금 - 외인
-    Long    priceTotalOrg;              // 거래대금 - 기관
 
     public Float getPriceYesterday() {
         return getPriceFinal() - getPriceChange();

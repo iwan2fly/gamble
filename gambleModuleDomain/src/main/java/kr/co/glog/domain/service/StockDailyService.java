@@ -2,9 +2,8 @@ package kr.co.glog.domain.service;
 
 
 import kr.co.glog.common.exception.ParameterMissingException;
-import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.StockDaily;
-import kr.co.glog.external.datagokr.fsc.model.GetPriceStockInfoResult;
+import kr.co.glog.external.datagokr.fsc.model.GetStockPriceInfoResult;
 import kr.co.glog.external.daumFinance.model.DaumDailyStock;
 import kr.co.glog.external.daumFinance.model.DaumInvestorStock;
 import lombok.RequiredArgsConstructor;
@@ -69,28 +68,28 @@ public class StockDailyService {
 
     /**
      * GetPriceStockInfoResult -> StockDaily
-     * @param getPriceStockInfoResult
+     * @param getStockPriceInfoResult
      */
-    public StockDaily getStockDailyFromFscStockInfo( GetPriceStockInfoResult getPriceStockInfoResult ) {
+    public StockDaily getStockDailyFromFscStockInfo( GetStockPriceInfoResult getStockPriceInfoResult) {
 
-        if ( getPriceStockInfoResult == null ) throw new ParameterMissingException( "getPriceStockInfoResult" );
-        log.debug( getPriceStockInfoResult.toString() );
+        if ( getStockPriceInfoResult == null ) throw new ParameterMissingException( "getPriceStockInfoResult" );
+        log.debug( getStockPriceInfoResult.toString() );
 
         StockDaily stockDaily = new StockDaily();
-        stockDaily.setIsin( getPriceStockInfoResult.getIsinCd() );                  // isin code
-        stockDaily.setTradeDate( getPriceStockInfoResult.getBasDt() ) ;             // 날짜
-        stockDaily.setStockCode( getPriceStockInfoResult.getSrtnCd() );             // 종목코드(6자리)
-        stockDaily.setStockName( getPriceStockInfoResult.getItmsNm() );             // 종목명
-        stockDaily.setPriceStart( getPriceStockInfoResult.getMkp() );               // 시가
-        stockDaily.setPriceHigh( getPriceStockInfoResult.getHipr() );               // 고가
-        stockDaily.setPriceLow( getPriceStockInfoResult.getLopr() );                // 저가
-        stockDaily.setPriceFinal( getPriceStockInfoResult.getClpr() );              // 종가
-        stockDaily.setPriceChange( getPriceStockInfoResult.getVs() );               // 대비
-        stockDaily.setRateChange( getPriceStockInfoResult.getFltRt() );             // 등락율
-        stockDaily.setVolumeTrade( getPriceStockInfoResult.getTrqu() );             // 거래량
-        stockDaily.setPriceTrade( getPriceStockInfoResult.getTrPrc() );             // 거래대금
-        stockDaily.setVolumeTotal( getPriceStockInfoResult.getLstgStCnt() );        // 주식수
-        stockDaily.setPriceTotal( getPriceStockInfoResult.getMrktTotAmt() );        // 시총
+        stockDaily.setIsin( getStockPriceInfoResult.getIsinCd() );                  // isin code
+        stockDaily.setTradeDate( getStockPriceInfoResult.getBasDt() ) ;             // 날짜
+        stockDaily.setStockCode( getStockPriceInfoResult.getSrtnCd() );             // 종목코드(6자리)
+        stockDaily.setStockName( getStockPriceInfoResult.getItmsNm() );             // 종목명
+        stockDaily.setPriceStart( getStockPriceInfoResult.getMkp() );               // 시가
+        stockDaily.setPriceHigh( getStockPriceInfoResult.getHipr() );               // 고가
+        stockDaily.setPriceLow( getStockPriceInfoResult.getLopr() );                // 저가
+        stockDaily.setPriceFinal( getStockPriceInfoResult.getClpr() );              // 종가
+        stockDaily.setPriceChange( getStockPriceInfoResult.getVs() );               // 대비
+        stockDaily.setRateChange( getStockPriceInfoResult.getFltRt() );             // 등락율
+        stockDaily.setVolumeTrade( getStockPriceInfoResult.getTrqu() );             // 거래량
+        stockDaily.setPriceTrade( getStockPriceInfoResult.getTrPrc() );             // 거래대금
+        stockDaily.setVolumeTotal( getStockPriceInfoResult.getLstgStCnt() );        // 주식수
+        stockDaily.setPriceTotal( getStockPriceInfoResult.getMrktTotAmt() );        // 시총
 
         return stockDaily;
     }

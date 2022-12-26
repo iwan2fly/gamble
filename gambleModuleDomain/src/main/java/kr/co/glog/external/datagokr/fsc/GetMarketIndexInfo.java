@@ -5,8 +5,9 @@ import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.exception.NetworkCommunicationFailureException;
 import kr.co.glog.domain.service.StockService;
 import kr.co.glog.domain.stock.dao.CompanyDao;
-import kr.co.glog.external.datagokr.fsc.model.GetStockPriceInfoResult;
 import kr.co.glog.external.ExternalKey;
+import kr.co.glog.external.datagokr.fsc.model.GetMarketIndexInfoResult;
+import kr.co.glog.external.datagokr.fsc.model.GetStockPriceInfoResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -21,20 +22,19 @@ import java.util.ArrayList;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GetStockPriceInfo {
+public class GetMarketIndexInfo {
 
     private final CompanyDao companyDao;
     private final StockService stockService;
 
     // 기본 URL
-    public static String baseUrl = "http://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?resultType=json&serviceKey=##serviceKey##&mrktCls=##mrktCls##&isinCd=##isinCd##&basDt=##basDt##&beginBasDt=##beginBasDt##&endBasDt=##endBasDt##&pageNo=##pageNo##&numOfRows=##numOfRows##";
+    public static String baseUrl = "http://apis.data.go.kr/1160100/service/GetMarketIndexInfoService/getStockMarketIndex?resultType=json&serviceKey=##serviceKey##&idxNm=##idxNm##&basDt=##basDt##&beginBasDt=##beginBasDt##&endBasDt=##endBasDt##&pageNo=##pageNo##&numOfRows=##numOfRows##";
 
 
     /**
-     *  금융위원회_주식시세정보 : 주식시세
-     *  KRX에 상장된 주식의 시세 정보를 제공
-     *  @param mrktCls      특정시장
-     *  @param isinCd       특정종목
+     *  금융위원회_지수시세정보 : 지수시세
+     *  KRX에 상장된 지수의 시세 정보를 제공
+     *  @param idxNm      지수명
      *  @param basDt       특정일자
      *  @param beginBasDt  시작일자
      *  @param endBasDt    종료일자
@@ -42,14 +42,13 @@ public class GetStockPriceInfo {
      *  @param numOfRows    페이지당 건수
      * @return
      */
-    public Document getDocument( String mrktCls, String isinCd, String basDt, String beginBasDt, String endBasDt, Integer pageNo, Integer numOfRows ) {
+    public Document getDocument( String idxNm, String basDt, String beginBasDt, String endBasDt, Integer pageNo, Integer numOfRows ) {
 
         Document document   = null;
 
         try {
             String replacedUrl = baseUrl.replaceAll( "##serviceKey##", ExternalKey.DATAGOKR_SERVICE_KEY);
-            replacedUrl = replacedUrl.replaceAll( "##mrktCls##", mrktCls == null ? "" : mrktCls );
-            replacedUrl = replacedUrl.replaceAll( "##isinCd##", isinCd == null ? "" : isinCd );
+            replacedUrl = replacedUrl.replaceAll( "##idxNm##", idxNm == null ? "" : idxNm );
             replacedUrl = replacedUrl.replaceAll( "##basDt##", basDt == null ? "" : basDt );
             replacedUrl = replacedUrl.replaceAll( "##beginBasDt##", beginBasDt == null ? "" : beginBasDt );
             replacedUrl = replacedUrl.replaceAll( "##endBasDt##", endBasDt == null ? "" : endBasDt );
@@ -62,15 +61,15 @@ public class GetStockPriceInfo {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new NetworkCommunicationFailureException( "금융위원회_주식시세정보 조회 중 오류가 발생했습니다.");
+            throw new NetworkCommunicationFailureException( "금융위원회_지수시세정보 조회 중 오류가 발생했습니다.");
         }
 
         return document;
     }
 
-    public ArrayList<GetStockPriceInfoResult> getStockPriceInfoList(Document document ) {
+    public ArrayList<GetMarketIndexInfoResult> getMarketIndexInfoList(Document document ) {
 
-        ArrayList<GetStockPriceInfoResult> itemList = new ArrayList<GetStockPriceInfoResult>();
+        ArrayList<GetMarketIndexInfoResult> itemList = new ArrayList<GetMarketIndexInfoResult>();
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
@@ -86,13 +85,13 @@ public class GetStockPriceInfo {
 
             for ( int i = 0; i < itemArray.size(); i++ ) {
                 JSONObject item = (JSONObject)itemArray.get(i);
-                GetStockPriceInfoResult getStockPriceInfoResult = objectMapper.readValue( item.toString(), GetStockPriceInfoResult.class );
-                itemList.add(getStockPriceInfoResult);
+                GetMarketIndexInfoResult getMarketIndexInfoResult = objectMapper.readValue( item.toString(), GetMarketIndexInfoResult.class );
+                itemList.add(getMarketIndexInfoResult);
             }
 
         } catch ( Exception e ) {
             e.printStackTrace();
-            throw new ApplicationRuntimeException( "금융위원회 주식시세정보 파싱 중 오류가 발생했습니다.");
+            throw new ApplicationRuntimeException( "금융위원회 지수시세정보 파싱 중 오류가 발생했습니다.");
         }
 
         return itemList;

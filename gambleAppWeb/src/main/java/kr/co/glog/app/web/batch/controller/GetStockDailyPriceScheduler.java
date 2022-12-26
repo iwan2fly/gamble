@@ -1,9 +1,12 @@
 package kr.co.glog.app.web.batch.controller;
 
+import kr.co.glog.batch.service.IndexDailyBatchService;
 import kr.co.glog.batch.service.StockDailyBatchService;
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
+import kr.co.glog.domain.service.StatIndexService;
+import kr.co.glog.domain.stock.MarketCode;
 import kr.co.glog.domain.stock.dao.CompanyDao;
 import kr.co.glog.domain.stock.dao.CompanyFinancialInfoDao;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
@@ -51,6 +54,8 @@ public class GetStockDailyPriceScheduler {
 
     private final GetStockPriceInfo getStockPriceInfo;
     private final StockDailyBatchService stockDailyBatchService;
+    private final IndexDailyBatchService indexDailyBatchService;
+    private final StatIndexService statIndexService;
 
 
     //스프링 스케줄러 / 쿼츠 크론 표현식
@@ -484,15 +489,24 @@ public class GetStockDailyPriceScheduler {
     }
 
 
-    // 코스피 코스닥 전 종목 조회 후 stock 테이블에 등록
+
     @Scheduled(cron = "0 0 12 * * * ")
     public void upsertFromKrxData10() throws InterruptedException {
+
+        // 코스피, 코스닥 업서트
+        indexDailyBatchService.upsertFromKrxData10( MarketCode.kospi );
+        indexDailyBatchService.upsertFromKrxData10( MarketCode.kosdaq );
+
+        // 코스피 코스닥 전 종목 조회 후 stock 테이블에 등록
         stockDailyBatchService.upsertFromKrxData10();
+
+
     }
 
 
-    @Scheduled(cron = "0 52 10 30 * * ")
-    public void test() throws InterruptedException {
 
+    @Scheduled(cron = "0 33 20 26 * * ")
+    public void test() throws InterruptedException {
+        statIndexService.makeStatIndex( MarketCode.kospi, "20220101", "20221231");
     }
 }
