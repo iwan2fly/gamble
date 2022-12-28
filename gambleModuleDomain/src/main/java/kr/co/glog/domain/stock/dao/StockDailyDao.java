@@ -5,6 +5,8 @@ import kr.co.glog.domain.stock.entity.StockDaily;
 import kr.co.glog.domain.stock.mapper.StockDailyMapper;
 import kr.co.glog.domain.stock.model.StockDailyParam;
 import kr.co.glog.domain.stock.model.StockDailyResult;
+import kr.co.glog.domain.stock.model.StockDailyParam;
+import kr.co.glog.domain.stock.model.StockDailyResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -19,6 +21,109 @@ public class StockDailyDao {
 
     private final StockDailyMapper stockDailyMapper;
 
+    /**
+     * 거래일수, 최대값, 최소값, 평균을 구합니다.
+     * @param stockCode 주식코드, startDate 시작일, endDate 종료일
+     * @return
+     */
+    public StockDailyResult getStatStockCommon(String stockCode, String startDate, String endDate) {
+
+        if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
+        if ( startDate == null ) throw new ParameterMissingException( "startDate" );
+        if ( endDate == null ) throw new ParameterMissingException( "endDate" );
+
+        StockDailyParam stockDailyParam = new StockDailyParam();
+        stockDailyParam.setStockCode( stockCode );
+        stockDailyParam.setStartDate( startDate );
+        stockDailyParam.setEndDate( endDate );
+        return stockDailyMapper.selectStatStockCommon( stockDailyParam );
+    }
+
+
+    /**
+     * 주식 가격에 대한 표준편차를 구합니다.
+     * @param stockCode 주식코드, startDate 작일, endDate 종료일, averagePrice 평균가격
+     * @return
+     */
+    public StockDailyResult getStatStockPriceStdDev(String stockCode, String startDate, String endDate, Integer averagePrice ) {
+
+        if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
+        if ( startDate == null ) throw new ParameterMissingException( "startDate" );
+        if ( endDate == null ) throw new ParameterMissingException( "endDate" );
+        if ( averagePrice == null ) throw new ParameterMissingException( "averagePrice" );
+
+        // 데이터 전체 건수가 필요함
+        StockDailyResult stockDailyResult = this.getStatStockCommon( stockCode, startDate, endDate );
+
+        return this.getStatStockPriceStdDev( stockCode, startDate, endDate, averagePrice, stockDailyResult.getDataCount() );
+    }
+
+    public StockDailyResult getStatStockPriceStdDev(String stockCode, String startDate, String endDate, Integer averagePrice, Integer dataCount ) {
+
+        if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
+        if ( startDate == null ) throw new ParameterMissingException( "startDate" );
+        if ( endDate == null ) throw new ParameterMissingException( "endDate" );
+        if ( averagePrice == null ) throw new ParameterMissingException( "averagePrice" );
+        if ( dataCount == null ) throw new ParameterMissingException( "dataCount" );
+
+        StockDailyParam stockDailyParam = new StockDailyParam();
+        stockDailyParam.setStockCode( stockCode );
+        stockDailyParam.setStartDate( startDate );
+        stockDailyParam.setEndDate( endDate );
+        stockDailyParam.setAveragePrice( averagePrice );
+        stockDailyParam.setDataCount( dataCount );
+
+        StockDailyResult stockDailyResult = stockDailyMapper.selectStatStockPriceStdDev( stockDailyParam );
+
+
+        return stockDailyResult;
+    }
+
+
+    /**
+     * 주식 거래량에 대한 대한 표준편차를 구합니다.
+     * @param stockCode 주식코드, startDate 시작일, endDate 종료일, averageVolume 평균 거래량
+     * @return
+     */
+    public StockDailyResult selectStatStockVolumeStdDev( String stockCode, String startDate, String endDate, Long averageVolume ) {
+
+        if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
+        if ( startDate == null ) throw new ParameterMissingException( "startDate" );
+        if ( endDate == null ) throw new ParameterMissingException( "endDate" );
+        if ( averageVolume == null ) throw new ParameterMissingException( "averageVolume" );
+
+        // 데이터 전체 건수가 필요함
+        StockDailyResult stockDailyResult = this.getStatStockCommon( stockCode, startDate, endDate );
+
+        return this.selectStatStockVolumeStdDev( stockCode, startDate, endDate, averageVolume, stockDailyResult.getDataCount() );
+    }
+
+    public StockDailyResult selectStatStockVolumeStdDev( String stockCode, String startDate, String endDate, Long averageVolume, Integer dataCount ) {
+
+        if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
+        if ( startDate == null ) throw new ParameterMissingException( "startDate" );
+        if ( endDate == null ) throw new ParameterMissingException( "endDate" );
+        if ( averageVolume == null ) throw new ParameterMissingException( "averageVolume" );
+        if ( dataCount == null ) throw new ParameterMissingException( "dataCount" );
+
+        StockDailyParam stockDailyParam = new StockDailyParam();
+        stockDailyParam.setStockCode( stockCode );
+        stockDailyParam.setStartDate( startDate );
+        stockDailyParam.setEndDate( endDate );
+        stockDailyParam.setAverageVolume( averageVolume );
+        stockDailyParam.setDataCount( dataCount );
+
+        log.debug( stockDailyParam.toString() );
+        StockDailyResult stockDailyResult = stockDailyMapper.selectStatStockVolumeStdDev( stockDailyParam );
+        log.debug( stockDailyResult.toString() );
+
+        return stockDailyResult;
+    }
+    
+    
+    
+    
+    
     // 키 SELECT
     public StockDailyResult getStockDaily(Long stockDailyId ) {
         if ( stockDailyId == null ) throw new ParameterMissingException( "stockDailyId" );
@@ -80,20 +185,20 @@ public class StockDailyDao {
 
         int insertCount = 0;
         int remainSize = stockDailyList.size();
-        int startIndex = 0;
-        int endIndex = insertSize;
+        int startStock = 0;
+        int endStock = insertSize;
         while ( remainSize > insertSize ) {
 
-            ArrayList<StockDaily> subList = (ArrayList) stockDailyList.subList( startIndex, endIndex );
+            ArrayList<StockDaily> subList = (ArrayList) stockDailyList.subList( startStock, endStock );
             insertCount += stockDailyMapper.insertsStockDaily( subList );
             remainSize -= insertSize;           // insert 숫자만큼 남은 데이터 개수 줄임
-            startIndex += insertSize;           // startIndex 를 다음으로
-            endIndex += insertSize;             // endIndex를 다음으로
-            if ( endIndex > stockDailyList.size() ) endIndex = stockDailyList.size();     // 마지막 인덱스가 배열을 벗어나면 마지막 인덱스는 배열 마지막으로
+            startStock += insertSize;           // startStock 를 다음으로
+            endStock += insertSize;             // endStock를 다음으로
+            if ( endStock > stockDailyList.size() ) endStock = stockDailyList.size();     // 마지막 인덱스가 배열을 벗어나면 마지막 인덱스는 배열 마지막으로
         }
 
-        if ( startIndex < stockDailyList.size() ) {
-            ArrayList<StockDaily> subList = (ArrayList) stockDailyList.subList(startIndex, endIndex);
+        if ( startStock < stockDailyList.size() ) {
+            ArrayList<StockDaily> subList = (ArrayList) stockDailyList.subList(startStock, endStock);
             insertCount += stockDailyMapper.insertsStockDaily(subList);
         }
 

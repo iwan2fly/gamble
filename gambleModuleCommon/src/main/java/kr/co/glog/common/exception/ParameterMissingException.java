@@ -14,7 +14,7 @@ public class ParameterMissingException extends ApplicationRuntimeException {
 	public ParameterMissingException() {
 	}
 
-	public ParameterMissingException(String message) {
+	public ParameterMissingException( String message ) {
 		super.setMessage( message );
 	}
 

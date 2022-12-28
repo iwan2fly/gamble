@@ -4,22 +4,22 @@
 
     <!-- 지수 특정 기간 동안의 최소, 최대, 거래일수, 평균 -->
     <select id="selectStatIndexCommon" parameterType="IndexDailyParam" resultType="IndexDailyResult" >
-        SELECT  MIN(priceLow) minPrice, MAX(priceHigh) maxPrice, ROUND(SUM(priceFinal)/COUNT(*),2) averagePrice, COUNT(*) dataCount,
-                MIN(volumeTrade) minVolume, MAX(volumeTrade) maxVolume, ROUND(SUM(volumeTrade)/COUNT(*),2) averageVolume
+        SELECT  MIN(priceLow) priceLow, MAX(priceHigh) priceHigh, ROUND(SUM(priceFinal)/COUNT(*),2) priceAverage, COUNT(*) dataCount,
+                MIN(volumeTrade) volumeLow, MAX(volumeTrade) volumeHigh, ROUND(SUM(volumeTrade)/COUNT(*),2) volumeAverage
         FROM    indexDaily
         WHERE   tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode}
     </select>
 
     <!-- 지수 가격 특정 기간 동안의 표준편차 -->
     <select id="selectStatIndexPriceStdDev" parameterType="IndexDailyParam" resultType="IndexDailyResult" >
-        SELECT  ROUND( SQRT( SUM( POW( priceFinal - #{averagePrice}, 2 ) ) / #{dataCount} ), 2 ) standardDeviationPrice
+        SELECT  ROUND( SQRT( SUM( POW( priceFinal - #{averagePrice}, 2 ) ) / #{dataCount} ), 2 ) priceStandardDeviation
         FROM    indexDaily
         WHERE   tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode}
     </select>
 
     <!-- 지수 거래량 특정 기간 동안의 표준편차 -->
     <select id="selectStatIndexVolumeStdDev" parameterType="IndexDailyParam" resultType="IndexDailyResult" >
-        SELECT  ROUND( SQRT( SUM( POW( volumeTrade - #{averageVolume}, 2 ) ) / #{dataCount} ), 2 ) standardDeviationVolume
+        SELECT  ROUND( SQRT( SUM( POW( volumeTrade - #{averageVolume}, 2 ) ) / #{dataCount} ), 2 ) volumeStandardDeviation
         FROM    indexDaily
         WHERE   tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode}
     </select>
@@ -100,6 +100,8 @@
                 <if test="priceTrade != null and priceTrade != ''">AND indexDaily.priceTrade=#{priceTrade}</if>
                 <if test="volumeTrade != null and volumeTrade != ''">AND indexDaily.volumeTrade=#{volumeTrade}</if>
                 <if test="rateChange != null and rateChange != ''">AND indexDaily.rateChange=#{rateChange}</if>
+                <if test="startDate != null and startDate != ''">AND indexDaily.tradeDate <![CDATA[ >= ]]> #{startDate}</if>
+                <if test="endDate != null and endDate != ''">AND indexDaily.tradeDate <![CDATA[ <= ]]> #{endDate}</if>
             </trim>
         </where>
     </sql>

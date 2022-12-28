@@ -7,6 +7,7 @@ import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
 import kr.co.glog.domain.service.StatIndexService;
 import kr.co.glog.domain.stock.MarketCode;
+import kr.co.glog.domain.stock.PeriodCode;
 import kr.co.glog.domain.stock.dao.CompanyDao;
 import kr.co.glog.domain.stock.dao.CompanyFinancialInfoDao;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
@@ -505,8 +506,32 @@ public class GetStockDailyPriceScheduler {
 
 
 
-    @Scheduled(cron = "0 33 20 26 * * ")
+    @Scheduled(cron = "0 55 15 28 * * ")
     public void test() throws InterruptedException {
-        statIndexService.makeStatIndex( MarketCode.kospi, "20220101", "20221231");
+        statIndexService.makeStatIndexYear( MarketCode.kospi, "20200101" );
+        statIndexService.makeStatIndexYear( MarketCode.kosdaq, "20200101" );
+        statIndexService.makeStatIndexYear( MarketCode.kospi, "20210101" );
+        statIndexService.makeStatIndexYear( MarketCode.kosdaq, "20210101" );
+        statIndexService.makeStatIndexYear( MarketCode.kospi, "20220101" );
+        statIndexService.makeStatIndexYear( MarketCode.kosdaq, "20220101" );
+
+        for ( int year = 2020; year < 2023; year++ ) {
+            for (int i = 1; i <= 12; i++) {
+                String month = i < 10 ? "0" + i : "" + i;
+                statIndexService.makeStatIndexMonth(MarketCode.kospi, year+ month + "01");
+                statIndexService.makeStatIndexMonth(MarketCode.kosdaq, year + month + "01");
+            }
+        }
+
+        int date = 20200101;
+        while ( date < 20230101 ) {
+            String dateStr = "" + date;
+            statIndexService.makeStatIndexWeek(MarketCode.kospi, dateStr);
+            statIndexService.makeStatIndexWeek(MarketCode.kosdaq, dateStr);
+
+            dateStr = DateUtil.addDate( dateStr, "D", "yyyyMMdd", 7 );
+            date = Integer.parseInt( dateStr );
+        }
+
     }
 }

@@ -861,9 +861,70 @@ public class DateUtil {
 		return cal.getTime();
 	}
 
-	/*
+	// 특정일자의 주차 리턴
+	public static Integer getWeekOfYear( String yyyymmdd ) {
+
+		int year = Integer.parseInt( yyyymmdd.substring(0, 4) );
+		int month = Integer.parseInt( yyyymmdd.substring(4, 6) );
+		int day = Integer.parseInt( yyyymmdd.substring(6, 8) );
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(year, month - 1, day);
+
+		return calendar.get(Calendar.WEEK_OF_YEAR);
+
+
+	}
+
+	// year+주차 리턴
+	public static String getYearWeek( String yyyymmdd ) {
+		int yearOfWeek = getWeekOfYear( yyyymmdd );
+		int year = Integer.parseInt( yyyymmdd.substring(0, 4) );
+		int month = Integer.parseInt( yyyymmdd.substring(4, 6) );
+		if ( month == 1 && yearOfWeek > 50 ) year--;
+		return year + ( yearOfWeek < 10 ? "0" + yearOfWeek : "" + yearOfWeek );
+	}
+
+	// 주의 첫날 날짜 리턴
+	public static String getFirstDateOfWeek( String yyyymmdd ) {
+		int year = Integer.parseInt( yyyymmdd.substring(0, 4) );
+		int month = Integer.parseInt( yyyymmdd.substring(4, 6) );
+		int day = Integer.parseInt( yyyymmdd.substring(6, 8) );
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(year, month - 1, day);
+
+		int dayOfWeek = calendar.get( Calendar.DAY_OF_WEEK );
+		calendar.add( Calendar.DATE, -(dayOfWeek-1) );
+		SimpleDateFormat sdf = new SimpleDateFormat( "yyyyMMdd" );
+
+		return sdf.format( calendar.getTime() );
+	}
+
+	// 주의 마지막날 날짜 리턴
+	public static String getLastDateOfWeek( String yyyymmdd ) {
+		int year = Integer.parseInt( yyyymmdd.substring(0, 4) );
+		int month = Integer.parseInt( yyyymmdd.substring(4, 6) );
+		int day = Integer.parseInt( yyyymmdd.substring(6, 8) );
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(year, month - 1, day);
+
+		int dayOfWeek = calendar.get( Calendar.DAY_OF_WEEK );
+		calendar.add( Calendar.DATE, +(7-dayOfWeek) );
+		SimpleDateFormat sdf = new SimpleDateFormat( "yyyyMMdd" );
+
+		return sdf.format( calendar.getTime() );
+	}
+
+
+
+
 	public static void main( String [] args ) throws ParseException
 	{
+		System.out.println( DateUtil.getFirstDateOfWeek( "20201231" ) );
+		System.out.println( DateUtil.getLastDateOfWeek( "20201231" ) );
+		/*
 		System.out.println( DateUtil.get20000101() );
 		System.out.println( DateUtil.daysFromNow( new Timestamp( System.currentTimeMillis() ) ) );
 		System.out.println( getToday( "yyyy-MM-dd" ) );
@@ -874,6 +935,7 @@ public class DateUtil {
 		System.out.println( DateUtil.getDiffDays("20201029", "20201130"));
 		System.out.println( DateUtil.daysBetween("20220129", "20220130", "yyyyMMdd") );
 		System.out.println( DateUtil.getDayOfWeek( "20220127" ) + ", " + DateUtil.getDayOfWeekLableEng( DateUtil.getDayOfWeek( "20220127" ) ) );
+		*/
 	}
-	*/
+
 }

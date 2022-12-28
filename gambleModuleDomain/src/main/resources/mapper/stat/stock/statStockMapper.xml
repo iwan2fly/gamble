@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.glog.domain.stat.stock.mapper.StatStockMapper">
+
+
+    <insert id="insertStatStock" parameterType="StatStock" useGeneratedKeys="true" keyProperty="statStockId">
+        INSERT INTO statStock
+            (  stockCode, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerLow, foreignerHigh, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
+        VALUES
+            (  #{stockCode}, #{periodCode}, #{year}, #{month}, #{yearWeek}, #{week}, #{startDate}, #{endDate}, #{tradeDays}, #{pricePrevious}, #{priceStart}, #{priceFinal}, #{priceLow}, #{priceHigh}, #{priceAverage}, #{priceStandardDeviation}, #{priceChange}, #{rateChange}, #{volumeLow}, #{volumeHigh}, #{volumeAverage}, #{volumeStandardDeviation}, #{foreignerLow}, #{foreignerHigh}, #{foreignerAverage}, #{foreignerStandardDeviation}, #{priceLowDate}, #{priceHighDate}, #{volumeLowDate}, #{volumeHighDate}, now(), now() )
+    </insert>
+
+    <insert id="insertsStatStock" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statStockId" keyProperty="statStockId">
+        INSERT INTO statStock
+            (  stockCode, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerLow, foreignerHigh, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," open="" close="">
+            (  #{item.stockCode}, #{item.periodCode}, #{item.year}, #{item.month}, #{item.yearWeek}, #{item.week}, #{item.startDate}, #{item.endDate}, #{item.tradeDays}, #{item.pricePrevious}, #{item.priceStart}, #{item.priceFinal}, #{item.priceLow}, #{item.priceHigh}, #{item.priceAverage}, #{item.priceStandardDeviation}, #{item.priceChange}, #{item.rateChange}, #{item.volumeLow}, #{item.volumeHigh}, #{item.volumeAverage}, #{item.volumeStandardDeviation}, #{item.foreignerLow}, #{item.foreignerHigh}, #{item.foreignerAverage}, #{item.foreignerStandardDeviation}, #{item.priceLowDate}, #{item.priceHighDate}, #{item.volumeLowDate}, #{item.volumeHighDate}, now(), now() )
+        </foreach>
+    </insert>
+
+    <update id="updateStatStock" parameterType="StatStock">
+        UPDATE 	statStock
+        SET
+        <trim prefix="" suffixOverrides=",">
+            <if test="periodCode != null">periodCode = #{periodCode},</if>
+            <if test="week != null">week = #{week},</if>
+            <if test="startDate != null">startDate = #{startDate},</if>
+            <if test="endDate != null">endDate = #{endDate},</if>
+            <if test="tradeDays != null">tradeDays = #{tradeDays},</if>
+            <if test="pricePrevious != null">pricePrevious = #{pricePrevious},</if>
+            <if test="priceStart != null">priceStart = #{priceStart},</if>
+            <if test="priceFinal != null">priceFinal = #{priceFinal},</if>
+            <if test="priceLow != null">priceLow = #{priceLow},</if>
+            <if test="priceHigh != null">priceHigh = #{priceHigh},</if>
+            <if test="priceAverage != null">priceAverage = #{priceAverage},</if>
+            <if test="priceStandardDeviation != null">priceStandardDeviation = #{priceStandardDeviation},</if>
+            <if test="priceChange != null">priceChange = #{priceChange},</if>
+            <if test="rateChange != null">rateChange = #{rateChange},</if>
+            <if test="volumeLow != null">volumeLow = #{volumeLow},</if>
+            <if test="volumeHigh != null">volumeHigh = #{volumeHigh},</if>
+            <if test="volumeAverage != null">volumeAverage = #{volumeAverage},</if>
+            <if test="volumeStandardDeviation != null">volumeStandardDeviation = #{volumeStandardDeviation},</if>
+            <if test="foreignerLow != null">foreignerLow = #{foreignerLow},</if>
+            <if test="foreignerHigh != null">foreignerHigh = #{foreignerHigh},</if>
+            <if test="foreignerAverage != null">foreignerAverage = #{foreignerAverage},</if>
+            <if test="foreignerStandardDeviation != null">foreignerStandardDeviation = #{foreignerStandardDeviation},</if>
+            <if test="priceLowDate != null">priceLowDate = #{priceLowDate},</if>
+            <if test="priceHighDate != null">priceHighDate = #{priceHighDate},</if>
+            <if test="volumeLowDate != null">volumeLowDate = #{volumeLowDate},</if>
+            <if test="volumeHighDate != null">volumeHighDate = #{volumeHighDate},</if>
+            updateTime = now()
+        </trim>
+        <choose>
+            <when test="statStockId != null and statStockId != ''">WHERE statStock.statStockId=#{statStockId}</when>
+            <otherwise>
+            WHERE   stockCode = #{stockCode}
+            AND     year = #{year}
+            AND     month = #{month}
+            AND     yearWeek = #{yearWeek}
+            </otherwise>
+        </choose>
+    </update>
+
+    <delete id="deleteStatStock" parameterType="StatStock">
+        DELETE FROM statStock
+        WHERE 	statStockId=#{statStockId}
+    </delete>
+
+    <select id="selectStatStockList" parameterType="StatStockParam" resultType="StatStockResult" >
+        SELECT 	statStock.*
+        FROM 	statStock
+        <include refid="whereStatStock" ></include>
+        <include refid="orderStatStock" ></include>
+    </select>
+
+    <select id="selectStatStockListCount" parameterType="StatStockParam" resultType="java.lang.Integer">
+        SELECT 	COUNT(*)
+        FROM   	statStock
+        <include refid="whereStatStock" ></include>
+    </select>
+
+    <sql id="whereStatStock">
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="statStockId != null and statStockId != ''">AND statStock.statStockId=#{statStockId}</if>
+                <if test="stockCode != null and stockCode != ''">AND statStock.stockCode=#{stockCode}</if>
+                <if test="preiodCode != null and preiodCode != ''">AND statStock.preiodCode=#{preiodCode}</if>
+                <if test="year != null and year != ''">AND statStock.year=#{year}</if>
+                <if test="month != null and month != ''">AND statStock.month=#{month}</if>
+                <if test="yearWeek != null and yearWeek != ''">AND statStock.yearWeek=#{yearWeek}</if>
+                <if test="week != null and week != ''">AND statStock.week=#{week}</if>
+                <if test="startDate != null and startDate != ''">AND statStock.startDate=#{startDate}</if>
+                <if test="endDate != null and endDate != ''">AND statStock.endDate=#{endDate}</if>
+                <if test="tradeDays != null and tradeDays != ''">AND statStock.tradeDays=#{tradeDays}</if>
+                <if test="pricePrevious != null and pricePrevious != ''">AND statStock.pricePrevious=#{pricePrevious}</if>
+                <if test="priceStart != null and priceStart != ''">AND statStock.priceStart=#{priceStart}</if>
+                <if test="priceFinal != null and priceFinal != ''">AND statStock.priceFinal=#{priceFinal}</if>
+                <if test="priceLow != null and priceLow != ''">AND statStock.priceLow=#{priceLow}</if>
+                <if test="priceHigh != null and priceHigh != ''">AND statStock.priceHigh=#{priceHigh}</if>
+                <if test="priceAverage != null and priceAverage != ''">AND statStock.priceAverage=#{priceAverage}</if>
+                <if test="priceStandardDeviation != null and priceStandardDeviation != ''">AND statStock.priceStandardDeviation=#{priceStandardDeviation}</if>
+                <if test="priceChange != null and priceChange != ''">AND statStock.priceChange=#{priceChange}</if>
+                <if test="rateChange != null and rateChange != ''">AND statStock.rateChange=#{rateChange}</if>
+                <if test="volumeLow != null and volumeLow != ''">AND statStock.volumeLow=#{volumeLow}</if>
+                <if test="volumeHigh != null and volumeHigh != ''">AND statStock.volumeHigh=#{volumeHigh}</if>
+                <if test="volumeAverage != null and volumeAverage != ''">AND statStock.volumeAverage=#{volumeAverage}</if>
+                <if test="volumeStandardDeviation != null and volumeStandardDeviation != ''">AND statStock.volumeStandardDeviation=#{volumeStandardDeviation}</if>
+                <if test="foreignerLow != null and foreignerLow != ''">AND statStock.foreignerLow=#{foreignerLow}</if>
+                <if test="foreignerHigh != null and foreignerHigh != ''">AND statStock.foreignerHigh=#{foreignerHigh}</if>
+                <if test="foreignerAverage != null and foreignerAverage != ''">AND statStock.foreignerAverage=#{foreignerAverage}</if>
+                <if test="foreignerStandardDeviation != null and foreignerStandardDeviation != ''">AND statStock.foreignerStandardDeviation=#{foreignerStandardDeviation}</if>
+                <if test="priceLowDate != null and priceLowDate != ''">AND statStock.priceLowDate=#{priceLowDate}</if>
+                <if test="priceHighDate != null and priceHighDate != ''">AND statStock.priceHighDate=#{priceHighDate}</if>
+                <if test="volumeLowDate != null and volumeLowDate != ''">AND statStock.volumeLowDate=#{volumeLowDate}</if>
+                <if test="volumeHighDate != null and volumeHighDate != ''">AND statStock.volumeHighDate=#{volumeHighDate}</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND statStock.statNameCode like CONCAT('%',#{pagingParam.filter},'%')</if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="orderStatStock">
+        <if test='pagingParam.sortStock != null and pagingParam.sortStock != ""'>ORDER BY
+            <choose>
+                <when test="pagingParam.sortStock eq 'statStockId'">statStockId</when>
+                <when test="pagingParam.sortStock eq 'stockCode'">stockCode</when>
+                <when test="pagingParam.sortStock eq 'periodCode'">periodCode</when>
+                <when test="pagingParam.sortStock eq 'year'">year</when>
+                <when test="pagingParam.sortStock eq 'month'">month</when>
+                <when test="pagingParam.sortStock eq 'yearWeek'">yearWeek</when>
+                <when test="pagingParam.sortStock eq 'week'">week</when>
+                <when test="pagingParam.sortStock eq 'startDate'">startDate</when>
+                <when test="pagingParam.sortStock eq 'endDate'">endDate</when>
+                <when test="pagingParam.sortStock eq 'tradeDays'">tradeDays</when>
+                <when test="pagingParam.sortStock eq 'pricePrevious'">pricePrevious</when>
+                <when test="pagingParam.sortStock eq 'priceStart'">priceStart</when>
+                <when test="pagingParam.sortStock eq 'priceFinal'">priceFinal</when>
+                <when test="pagingParam.sortStock eq 'priceLow'">priceLow</when>
+                <when test="pagingParam.sortStock eq 'priceHigh'">priceHigh</when>
+                <when test="pagingParam.sortStock eq 'priceAverage'">priceAverage</when>
+                <when test="pagingParam.sortStock eq 'priceStandardDeviation'">priceStandardDeviation</when>
+                <when test="pagingParam.sortStock eq 'priceChange'">priceChange</when>
+                <when test="pagingParam.sortStock eq 'rateChange'">rateChange</when>
+                <when test="pagingParam.sortStock eq 'volumeLow'">volumeLow</when>
+                <when test="pagingParam.sortStock eq 'volumeHigh'">volumeHigh</when>
+                <when test="pagingParam.sortStock eq 'volumeAverage'">volumeAverage</when>
+                <when test="pagingParam.sortStock eq 'volumeStandardDeviation'">volumeStandardDeviation</when>
+                <when test="pagingParam.sortStock eq 'foreignerLow'">foreignerLow</when>
+                <when test="pagingParam.sortStock eq 'foreignerHigh'">foreignerHigh</when>
+                <when test="pagingParam.sortStock eq 'foreignerAverage'">foreignerAverage</when>
+                <when test="pagingParam.sortStock eq 'foreignerStandardDeviation'">foreignerStandardDeviation</when>
+                <when test="pagingParam.sortStock eq 'priceLowDate'">priceLowDate</when>
+                <when test="pagingParam.sortStock eq 'priceHighDate'">priceHighDate</when>
+                <when test="pagingParam.sortStock eq 'volumeLowDate'">volumeLowDate</when>
+                <when test="pagingParam.sortStock eq 'volumeHighDate'">volumeHighDate</when>
+                <otherwise>statStockId</otherwise>
+            </choose>
+            <choose>
+                <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
+                <otherwise>ASC</otherwise>
+            </choose>
+        </if>
+        <if test="pagingParam.rows gt 0">
+            LIMIT #{pagingParam.startStock}, #{pagingParam.endStock}
+        </if>
+    </sql>
+    
+</mapper>

@@ -12,13 +12,15 @@ import org.apache.ibatis.type.Alias;
 @Alias("IndexDailyResult")
 public class IndexDailyResult extends IndexDaily {
 
-    Integer dataCount;              // 자료건수 = 거래일수
+    Integer dataCount;                  // 자료건수 = 거래일수
 
-    Float   minPrice;               // 최소값
-    Float   maxPrice;               // 최대값
-    Float   averagePrice;           // 평균값
+    Float   priceLow;                   // 최소값
+    Float   priceHigh;                  // 최대값
+    Float   priceAverage;               // 평균값
+    Float   priceStandardDeviation;     // 가격 표준편차
 
-    Long    minVolume;              // 최소거래량
-    Long    maxVolume;              // 최대거래량
-    Long    averageVolume;          // 평균거래량
+    Long    volumeLow;                  // 최소거래량
+    Long    volumeHigh;                 // 최대거래량
+    Long    volumeAverage;              // 평균거래량
+    Long   volumeStandardDeviation;     // 거래량 표준편차
 }

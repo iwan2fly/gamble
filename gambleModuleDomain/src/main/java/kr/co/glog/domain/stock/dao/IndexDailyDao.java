@@ -24,7 +24,7 @@ public class IndexDailyDao {
      * @param marketCode 시장코드, startDate 시작일, endDate 종료일
      * @return
      */
-    public IndexDailyResult selectStatIndexCommon( String marketCode, String startDate, String endDate) {
+    public IndexDailyResult getStatIndexCommon(String marketCode, String startDate, String endDate) {
 
         if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
@@ -43,7 +43,7 @@ public class IndexDailyDao {
      * @param marketCode 시장코드, startDate 작일, endDate 종료일, averagePrice 평균가격
      * @return
      */
-    public IndexDailyResult selectStatIndexPriceStdDev( String marketCode, String startDate, String endDate, Float averagePrice ) {
+    public IndexDailyResult getStatIndexPriceStdDev(String marketCode, String startDate, String endDate, Float averagePrice ) {
 
         if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
@@ -51,12 +51,12 @@ public class IndexDailyDao {
         if ( averagePrice == null ) throw new ParameterMissingException( "averagePrice" );
 
         // 데이터 전체 건수가 필요함
-        IndexDailyResult indexDailyResult = this.selectStatIndexCommon( marketCode, startDate, endDate );
+        IndexDailyResult indexDailyResult = this.getStatIndexCommon( marketCode, startDate, endDate );
 
-        return this.selectStatIndexPriceStdDev( marketCode, startDate, endDate, averagePrice, indexDailyResult.getDataCount() );
+        return this.getStatIndexPriceStdDev( marketCode, startDate, endDate, averagePrice, indexDailyResult.getDataCount() );
     }
 
-    public IndexDailyResult selectStatIndexPriceStdDev( String marketCode, String startDate, String endDate, Float averagePrice, Integer dataCount ) {
+    public IndexDailyResult getStatIndexPriceStdDev(String marketCode, String startDate, String endDate, Float averagePrice, Integer dataCount ) {
 
         if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
@@ -71,7 +71,10 @@ public class IndexDailyDao {
         indexDailyParam.setAveragePrice( averagePrice );
         indexDailyParam.setDataCount( dataCount );
 
-        return indexDailyMapper.selectStatIndexPriceStdDev( indexDailyParam );
+        IndexDailyResult indexDailyResult = indexDailyMapper.selectStatIndexPriceStdDev( indexDailyParam );
+
+
+        return indexDailyResult;
     }
 
 
@@ -88,7 +91,7 @@ public class IndexDailyDao {
         if ( averageVolume == null ) throw new ParameterMissingException( "averageVolume" );
 
         // 데이터 전체 건수가 필요함
-        IndexDailyResult indexDailyResult = this.selectStatIndexCommon( marketCode, startDate, endDate );
+        IndexDailyResult indexDailyResult = this.getStatIndexCommon( marketCode, startDate, endDate );
 
         return this.selectStatIndexVolumeStdDev( marketCode, startDate, endDate, averageVolume, indexDailyResult.getDataCount() );
     }
@@ -108,7 +111,11 @@ public class IndexDailyDao {
         indexDailyParam.setAverageVolume( averageVolume );
         indexDailyParam.setDataCount( dataCount );
 
-        return indexDailyMapper.selectStatIndexVolumeStdDev( indexDailyParam );
+        log.debug( indexDailyParam.toString() );
+        IndexDailyResult indexDailyResult = indexDailyMapper.selectStatIndexVolumeStdDev( indexDailyParam );
+        log.debug( indexDailyResult.toString() );
+
+        return indexDailyResult;
     }
 
 

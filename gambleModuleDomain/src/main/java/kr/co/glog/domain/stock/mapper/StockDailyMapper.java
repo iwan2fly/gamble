@@ -3,12 +3,21 @@ package kr.co.glog.domain.stock.mapper;
 import kr.co.glog.domain.stock.entity.StockDaily;
 import kr.co.glog.domain.stock.model.StockDailyParam;
 import kr.co.glog.domain.stock.model.StockDailyResult;
+import kr.co.glog.domain.stock.model.StockDailyParam;
+import kr.co.glog.domain.stock.model.StockDailyResult;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.ArrayList;
 
 @Mapper
 public interface StockDailyMapper {
+
+
+    public StockDailyResult selectStatStockCommon(StockDailyParam indexDailyParam  );		        // 주식 평균
+    public StockDailyResult selectStatStockPriceStdDev(StockDailyParam indexDailyParam );	        // 주식 가격 표준편차
+    public StockDailyResult selectStatStockVolumeStdDev( StockDailyParam indexDailyParam );	        // 주식 거래량 표준편차
+    
+    
     public int insertStockDaily( StockDaily stockDaily );									    // 등록
     public int insertsStockDaily( ArrayList<StockDaily> stockDailyList );		                // 대량등록
     public int updateStockDaily( StockDaily stockDaily );									    // 수정
