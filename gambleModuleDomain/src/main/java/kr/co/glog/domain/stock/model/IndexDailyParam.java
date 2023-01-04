@@ -18,7 +18,8 @@ public class IndexDailyParam extends IndexDaily {
     Integer dataCount;      // 자료 건수
     String  startDate;      // 기간 시작일
     String  endDate;        // 기간 종료일
-    Float   averagePrice;   // 평균가격
-    Long    averageVolume;  // 평균거래량
+    String  beforeDate;     // 해당 날짜의 전날까지
+    Float   priceAverage;   // 평균가격
+    Long    volumeAverage;  // 평균거래량
 
 }

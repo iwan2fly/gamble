@@ -81,7 +81,7 @@
             <trim prefixOverrides = "AND | OR">
                 <if test="statIndexId != null and statIndexId != ''">AND statIndex.statIndexId=#{statIndexId}</if>
                 <if test="marketCode != null and marketCode != ''">AND statIndex.marketCode=#{marketCode}</if>
-                <if test="preiodCode != null and preiodCode != ''">AND statIndex.preiodCode=#{preiodCode}</if>
+                <if test="periodCode != null and periodCode != ''">AND statIndex.periodCode=#{periodCode}</if>
                 <if test="year != null and year != ''">AND statIndex.year=#{year}</if>
                 <if test="month != null and month != ''">AND statIndex.month=#{month}</if>
                 <if test="yearWeek != null and yearWeek != ''">AND statIndex.yearWeek=#{yearWeek}</if>

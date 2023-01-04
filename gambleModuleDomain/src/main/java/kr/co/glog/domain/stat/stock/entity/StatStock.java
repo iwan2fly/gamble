@@ -35,10 +35,13 @@ public class StatStock extends EntityModel {
     Long    volumeHigh;                         // 최고거래량
     Long    volumeAverage;                      // 평균거래량
     Long    volumeStandardDeviation;            // 거래량 표준편차
-    Long    foreignerLow;                       // 외국인 최소
-    Long    foreignerHigh;                      // 외국인 최대
-    Long    foreignerAverage;                   // 외국인 평균
-    Long    foreignerStandardDeviation;         // 외국인 표준편차
+    Long    foreignerPrevious;                    // 외국인 보유량 이전
+    Long    foreignerStart;                     // 외국인 보유량 최초
+    Long    foreignerLow;                       // 외국인 보유량 최소
+    Long    foreignerHigh;                      // 외국인 보유량 최대
+    Long    foreignerFinal;                     // 외국인 보유량 최종
+    Long    foreignerAverage;                   // 외국인 보유량 평균
+    Long    foreignerStandardDeviation;         // 외국인 보유량 표준편차
     String  priceLowDate;                       // 최저가날짜
     String  priceHighDate;                      // 최고가날짜
     String  volumeLowDate;                      // 최저거래량 날짜

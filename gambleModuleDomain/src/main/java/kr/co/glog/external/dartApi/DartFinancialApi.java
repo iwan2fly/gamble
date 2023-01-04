@@ -1,7 +1,7 @@
 package kr.co.glog.external.dartApi;
 
 import kr.co.glog.common.exception.ApplicationRuntimeException;
-import kr.co.glog.domain.stock.dao.CompanyFinancialInfoDao;
+import kr.co.glog.domain.stock.dao.DartCompanyFinancialInfoDao;
 import kr.co.glog.domain.stock.entity.DartCompanyFinancialInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class DartFinancialApi {
 
-    private final CompanyFinancialInfoDao companyFinancialInfoDao;
+    private final DartCompanyFinancialInfoDao dartCompanyFinancialInfoDao;
 
     // 기본 URL
     public static String url = "https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=" + DartKey.DART_CRTFC_KRY + "&corp_code=##companyCode##&bsns_year=##bsnsYear##&&reprt_code=##reprtCode##";
@@ -36,7 +36,7 @@ public class DartFinancialApi {
         ArrayList<DartCompanyFinancialInfo> dartCompanyFinancialInfoList = getCompanyFinancialInfo( document );
         for ( DartCompanyFinancialInfo dartCompanyFinancialInfo : dartCompanyFinancialInfoList) {
             dartCompanyFinancialInfo.setCompanyCode(companyCode);
-            companyFinancialInfoDao.updateInsetCompanyFinancialInfo(dartCompanyFinancialInfo);
+            dartCompanyFinancialInfoDao.updateInsetCompanyFinancialInfo(dartCompanyFinancialInfo);
         }
     }
 

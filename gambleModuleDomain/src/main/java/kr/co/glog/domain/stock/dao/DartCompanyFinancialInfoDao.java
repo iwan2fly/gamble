@@ -15,7 +15,7 @@ import java.util.ArrayList;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class CompanyFinancialInfoDao {
+public class DartCompanyFinancialInfoDao {
 
     private final DartCompanyFinancialInfoMapper dartCompanyFinancialInfoMapper;
 

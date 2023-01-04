@@ -3,7 +3,13 @@ package kr.co.glog.common.utils;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.IsoFields;
+import java.time.temporal.WeekFields;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class DateUtil {
 
@@ -868,24 +874,23 @@ public class DateUtil {
 		int month = Integer.parseInt( yyyymmdd.substring(4, 6) );
 		int day = Integer.parseInt( yyyymmdd.substring(6, 8) );
 
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(year, month - 1, day);
-
-		return calendar.get(Calendar.WEEK_OF_YEAR);
-
-
+		int result = LocalDate.of( year, month, day).get(WeekFields.of( DayOfWeek.SUNDAY, 4 ).weekOfWeekBasedYear() );
+		return result;
 	}
 
-	// year+주차 리턴
+	// 특정일자의 year+주차 리턴
 	public static String getYearWeek( String yyyymmdd ) {
-		int yearOfWeek = getWeekOfYear( yyyymmdd );
 		int year = Integer.parseInt( yyyymmdd.substring(0, 4) );
 		int month = Integer.parseInt( yyyymmdd.substring(4, 6) );
-		if ( month == 1 && yearOfWeek > 50 ) year--;
-		return year + ( yearOfWeek < 10 ? "0" + yearOfWeek : "" + yearOfWeek );
+		int day = Integer.parseInt( yyyymmdd.substring(6, 8) );
+
+		int weekOfYear = getWeekOfYear( yyyymmdd );
+		String result = "" + LocalDate.of( year, month, day).get( WeekFields.of( DayOfWeek.SUNDAY, 4 ).weekBasedYear() ) + ( weekOfYear < 10 ? "0" + weekOfYear : "" + weekOfYear );
+
+		return "" + result;
 	}
 
-	// 주의 첫날 날짜 리턴
+	// 특정일자 주차의 첫날 날짜 리턴
 	public static String getFirstDateOfWeek( String yyyymmdd ) {
 		int year = Integer.parseInt( yyyymmdd.substring(0, 4) );
 		int month = Integer.parseInt( yyyymmdd.substring(4, 6) );
@@ -901,7 +906,7 @@ public class DateUtil {
 		return sdf.format( calendar.getTime() );
 	}
 
-	// 주의 마지막날 날짜 리턴
+	// 특정일자 주차의 마지막날 날짜 리턴
 	public static String getLastDateOfWeek( String yyyymmdd ) {
 		int year = Integer.parseInt( yyyymmdd.substring(0, 4) );
 		int month = Integer.parseInt( yyyymmdd.substring(4, 6) );
@@ -922,8 +927,25 @@ public class DateUtil {
 
 	public static void main( String [] args ) throws ParseException
 	{
-		System.out.println( DateUtil.getFirstDateOfWeek( "20201231" ) );
-		System.out.println( DateUtil.getLastDateOfWeek( "20201231" ) );
+		/*
+		String year = "2021";
+		for ( int i = 1 ; i <= 12; i++ ) {
+			for ( int j = 1 ; j <= 31; j++ ) {
+				String month = i < 10 ? "0" + i : "" + i;
+				String day = j < 10 ? "0" + j : "" + j;
+				System.out.println( year + month + day + ": " + DateUtil.getYearWeek(year + month + day));
+			}
+		}
+
+
+		 */
+
+		System.out.println( WeekFields.of( DayOfWeek.SUNDAY, 4 ) );
+
+		System.out.println( "20191229 : " + getDayOfWeek( "20191229" ) );
+		System.out.println( "20191229 : " + getYearWeek( "20191229" ) );
+		System.out.println( "20201227 : " + getDayOfWeek( "20201227" ) );
+		System.out.println( "20201227 : " + getYearWeek( "20201227" ) );
 		/*
 		System.out.println( DateUtil.get20000101() );
 		System.out.println( DateUtil.daysFromNow( new Timestamp( System.currentTimeMillis() ) ) );
@@ -939,3 +961,4 @@ public class DateUtil {
 	}
 
 }
+

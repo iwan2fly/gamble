@@ -13,7 +13,6 @@ import kr.co.glog.domain.stock.dao.StockDailyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.Stock;
 import kr.co.glog.domain.stock.entity.StockDaily;
-import kr.co.glog.external.daumFinance.model.DaumDailyStock;
 import kr.co.glog.external.daumFinance.model.DaumInvestorStock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +30,6 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class DaumDailyInvestorScrapper {
 
-    private final StockDailyService stockDailyService;
-    private final StockDailyDao stockDailyDao;
-    private final StockDao stockDao;
-
     /**
      * 다음 주식에서 특정 종목의 일자별 외국인/기관 데이터를 읽어옵니다.
      * @param stockCode
@@ -43,7 +38,7 @@ public class DaumDailyInvestorScrapper {
      * @return
      * @throws ApplicationRuntimeException
      */
-    private Document getDocument(String stockCode, int perPage, int page ) throws ApplicationRuntimeException {
+    public Document getDocument(String stockCode, int perPage, int page ) throws ApplicationRuntimeException {
         if ( perPage > 100 ) perPage = 100;     // 페이지당 100개가 한계
 
         String header = "A";                    // 일반 주식은 다음에서 A로 시작
@@ -188,86 +183,6 @@ public class DaumDailyInvestorScrapper {
 
 
 
-    /**
-     * 특정 종목의 전체 투자자별 데이터를 StockDaily 테이블에 업데이트
-     * @param stockCode
-     */
-    public void updateDailyInvestorFullData( String stockCode  ) throws InterruptedException {
 
-        int perPage = 100;
 
-        Document document = getDocument( stockCode, perPage, 1 );
-        int totalPages = getTotalPages( document );
-        log.debug( "totalPages : " + totalPages );
-
-        ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
-        for ( int page = 1; page <= totalPages; page++ ) {
-
-            ArrayList<DaumInvestorStock> daumInvestorStockList = getDailyInvestorList( stockCode, perPage, page );
-
-            for ( DaumInvestorStock daumInvestorStock : daumInvestorStockList ) {
-                StockDaily stockDaily = stockDailyService.getStockDailyFromDaumInvestorStock( daumInvestorStock );
-                stockDaily.setStockCode( stockCode );
-                stockDailyList.add( stockDaily );
-            }
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-        }
-
-        for ( StockDaily stockDaily : stockDailyList ) {
-            log.debug( stockDaily.toString() );
-            try {
-                stockDailyDao.updateStockDaily( stockDaily );
-            } catch ( org.springframework.dao.DuplicateKeyException dke ) {
-                log.debug( dke.getMessage() );
-                break;
-            }
-        }
-
-    }
-
-    /**
-     * 특정 종목의 일별 데이터 첫 페이지를 테이블에 업서트
-     * @param stockCode
-     */
-    public void upsertDailyStock( String stockCode  ) {
-
-        int perPage = 10;
-
-        ArrayList<DaumInvestorStock> daumInvestorStockList = getDailyInvestorList( stockCode, perPage, 1 );
-
-        ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
-        for ( DaumInvestorStock daumInvestorStock : daumInvestorStockList ) {
-            StockDaily stockDaily = stockDailyService.getStockDailyFromDaumInvestorStock( daumInvestorStock );
-            if ( stockDaily.getStockCode() == null ) stockDaily.setStockCode( stockCode );      // 해당 페이지의 데이터에는 stockCode가 없어서 세팅
-            stockDailyList.add( stockDaily );
-        }
-
-        for ( StockDaily stockDaily : stockDailyList ) {
-            log.debug( stockDaily.toString() );
-            try {
-                stockDailyDao.updateStockDaily( stockDaily );
-            } catch ( org.springframework.dao.DuplicateKeyException dke ) {
-
-            }
-        }
-
-        // 일간 데이터가 있을 경우, 그 첫 번째 데이터는 가장 최근 데이터임
-        // 그 최근 데이터를 stock 에 업데이트
-        if ( stockDailyList.size() > 0 ) {
-            StockDaily stockDaily = stockDailyList.get(0);
-            Stock stock = new Stock();
-            stock.setStockCode( stockCode );
-            stock.setCurrentPrice( stockDaily.getPriceFinal() );
-            stock.setForeignersHoldRate( stockDaily.getForeignerHoldRate() );
-            stock.setForeignersStockCount( stockDaily.getForeignerStockCount() );
-            stockDao.updateStock( stock );
-        }
-
-    }
 }

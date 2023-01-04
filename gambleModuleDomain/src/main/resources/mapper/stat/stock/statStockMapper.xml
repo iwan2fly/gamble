@@ -5,17 +5,17 @@
 
     <insert id="insertStatStock" parameterType="StatStock" useGeneratedKeys="true" keyProperty="statStockId">
         INSERT INTO statStock
-            (  stockCode, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerLow, foreignerHigh, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
+            (  stockCode, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerPrevious, foreignerStart, foreignerLow, foreignerHigh, foreignerFinal, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
         VALUES
-            (  #{stockCode}, #{periodCode}, #{year}, #{month}, #{yearWeek}, #{week}, #{startDate}, #{endDate}, #{tradeDays}, #{pricePrevious}, #{priceStart}, #{priceFinal}, #{priceLow}, #{priceHigh}, #{priceAverage}, #{priceStandardDeviation}, #{priceChange}, #{rateChange}, #{volumeLow}, #{volumeHigh}, #{volumeAverage}, #{volumeStandardDeviation}, #{foreignerLow}, #{foreignerHigh}, #{foreignerAverage}, #{foreignerStandardDeviation}, #{priceLowDate}, #{priceHighDate}, #{volumeLowDate}, #{volumeHighDate}, now(), now() )
+            (  #{stockCode}, #{periodCode}, #{year}, #{month}, #{yearWeek}, #{week}, #{startDate}, #{endDate}, #{tradeDays}, #{pricePrevious}, #{priceStart}, #{priceFinal}, #{priceLow}, #{priceHigh}, #{priceAverage}, #{priceStandardDeviation}, #{priceChange}, #{rateChange}, #{volumeLow}, #{volumeHigh}, #{volumeAverage}, #{volumeStandardDeviation}, #{foreignerPrevious}, #{foreignerStart}, #{foreignerLow}, #{foreignerHigh}, #{foreignerFinal}, #{foreignerAverage}, #{foreignerStandardDeviation}, #{priceLowDate}, #{priceHighDate}, #{volumeLowDate}, #{volumeHighDate}, now(), now() )
     </insert>
 
     <insert id="insertsStatStock" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statStockId" keyProperty="statStockId">
         INSERT INTO statStock
-            (  stockCode, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerLow, foreignerHigh, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
+            (  stockCode, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerPrevious, foreignerStart, foreignerLow, foreignerHigh, foreignerFinal, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            (  #{item.stockCode}, #{item.periodCode}, #{item.year}, #{item.month}, #{item.yearWeek}, #{item.week}, #{item.startDate}, #{item.endDate}, #{item.tradeDays}, #{item.pricePrevious}, #{item.priceStart}, #{item.priceFinal}, #{item.priceLow}, #{item.priceHigh}, #{item.priceAverage}, #{item.priceStandardDeviation}, #{item.priceChange}, #{item.rateChange}, #{item.volumeLow}, #{item.volumeHigh}, #{item.volumeAverage}, #{item.volumeStandardDeviation}, #{item.foreignerLow}, #{item.foreignerHigh}, #{item.foreignerAverage}, #{item.foreignerStandardDeviation}, #{item.priceLowDate}, #{item.priceHighDate}, #{item.volumeLowDate}, #{item.volumeHighDate}, now(), now() )
+            (  #{item.stockCode}, #{item.periodCode}, #{item.year}, #{item.month}, #{item.yearWeek}, #{item.week}, #{item.startDate}, #{item.endDate}, #{item.tradeDays}, #{item.pricePrevious}, #{item.priceStart}, #{item.priceFinal}, #{item.priceLow}, #{item.priceHigh}, #{item.priceAverage}, #{item.priceStandardDeviation}, #{item.priceChange}, #{item.rateChange}, #{item.volumeLow}, #{item.volumeHigh}, #{item.volumeAverage}, #{item.volumeStandardDeviation}, #{item.foreignerPrevious}, #{item.foreignerStart}, #{item.foreignerLow}, #{item.foreignerHigh}, #{item.foreignerFinal}, #{item.foreignerAverage}, #{item.foreignerStandardDeviation}, #{item.priceLowDate}, #{item.priceHighDate}, #{item.volumeLowDate}, #{item.volumeHighDate}, now(), now() )
         </foreach>
     </insert>
 
@@ -41,8 +41,11 @@
             <if test="volumeHigh != null">volumeHigh = #{volumeHigh},</if>
             <if test="volumeAverage != null">volumeAverage = #{volumeAverage},</if>
             <if test="volumeStandardDeviation != null">volumeStandardDeviation = #{volumeStandardDeviation},</if>
+            <if test="foreignerPrevious != null">foreignerPrevious = #{foreignerPrevious},</if>
+            <if test="foreignerStart != null">foreignerStart = #{foreignerStart},</if>
             <if test="foreignerLow != null">foreignerLow = #{foreignerLow},</if>
             <if test="foreignerHigh != null">foreignerHigh = #{foreignerHigh},</if>
+            <if test="foreignerFinal != null">foreignerFinal = #{foreignerFinal},</if>
             <if test="foreignerAverage != null">foreignerAverage = #{foreignerAverage},</if>
             <if test="foreignerStandardDeviation != null">foreignerStandardDeviation = #{foreignerStandardDeviation},</if>
             <if test="priceLowDate != null">priceLowDate = #{priceLowDate},</if>
@@ -85,7 +88,7 @@
             <trim prefixOverrides = "AND | OR">
                 <if test="statStockId != null and statStockId != ''">AND statStock.statStockId=#{statStockId}</if>
                 <if test="stockCode != null and stockCode != ''">AND statStock.stockCode=#{stockCode}</if>
-                <if test="preiodCode != null and preiodCode != ''">AND statStock.preiodCode=#{preiodCode}</if>
+                <if test="periodCode != null and periodCode != ''">AND statStock.periodCode=#{periodCode}</if>
                 <if test="year != null and year != ''">AND statStock.year=#{year}</if>
                 <if test="month != null and month != ''">AND statStock.month=#{month}</if>
                 <if test="yearWeek != null and yearWeek != ''">AND statStock.yearWeek=#{yearWeek}</if>
@@ -106,8 +109,11 @@
                 <if test="volumeHigh != null and volumeHigh != ''">AND statStock.volumeHigh=#{volumeHigh}</if>
                 <if test="volumeAverage != null and volumeAverage != ''">AND statStock.volumeAverage=#{volumeAverage}</if>
                 <if test="volumeStandardDeviation != null and volumeStandardDeviation != ''">AND statStock.volumeStandardDeviation=#{volumeStandardDeviation}</if>
+                <if test="foreignerPrevious != null and foreignerPrevious != ''">AND statStock.foreignerPrevious=#{foreignerPrevious}</if>
+                <if test="foreignerStart != null and foreignerStart != ''">AND statStock.foreignerStart=#{foreignerStart}</if>
                 <if test="foreignerLow != null and foreignerLow != ''">AND statStock.foreignerLow=#{foreignerLow}</if>
                 <if test="foreignerHigh != null and foreignerHigh != ''">AND statStock.foreignerHigh=#{foreignerHigh}</if>
+                <if test="foreignerFinal != null and foreignerFinal != ''">AND statStock.foreignerFinal=#{foreignerFinal}</if>
                 <if test="foreignerAverage != null and foreignerAverage != ''">AND statStock.foreignerAverage=#{foreignerAverage}</if>
                 <if test="foreignerStandardDeviation != null and foreignerStandardDeviation != ''">AND statStock.foreignerStandardDeviation=#{foreignerStandardDeviation}</if>
                 <if test="priceLowDate != null and priceLowDate != ''">AND statStock.priceLowDate=#{priceLowDate}</if>
@@ -120,39 +126,42 @@
     </sql>
 
     <sql id="orderStatStock">
-        <if test='pagingParam.sortStock != null and pagingParam.sortStock != ""'>ORDER BY
+        <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
             <choose>
-                <when test="pagingParam.sortStock eq 'statStockId'">statStockId</when>
-                <when test="pagingParam.sortStock eq 'stockCode'">stockCode</when>
-                <when test="pagingParam.sortStock eq 'periodCode'">periodCode</when>
-                <when test="pagingParam.sortStock eq 'year'">year</when>
-                <when test="pagingParam.sortStock eq 'month'">month</when>
-                <when test="pagingParam.sortStock eq 'yearWeek'">yearWeek</when>
-                <when test="pagingParam.sortStock eq 'week'">week</when>
-                <when test="pagingParam.sortStock eq 'startDate'">startDate</when>
-                <when test="pagingParam.sortStock eq 'endDate'">endDate</when>
-                <when test="pagingParam.sortStock eq 'tradeDays'">tradeDays</when>
-                <when test="pagingParam.sortStock eq 'pricePrevious'">pricePrevious</when>
-                <when test="pagingParam.sortStock eq 'priceStart'">priceStart</when>
-                <when test="pagingParam.sortStock eq 'priceFinal'">priceFinal</when>
-                <when test="pagingParam.sortStock eq 'priceLow'">priceLow</when>
-                <when test="pagingParam.sortStock eq 'priceHigh'">priceHigh</when>
-                <when test="pagingParam.sortStock eq 'priceAverage'">priceAverage</when>
-                <when test="pagingParam.sortStock eq 'priceStandardDeviation'">priceStandardDeviation</when>
-                <when test="pagingParam.sortStock eq 'priceChange'">priceChange</when>
-                <when test="pagingParam.sortStock eq 'rateChange'">rateChange</when>
-                <when test="pagingParam.sortStock eq 'volumeLow'">volumeLow</when>
-                <when test="pagingParam.sortStock eq 'volumeHigh'">volumeHigh</when>
-                <when test="pagingParam.sortStock eq 'volumeAverage'">volumeAverage</when>
-                <when test="pagingParam.sortStock eq 'volumeStandardDeviation'">volumeStandardDeviation</when>
-                <when test="pagingParam.sortStock eq 'foreignerLow'">foreignerLow</when>
-                <when test="pagingParam.sortStock eq 'foreignerHigh'">foreignerHigh</when>
-                <when test="pagingParam.sortStock eq 'foreignerAverage'">foreignerAverage</when>
-                <when test="pagingParam.sortStock eq 'foreignerStandardDeviation'">foreignerStandardDeviation</when>
-                <when test="pagingParam.sortStock eq 'priceLowDate'">priceLowDate</when>
-                <when test="pagingParam.sortStock eq 'priceHighDate'">priceHighDate</when>
-                <when test="pagingParam.sortStock eq 'volumeLowDate'">volumeLowDate</when>
-                <when test="pagingParam.sortStock eq 'volumeHighDate'">volumeHighDate</when>
+                <when test="pagingParam.sortIndex eq 'statStockId'">statStockId</when>
+                <when test="pagingParam.sortIndex eq 'stockCode'">stockCode</when>
+                <when test="pagingParam.sortIndex eq 'periodCode'">periodCode</when>
+                <when test="pagingParam.sortIndex eq 'year'">year</when>
+                <when test="pagingParam.sortIndex eq 'month'">month</when>
+                <when test="pagingParam.sortIndex eq 'yearWeek'">yearWeek</when>
+                <when test="pagingParam.sortIndex eq 'week'">week</when>
+                <when test="pagingParam.sortIndex eq 'startDate'">startDate</when>
+                <when test="pagingParam.sortIndex eq 'endDate'">endDate</when>
+                <when test="pagingParam.sortIndex eq 'tradeDays'">tradeDays</when>
+                <when test="pagingParam.sortIndex eq 'pricePrevious'">pricePrevious</when>
+                <when test="pagingParam.sortIndex eq 'priceStart'">priceStart</when>
+                <when test="pagingParam.sortIndex eq 'priceFinal'">priceFinal</when>
+                <when test="pagingParam.sortIndex eq 'priceLow'">priceLow</when>
+                <when test="pagingParam.sortIndex eq 'priceHigh'">priceHigh</when>
+                <when test="pagingParam.sortIndex eq 'priceAverage'">priceAverage</when>
+                <when test="pagingParam.sortIndex eq 'priceStandardDeviation'">priceStandardDeviation</when>
+                <when test="pagingParam.sortIndex eq 'priceChange'">priceChange</when>
+                <when test="pagingParam.sortIndex eq 'rateChange'">rateChange</when>
+                <when test="pagingParam.sortIndex eq 'volumeLow'">volumeLow</when>
+                <when test="pagingParam.sortIndex eq 'volumeHigh'">volumeHigh</when>
+                <when test="pagingParam.sortIndex eq 'volumeAverage'">volumeAverage</when>
+                <when test="pagingParam.sortIndex eq 'volumeStandardDeviation'">volumeStandardDeviation</when>
+                <when test="pagingParam.sortIndex eq 'foreignerPrevious'">foreignerPrevious</when>
+                <when test="pagingParam.sortIndex eq 'foreignerStart'">foreignerStart</when>
+                <when test="pagingParam.sortIndex eq 'foreignerLow'">foreignerLow</when>
+                <when test="pagingParam.sortIndex eq 'foreignerHigh'">foreignerHigh</when>
+                <when test="pagingParam.sortIndex eq 'foreignerFinal'">foreignerFinal</when>
+                <when test="pagingParam.sortIndex eq 'foreignerAverage'">foreignerAverage</when>
+                <when test="pagingParam.sortIndex eq 'foreignerStandardDeviation'">foreignerStandardDeviation</when>
+                <when test="pagingParam.sortIndex eq 'priceLowDate'">priceLowDate</when>
+                <when test="pagingParam.sortIndex eq 'priceHighDate'">priceHighDate</when>
+                <when test="pagingParam.sortIndex eq 'volumeLowDate'">volumeLowDate</when>
+                <when test="pagingParam.sortIndex eq 'volumeHighDate'">volumeHighDate</when>
                 <otherwise>statStockId</otherwise>
             </choose>
             <choose>
@@ -161,7 +170,7 @@
             </choose>
         </if>
         <if test="pagingParam.rows gt 0">
-            LIMIT #{pagingParam.startStock}, #{pagingParam.endStock}
+            LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}
         </if>
     </sql>
     

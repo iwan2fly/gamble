@@ -1,0 +1,134 @@
+{{>web/layouts/fullNavHeader}}
+
+<script>
+    let serverParam = {
+        marketCode : '',
+        periodCode : '',
+        year: '',
+        month : '',
+        week : '',
+        yearWeek : '',
+    };
+
+    serverParam.marketCode = '{{serverParam.marketCode}}'
+    serverParam.periodCode = '{{serverParam.periodCode}}'
+    serverParam.year = '{{serverParam.year}}'
+    serverParam.month = '{{#serverParam.month}}{{serverParam.month}}{{/serverParam.month}}'
+    serverParam.week = '{{#serverParam.week}}{{serverParam.week}}{{/serverParam.week}}'
+    serverParam.yearWeek = '{{#serverParam.yearWeek}}{{serverParam.yearWeek}}{{/serverParam.yearWeek}}';
+</script>
+
+
+
+<!-- Page Sidebar Ends-->
+<div class="page-body" id="body">
+
+    <div class="container-fluid">
+        <div class="page-header dash-breadcrumb">
+            <div class="row">
+                <div class="col-6">
+                    <h3 class="f-w-600">
+                        <span v-text="serverParam.marketCode == 'kospi' ? '코스피' : '코스닥'"></span>
+                        <span v-text="serverParam.year + '년'"></span>
+                        <span v-if="serverParam.periodCode == 'month'" v-text="' > ' + serverParam.month + '월'"></span>
+                        <span v-if="serverParam.periodCode == 'week'" v-text="' > ' + serverParam.yearWeek + '주'"></span>
+                    </h3>
+                </div>
+                <div class="col-6">
+                    <div class="breadcrumb-sec">
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="index.html"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a></li>
+                            <li class="breadcrumb-item">Dashboard</li>
+                            <li class="breadcrumb-item active">Project</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container-fluid starts-->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="card">
+                <div class="card-header">
+                    <h5><span v-text="statIndex.priceFinal"></span>
+                        <code :class="statIndex.priceChange > 0 ? 'text-danger' : statIndex.priceChange < 0 ? 'text-primary' : ''" v-text="statIndex.priceChange"></code>
+                        <code :class="statIndex.priceChange > 0 ? 'text-danger' : statIndex.priceChange < 0 ? 'text-primary' : ''" v-text="statIndex.rateChange + '%'"></code>
+                    </h5>
+                    <span>
+                        <span v-text="yyyymmdd(statIndex.startDate)"></span> ~ <span v-text="yyyymmdd(statIndex.endDate)"></span>
+                        <span>(<span class="text-info" v-text="statIndex.tradeDays"></span>)</span>
+                    </span>
+                </div>
+
+                <div class="card-body p-t-0">
+                    <span v-text="statIndex.marketCode"></span>
+                    <div class="col-sm-12">marketCode : <span v-text="statIndex.marketCode"></span></div>
+                    <div class="col-sm-12">month : <span v-text="statIndex.month"></span></div>
+                    <div class="col-sm-12">periodCode : <span v-text="statIndex.periodCode"></span></div>
+                    <div class="col-sm-12">year : <span v-text="statIndex.year"></span></div>
+                    <div class="col-sm-12">yearWeek : <span v-text="statIndex.yearWeek"></span></div>
+                    <div class="col-sm-12">startDate : <span v-text="statIndex.startDate"></span></div>
+                    <div class="col-sm-12">endDate : <span v-text="statIndex.endDate"></span></div>
+                    <div class="col-sm-12">priceAverage : <span v-text="statIndex.priceAverage"></span></div>
+                    <div class="col-sm-12">priceChange : <span v-text="statIndex.priceChange"></span></div>
+                    <div class="col-sm-12">priceFinal : <span v-text="statIndex.priceFinal"></span></div>
+                    <div class="col-sm-12">priceHigh : <span v-text="statIndex.priceHigh"></span></div>
+                    <div class="col-sm-12">priceHighDate : <span v-text="statIndex.priceHighDate"></span></div>
+                    <div class="col-sm-12">priceLow : <span v-text="statIndex.priceLow"></span></div>
+                    <div class="col-sm-12">priceLowDate : <span v-text="statIndex.priceLowDate"></span></div>
+                    <div class="col-sm-12">pricePrevious : <span v-text="statIndex.pricePrevious"></span></div>
+                    <div class="col-sm-12">priceStandardDeviation : <span v-text="statIndex.priceStandardDeviation"></span></div>
+
+                    <div class="col-sm-12">priceStart : <span v-text="statIndex.priceStart"></span></div>
+                    <div class="col-sm-12">rateChange : <span v-text="statIndex.rateChange"></span></div>
+                    <div class="col-sm-12">tradeDays : <span v-text="statIndex.tradeDays"></span></div>
+                    <div class="col-sm-12">volumeAverage : <span v-text="statIndex.volumeAverage"></span></div>
+                    <div class="col-sm-12">volumeHigh : <span v-text="statIndex.volumeHigh"></span></div>
+                    <div class="col-sm-12">volumeHighDate : <span v-text="statIndex.volumeHighDate"></span></div>
+                    <div class="col-sm-12">volumeLow : <span v-text="statIndex.volumeLow"></span></div>
+                    <div class="col-sm-12">volumeLowDate : <span v-text="statIndex.volumeLowDate"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Container-fluid Ends-->
+
+    <!-- Container-fluid starts-->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="card">
+                <div class="card-header">
+                    <h5><span v-text="statIndex.periodCode"></span></h5>
+                    <span>
+                        <span v-text="yyyymmdd(statIndex.startDate)"></span> ~ <span v-text="yyyymmdd(statIndex.endDate)"></span>
+                        <span>(<span class="text-info" v-text="statIndex.tradeDays"></span>)</span>
+                    </span>
+                </div>
+
+                <div class="card-body p-t-0" id="statIndexChart">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Container-fluid Ends-->
+
+
+
+                <div id="main">
+                </div>
+    <div id="chart">
+    </div>
+
+
+</div>
+
+
+
+<script src="/js/web/svc/krx/indexes/statIndex.js"></script>
+
+{{>web/layouts/fullNavFooter}}
+
+

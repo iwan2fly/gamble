@@ -22,6 +22,22 @@ public class StockDailyDao {
     private final StockDailyMapper stockDailyMapper;
 
     /**
+     * 특정 기간동안 거래되었던 주식 목록
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public ArrayList<StockDailyResult> getStockListBetween ( String startDate, String endDate ) {
+        if ( startDate == null ) throw new ParameterMissingException( "startDate" );
+        if ( endDate == null ) throw new ParameterMissingException( "endDate" );
+
+        StockDailyParam stockDailyParam = new StockDailyParam();
+        stockDailyParam.setStartDate( startDate );
+        stockDailyParam.setEndDate( endDate );
+        return stockDailyMapper.selectStockListBetween( stockDailyParam );
+    }
+
+    /**
      * 거래일수, 최대값, 최소값, 평균을 구합니다.
      * @param stockCode 주식코드, startDate 시작일, endDate 종료일
      * @return
@@ -45,32 +61,32 @@ public class StockDailyDao {
      * @param stockCode 주식코드, startDate 작일, endDate 종료일, averagePrice 평균가격
      * @return
      */
-    public StockDailyResult getStatStockPriceStdDev(String stockCode, String startDate, String endDate, Integer averagePrice ) {
+    public StockDailyResult getStatStockPriceStdDev(String stockCode, String startDate, String endDate, Integer priceAverage ) {
 
         if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
         if ( endDate == null ) throw new ParameterMissingException( "endDate" );
-        if ( averagePrice == null ) throw new ParameterMissingException( "averagePrice" );
+        if ( priceAverage == null ) throw new ParameterMissingException( "priceAverage" );
 
         // 데이터 전체 건수가 필요함
         StockDailyResult stockDailyResult = this.getStatStockCommon( stockCode, startDate, endDate );
 
-        return this.getStatStockPriceStdDev( stockCode, startDate, endDate, averagePrice, stockDailyResult.getDataCount() );
+        return this.getStatStockPriceStdDev( stockCode, startDate, endDate, priceAverage, stockDailyResult.getDataCount() );
     }
 
-    public StockDailyResult getStatStockPriceStdDev(String stockCode, String startDate, String endDate, Integer averagePrice, Integer dataCount ) {
+    public StockDailyResult getStatStockPriceStdDev(String stockCode, String startDate, String endDate, Integer priceAverage, Integer dataCount ) {
 
         if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
         if ( endDate == null ) throw new ParameterMissingException( "endDate" );
-        if ( averagePrice == null ) throw new ParameterMissingException( "averagePrice" );
+        if ( priceAverage == null ) throw new ParameterMissingException( "priceAverage" );
         if ( dataCount == null ) throw new ParameterMissingException( "dataCount" );
 
         StockDailyParam stockDailyParam = new StockDailyParam();
         stockDailyParam.setStockCode( stockCode );
         stockDailyParam.setStartDate( startDate );
         stockDailyParam.setEndDate( endDate );
-        stockDailyParam.setAveragePrice( averagePrice );
+        stockDailyParam.setPriceAverage( priceAverage );
         stockDailyParam.setDataCount( dataCount );
 
         StockDailyResult stockDailyResult = stockDailyMapper.selectStatStockPriceStdDev( stockDailyParam );
@@ -85,32 +101,32 @@ public class StockDailyDao {
      * @param stockCode 주식코드, startDate 시작일, endDate 종료일, averageVolume 평균 거래량
      * @return
      */
-    public StockDailyResult selectStatStockVolumeStdDev( String stockCode, String startDate, String endDate, Long averageVolume ) {
+    public StockDailyResult selectStatStockVolumeStdDev( String stockCode, String startDate, String endDate, Long volumeAverage ) {
 
         if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
         if ( endDate == null ) throw new ParameterMissingException( "endDate" );
-        if ( averageVolume == null ) throw new ParameterMissingException( "averageVolume" );
+        if ( volumeAverage == null ) throw new ParameterMissingException( "volumeAverage" );
 
         // 데이터 전체 건수가 필요함
         StockDailyResult stockDailyResult = this.getStatStockCommon( stockCode, startDate, endDate );
 
-        return this.selectStatStockVolumeStdDev( stockCode, startDate, endDate, averageVolume, stockDailyResult.getDataCount() );
+        return this.selectStatStockVolumeStdDev( stockCode, startDate, endDate, volumeAverage, stockDailyResult.getDataCount() );
     }
 
-    public StockDailyResult selectStatStockVolumeStdDev( String stockCode, String startDate, String endDate, Long averageVolume, Integer dataCount ) {
+    public StockDailyResult selectStatStockVolumeStdDev( String stockCode, String startDate, String endDate, Long volumeAverage, Integer dataCount ) {
 
         if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
         if ( endDate == null ) throw new ParameterMissingException( "endDate" );
-        if ( averageVolume == null ) throw new ParameterMissingException( "averageVolume" );
+        if ( volumeAverage == null ) throw new ParameterMissingException( "volumeAverage" );
         if ( dataCount == null ) throw new ParameterMissingException( "dataCount" );
 
         StockDailyParam stockDailyParam = new StockDailyParam();
         stockDailyParam.setStockCode( stockCode );
         stockDailyParam.setStartDate( startDate );
         stockDailyParam.setEndDate( endDate );
-        stockDailyParam.setAverageVolume( averageVolume );
+        stockDailyParam.setVolumeAverage( volumeAverage );
         stockDailyParam.setDataCount( dataCount );
 
         log.debug( stockDailyParam.toString() );
@@ -119,8 +135,47 @@ public class StockDailyDao {
 
         return stockDailyResult;
     }
-    
-    
+
+
+    /**
+     * 외국인 보유량에 대한 대한 표준편차를 구합니다.
+     * @param stockCode 주식코드, startDate 시작일, endDate 종료일, averageVolume 평균 거래량
+     * @return
+     */
+    public StockDailyResult selectStatStockForeignerStdDev( String stockCode, String startDate, String endDate, Long foreignerAverage ) {
+
+        if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
+        if ( startDate == null ) throw new ParameterMissingException( "startDate" );
+        if ( endDate == null ) throw new ParameterMissingException( "endDate" );
+        if ( foreignerAverage == null ) throw new ParameterMissingException( "foreignerAverage" );
+
+        // 데이터 전체 건수가 필요함
+        StockDailyResult stockDailyResult = this.getStatStockCommon( stockCode, startDate, endDate );
+
+        return this.selectStatStockVolumeStdDev( stockCode, startDate, endDate, foreignerAverage, stockDailyResult.getDataCount() );
+    }
+
+    public StockDailyResult selectStatStockForeignerStdDev( String stockCode, String startDate, String endDate, Long foreignerAverage, Integer dataCount ) {
+
+        if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
+        if ( startDate == null ) throw new ParameterMissingException( "startDate" );
+        if ( endDate == null ) throw new ParameterMissingException( "endDate" );
+        if ( foreignerAverage == null ) throw new ParameterMissingException( "foreignerAverage" );
+        if ( dataCount == null ) throw new ParameterMissingException( "dataCount" );
+
+        StockDailyParam stockDailyParam = new StockDailyParam();
+        stockDailyParam.setStockCode( stockCode );
+        stockDailyParam.setStartDate( startDate );
+        stockDailyParam.setEndDate( endDate );
+        stockDailyParam.setForeignerAverage( foreignerAverage );
+        stockDailyParam.setDataCount( dataCount );
+
+        log.debug( stockDailyParam.toString() );
+        StockDailyResult stockDailyResult = stockDailyMapper.selectStatStockForeignerStdDev( stockDailyParam );
+        log.debug( stockDailyResult.toString() );
+
+        return stockDailyResult;
+    }
     
     
     

@@ -1,18 +1,19 @@
 package kr.co.glog.domain.service;
 
 
+import kr.co.glog.common.exception.NetworkCommunicationFailureException;
 import kr.co.glog.common.exception.ParameterMissingException;
+import kr.co.glog.domain.stock.dao.IndexDailyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.IndexDaily;
-import kr.co.glog.domain.stock.entity.StockDaily;
-import kr.co.glog.external.datagokr.fsc.GetMarketIndexInfo;
 import kr.co.glog.external.datagokr.fsc.model.GetMarketIndexInfoResult;
-import kr.co.glog.external.datagokr.fsc.model.GetStockPriceInfoResult;
+import kr.co.glog.external.daumFinance.DaumDailyIndexScrapper;
 import kr.co.glog.external.daumFinance.model.DaumDailyIndex;
-import kr.co.glog.external.daumFinance.model.DaumInvestorStock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 
 /**
@@ -23,13 +24,100 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class IndexDailyService {
 
+    private final IndexDailyDao indexDailyDao;
     private final StockDao stockDao;
+    private final DaumDailyIndexScrapper daumDailyIndexScrapper;
+
+
+    /**
+     * 다음 주식 페이지, 일별 데이터 첫 페이지 10개 데이터를 indexDaily 테이블에 upsert
+     * @param marketCode
+     */
+    public void upsertIndexDailyFromDaum( String marketCode  ) throws InterruptedException {
+
+        int perPage = 10;
+
+        // 다음
+        ArrayList<IndexDaily> indexDailyList = new ArrayList<IndexDaily>();
+        ArrayList<DaumDailyIndex> daumDailyIndexList = null;
+
+        int readCount = 0;
+        boolean isRead = false;
+        while ( !isRead ) {
+
+            if ( readCount >= 5 ) throw new NetworkCommunicationFailureException( "다음 주식 페이지 지수 목록 조회가 " + readCount + " 번 실패했습니다.");
+
+            try {
+                daumDailyIndexList = daumDailyIndexScrapper.getDailyIndexList(marketCode, perPage, 1);
+                isRead = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                readCount++;
+                Thread.sleep( 5000 );
+            }
+        }
+
+        // 우리 DB에 맞게 컨버트
+        for ( DaumDailyIndex daumDailyIndex : daumDailyIndexList ) {
+            IndexDaily indexDaily = convertToIndexDailyFromDaumDailyIndex( marketCode, daumDailyIndex );
+            indexDailyList.add( indexDaily );
+        }
+
+        // 하나씩 인서트 해보고 이미 있으면 업데이트
+        for ( int i = 0; i < indexDailyList.size(); i++ ) {
+            indexDailyDao.saveIndexDaily( indexDailyList.get(i) );
+        }
+    }
+
+
+    /**
+     * 다음 주식의 전체 일별 지수 데이터를 IndexDaily 테이블에 인서트
+     * @param marketCode
+     */
+    public void insertDailyIndexAllFromDaum(String marketCode  ) {
+
+        int perPage = 100;
+
+        ArrayList<IndexDaily> indexDailyList = new ArrayList<IndexDaily>();
+        int totalPages = daumDailyIndexScrapper.getTotalPages( marketCode, perPage );
+
+        log.debug( "totalPages : " + totalPages );
+
+        for ( int page = 1; page <= totalPages; page++ ) {
+
+            ArrayList<DaumDailyIndex> daumDailyStockList = daumDailyIndexScrapper.getDailyIndexList( marketCode, perPage, page );
+
+            for ( DaumDailyIndex daumDailyIndex : daumDailyStockList ) {
+                IndexDaily indexDaily = convertToIndexDailyFromDaumDailyIndex( marketCode, daumDailyIndex );
+                indexDailyList.add( indexDaily );
+            }
+
+            try {
+                Thread.sleep(5000 );
+            } catch (InterruptedException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+
+        for ( IndexDaily indexDaily : indexDailyList ) {
+            log.debug( indexDaily.toString() );
+            try {
+                indexDailyDao.insertIndexDaily( indexDaily );
+            } catch ( org.springframework.dao.DuplicateKeyException dke ) {
+                indexDailyDao.updateIndexDaily( indexDaily );
+                break;
+            }
+        }
+
+    }
+
 
     /**
      * DaumDailyIndex -> IndexDaily
      * @param daumDailyIndex
      */
-    public IndexDaily getIndexDailyFromDaumDailyIndex( String marketCode, DaumDailyIndex daumDailyIndex ) {
+    public IndexDaily convertToIndexDailyFromDaumDailyIndex(String marketCode, DaumDailyIndex daumDailyIndex ) {
 
         if ( daumDailyIndex == null ) throw new ParameterMissingException( "daumDailyIndex" );
 
@@ -49,6 +137,12 @@ public class IndexDailyService {
     }
 
 
+    /**
+     * FscMarketInf -> IndexDaily
+     * @param marketCode
+     * @param getMarketIndexInfoResult
+     * @return
+     */
     public IndexDaily getIndexkDailyFromFscMarketInfo( String marketCode, GetMarketIndexInfoResult getMarketIndexInfoResult ) {
 
         if ( getMarketIndexInfoResult == null ) throw new ParameterMissingException( "getMarketIndexInfoResult" );

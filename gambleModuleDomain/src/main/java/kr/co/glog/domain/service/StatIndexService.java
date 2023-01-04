@@ -6,6 +6,9 @@ import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
 import kr.co.glog.domain.stat.stock.dao.StatIndexDao;
 import kr.co.glog.domain.stat.stock.entity.StatIndex;
+import kr.co.glog.domain.stat.stock.model.StatIndexParam;
+import kr.co.glog.domain.stat.stock.model.StatIndexResult;
+import kr.co.glog.domain.stock.MarketCode;
 import kr.co.glog.domain.stock.PeriodCode;
 import kr.co.glog.domain.stock.dao.IndexDailyDao;
 import kr.co.glog.domain.stock.model.IndexDailyParam;
@@ -30,6 +33,138 @@ public class StatIndexService {
 
 
     /**
+     * 특정년도 통계
+     * @param marketCode
+     * @param year
+     * @return
+     */
+    public StatIndexResult getStatIndexYear(String marketCode, Integer year ) {
+        StatIndexParam statIndexParam = new StatIndexParam();
+        statIndexParam.setMarketCode( marketCode );
+        statIndexParam.setPeriodCode( PeriodCode.year );
+        statIndexParam.setYear( year );
+        statIndexParam.setYearWeek( year + "00" );
+        ArrayList<StatIndexResult> statIndexList = statIndexDao.getStatIndexList( statIndexParam );
+
+        StatIndexResult statIndexResult = null;
+        if ( statIndexList != null && statIndexList.size() == 1 ) statIndexResult = statIndexList.get(0);
+        return statIndexResult;
+    }
+
+    /**
+     * 특정 월 통계
+     * @param marketCode
+     * @param year
+     * @param month
+     * @return
+     */
+    public StatIndexResult getStatIndexMonth(String marketCode, Integer year, Integer month ) {
+        StatIndexParam statIndexParam = new StatIndexParam();
+        statIndexParam.setMarketCode( marketCode );
+        statIndexParam.setPeriodCode( PeriodCode.month );
+        statIndexParam.setYear( year );
+        statIndexParam.setMonth( month );
+        statIndexParam.setYearWeek( year + "00" );
+        ArrayList<StatIndexResult> statIndexList = statIndexDao.getStatIndexList( statIndexParam );
+
+        StatIndexResult statIndexResult = null;
+        if ( statIndexList != null && statIndexList.size() == 1 ) statIndexResult = statIndexList.get(0);
+        return statIndexResult;
+    }
+
+    /**
+     * 특정 주차 통계
+     * @param marketCode
+     * @param yearWeek
+     * @return
+     */
+    public StatIndexResult getStatIndexWeek(String marketCode, String yearWeek ) {
+        StatIndexParam statIndexParam = new StatIndexParam();
+        statIndexParam.setMarketCode( marketCode );
+        statIndexParam.setPeriodCode( PeriodCode.week );
+        statIndexParam.setYear( Integer.parseInt( yearWeek.substring(0,4) ) );
+        statIndexParam.setYearWeek( yearWeek );
+        ArrayList<StatIndexResult> statIndexList =  statIndexDao.getStatIndexList( statIndexParam );
+
+        StatIndexResult statIndexResult = null;
+        if ( statIndexList != null && statIndexList.size() == 1 ) statIndexResult = statIndexList.get(0);
+        return statIndexResult;
+    }
+
+
+    /**
+     * 특정 년도의 월간 데이터 리턴
+     * @param marketCode
+     * @param year
+     * @return
+     */
+    public ArrayList<StatIndexResult> getStatIndexMonthlyList( String marketCode, Integer year ) {
+        StatIndexParam statIndexParam = new StatIndexParam();
+        statIndexParam.setMarketCode( marketCode );
+        statIndexParam.setYear( year );
+        statIndexParam.setPeriodCode( PeriodCode.month );
+        statIndexParam.setYearWeek( year + "00" );
+        return statIndexDao.getStatIndexList( statIndexParam );
+    }
+
+
+
+    /**
+     *  2020년부터 연간/월간/주간 지수통계 upsert
+     */
+    public void makeStatIndexAll() {
+        makeStatIndexYear( MarketCode.kospi, "20200101" );
+        makeStatIndexYear( MarketCode.kosdaq, "20200101" );
+        makeStatIndexYear( MarketCode.kospi, "20210101" );
+        makeStatIndexYear( MarketCode.kosdaq, "20210101" );
+        makeStatIndexYear( MarketCode.kospi, "20220101" );
+        makeStatIndexYear( MarketCode.kosdaq, "20220101" );
+
+        for ( int year = 2020; year < 2023; year++ ) {
+            for (int i = 1; i <= 12; i++) {
+                String month = i < 10 ? "0" + i : "" + i;
+                makeStatIndexMonth(MarketCode.kospi, year+ month + "01");
+                makeStatIndexMonth(MarketCode.kosdaq, year + month + "01");
+            }
+        }
+
+        int date = 20200101;
+        while ( date < 20230101 ) {
+            String dateStr = "" + date;
+            makeStatIndexWeek(MarketCode.kospi, dateStr);
+            makeStatIndexWeek(MarketCode.kosdaq, dateStr);
+
+            dateStr = DateUtil.addDate( dateStr, "D", "yyyyMMdd", 7 );
+            date = Integer.parseInt( dateStr );
+        }
+    }
+
+    /**
+     *  오늘의 연간/월간/주간 지수통계 upsert
+     */
+    public void makeStatIndexToday() {
+        makeStatIndex( DateUtil.getToday() );
+    }
+
+    /**
+     *  특정 날짜의 연간/월간/주간 지수통계 upsert
+     */
+    public void makeStatIndex( String yyyymmdd ) {
+
+        // 주간
+        makeStatIndexWeek(MarketCode.kospi, yyyymmdd);
+        makeStatIndexWeek(MarketCode.kosdaq, yyyymmdd);
+
+        // 월간
+        makeStatIndexMonth(MarketCode.kospi, yyyymmdd);
+        makeStatIndexMonth(MarketCode.kosdaq, yyyymmdd);
+
+        // 연간
+        makeStatIndexYear( MarketCode.kospi, yyyymmdd );
+        makeStatIndexYear( MarketCode.kosdaq, yyyymmdd);
+    }
+
+    /**
      * 년간 지수 통계
      * @param marketCode
      * @param yyyymmdd
@@ -39,7 +174,7 @@ public class StatIndexService {
         if ( yyyymmdd == null ) throw new ParameterMissingException( "yyyymmdd" );
 
         String year = yyyymmdd.substring(0, 4);
-        makeStatIndexCommon( marketCode, PeriodCode.year, 0, year + "0101", year + "1231" );
+        makeStatIndexCommon( marketCode, PeriodCode.year,year + "0101", year + "1231", null );
     }
 
     /**
@@ -53,11 +188,11 @@ public class StatIndexService {
 
         String year = yyyymmdd.substring(0, 4);
         String month = yyyymmdd.substring(4, 6);
-        makeStatIndexCommon( marketCode, PeriodCode.month, 0, year + month + "01", year + month + "31" );
+        makeStatIndexCommon( marketCode, PeriodCode.month, year + month + "01", year + month + "31", null );
     }
 
     /**
-     * 월간 지수 통계
+     * 주간 지수 통계
      * @param marketCode
      * @param yyyymmdd
      */
@@ -65,19 +200,24 @@ public class StatIndexService {
         if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( yyyymmdd == null ) throw new ParameterMissingException( "yyyymmdd" );
 
-        Integer turn = DateUtil.getWeekOfYear( yyyymmdd );
+        String yearWeek = DateUtil.getYearWeek( yyyymmdd );
         String startDate = DateUtil.getFirstDateOfWeek( yyyymmdd );
         String endDate = DateUtil.getLastDateOfWeek( yyyymmdd );
 
-        makeStatIndexCommon( marketCode, PeriodCode.week, turn, startDate, endDate );
+        makeStatIndexCommon( marketCode, PeriodCode.week, startDate, endDate, yearWeek );
     }
+
 
     /**
      * 특정 기간 동안의 지수 일반 통계
      * @param startDate
      * @param endDate
      */
-    public void makeStatIndexCommon(String marketCode, String periodCode, Integer turn, String startDate, String endDate ) {
+  //  public void makeStatIndexCommon(String marketCode, String periodCode, String startDate, String endDate ) {
+  //      makeStatIndexCommon( marketCode, periodCode, startDate, endDate, null );
+   // }
+
+    public void makeStatIndexCommon(String marketCode, String periodCode, String startDate, String endDate, String yearWeek ) {
 
         if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
@@ -88,17 +228,19 @@ public class StatIndexService {
         statIndex.setPeriodCode( periodCode);
         statIndex.setStartDate( startDate );
         statIndex.setEndDate( endDate );
+        statIndex.setYearWeek( yearWeek == null ? startDate.substring(0, 4) + "00" : yearWeek );
+        statIndex.setWeek( yearWeek == null ? null : Integer.parseInt(yearWeek.substring(4,6) ) );
 
         statIndex.setMonth( 0 );
-        statIndex.setYearWeek( startDate.substring(0, 4) + "00" );
+
         if ( periodCode.equals( PeriodCode.year ) ) {
             statIndex.setYear( Integer.parseInt( startDate.substring(0, 4) ) );
         } else if ( periodCode.equals( PeriodCode.month ) ) {
             statIndex.setYear( Integer.parseInt( startDate.substring(0, 4) ) );
             statIndex.setMonth( Integer.parseInt( startDate.substring(4, 6) ) );
         } else if ( periodCode.equals( PeriodCode.week ) ) {
-            statIndex.setYear( Integer.parseInt( startDate.substring(0, 4) ) );
-            statIndex.setMonth( Integer.parseInt( startDate.substring(4, 6) ) );
+            statIndex.setYear( Integer.parseInt( yearWeek.substring(0, 4) ) );
+            statIndex.setMonth( Integer.parseInt( yearWeek.substring(4, 6) ) );
             statIndex.setYearWeek( DateUtil.getYearWeek( startDate ) );
             statIndex.setWeek( DateUtil.getWeekOfYear( startDate ) );
         }
@@ -143,7 +285,7 @@ public class StatIndexService {
         statIndex.setPriceHighDate( indexDailyList.get(0).getTradeDate() );
 
         // 최저거래량 / 최고거래량 일자
-        pagingParam.setSortIndex( "volumeHigh");
+        pagingParam.setSortIndex( "volumeTrade");
         pagingParam.setSortType("desc");
         pagingParam.setRows(0);
         indexDailyParam.setPagingParam( pagingParam );
@@ -166,15 +308,16 @@ public class StatIndexService {
         pagingParam.setRows(1);
         indexDailyParam.setPagingParam( pagingParam );
         indexDailyParam.setStartDate( null );
-        indexDailyParam.setEndDate( startDate );
+        indexDailyParam.setEndDate( null );
+        indexDailyParam.setBeforeDate( startDate );
         indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
         statIndex.setPricePrevious( indexDailyList.get(0).getPriceFinal() );
 
         // 변동가격 / 변동률
         Float pricePrevious = statIndex.getPricePrevious();
         Float priceNow = statIndex.getPriceFinal();
-        statIndex.setPriceChange( statIndex.getPriceFinal() - statIndex.getPricePrevious() );
-        statIndex.setRateChange( Math.round( statIndex.getPriceChange() / statIndex.getPricePrevious() * 10000 ) / 100f );      // 소수점 2자리까지만 남김
+        statIndex.setPriceChange( Math.round( 100 * ( statIndex.getPriceFinal() - statIndex.getPricePrevious() ) ) / 100f );     // 소수점 2자리까지만 남김
+        statIndex.setRateChange( Math.round( 10000 * statIndex.getPriceChange() / statIndex.getPricePrevious()  ) / 100f );      // 소수점 2자리까지만 남김
 
         statIndexDao.saveStatIndex( statIndex );
    }

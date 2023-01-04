@@ -1,10 +1,15 @@
 package kr.co.glog.batch.service;
 
+import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.exception.NetworkCommunicationFailureException;
+import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
 import kr.co.glog.domain.service.StockDailyService;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
+import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.StockDaily;
+import kr.co.glog.domain.stock.model.StockParam;
+import kr.co.glog.domain.stock.model.StockResult;
 import kr.co.glog.external.datagokr.fsc.GetStockPriceInfo;
 import kr.co.glog.external.datagokr.fsc.model.GetStockPriceInfoResult;
 import lombok.RequiredArgsConstructor;
@@ -20,50 +25,13 @@ import java.util.ArrayList;
 public class StockDailyBatchService {
 
     private final GetStockPriceInfo getStockPriceInfo;          // 일별 주식 시세 - 금융위원회
+    private final StockDao stockDao;
     private final StockDailyService stockDailyService;
     private final StockDailyDao stockDailyDao;
 
-    /**
-     *  2022.11.19 : 현재 마지막 날짜의 데이터가 언제 만들어지는 지 알 수 없음
-     *             : 거래일 다음날 오전 9시경에는 생성되어 있지 않는 거 같음
-     */
-    public void upsertFromKrxDataByDate( String yyyymmdd ) {
-
-        String batch = "[BATCH] 일별 종목 거래데이터 업데이트 - 금융위원회 주식정보";
-
-        long startTime = System.currentTimeMillis();
-        log.debug( batch + "시작 : " + startTime);
-
-        ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
-        try {
-
-            // 한 방에 전체 목록 가져옴
-            Document document = getStockPriceInfo.getDocument( "", "", yyyymmdd, "", "", 1, 10000 );
-            ArrayList<GetStockPriceInfoResult> list = getStockPriceInfo.getStockPriceInfoList( document );
-
-            // StockDaily 형태로 변환
-            for ( GetStockPriceInfoResult result : list ) {
-                StockDaily stockDaily = stockDailyService.getStockDailyFromFscStockInfo( result );
-                stockDailyList.add( stockDaily );
-            }
-
-            // 변환된 녀석을 저장
-            for ( StockDaily stockDaily : stockDailyList ) {
-                stockDailyDao.saveStockDaily( stockDaily );
-            }
-
-        } catch ( Exception e ) {
-            long exceptionTime = System.currentTimeMillis();
-            log.debug( batch + "에러 : " + exceptionTime);
-        } finally {
-            long endTime = System.currentTimeMillis();
-            log.debug( batch + "종료 : " + endTime);
-        }
-
-    }
 
     /**
-     * 2020.01.02 가 가져올 수 있는 가장 옛날 데이터
+     * KRX의 경우, 2020.01.02 가 가져올 수 있는 가장 옛날 데이터
      * 2020.01.02 부터 모든 데이터를 가져와서 업데이트 해보자
      *
      */
@@ -117,7 +85,7 @@ public class StockDailyBatchService {
                 time = System.currentTimeMillis();
                 log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 변환 시작 : " + time);
                 for ( GetStockPriceInfoResult result : list ) {
-                    StockDaily stockDaily = stockDailyService.getStockDailyFromFscStockInfo( result );
+                    StockDaily stockDaily = stockDailyService.convertToStockDailyFromFscStockInfo( result );
                     stockDailyList.add( stockDaily );
                 }
                 time = System.currentTimeMillis();
@@ -147,7 +115,7 @@ public class StockDailyBatchService {
 
 
     /**
-     * 최근 10일 데이터 업서트
+     * KRX 데이터로, 최근 10일 데이터 업서트
      */
     public void upsertFromKrxData10() {
 
@@ -201,7 +169,7 @@ public class StockDailyBatchService {
                 time = System.currentTimeMillis();
                 log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 변환 시작 : " + time);
                 for ( GetStockPriceInfoResult result : list ) {
-                    StockDaily stockDaily = stockDailyService.getStockDailyFromFscStockInfo( result );
+                    StockDaily stockDaily = stockDailyService.convertToStockDailyFromFscStockInfo( result );
                     stockDailyList.add( stockDaily );
                 }
                 time = System.currentTimeMillis();
@@ -226,5 +194,122 @@ public class StockDailyBatchService {
             log.debug( batch + "종료 : " + time);
         }
 
+    }
+
+
+    /**
+     *  다음 페이지에서 코스피 코스닥 전 종목 조회해서 upsert
+     */
+    public void upsertDailyStockDataBatchFromDaumDaily() {
+
+        String batch = "[BATCH] 일별 KOSPI, KOSDAQ, KONEX 종목 업데이트 - ";
+
+        long startTime = System.currentTimeMillis();
+        log.debug(batch + "시작 : " + startTime);
+
+        // 페이징 파라미터, 종목코드로 정렬
+        PagingParam pagingParam = new PagingParam();
+        pagingParam.setSortIndex("stockCode");
+
+        // 코스피 전종목 조회
+        StockParam stockParam = new StockParam();
+        stockParam.setMarketCode("kospi");
+        stockParam.setPagingParam(pagingParam);
+        ArrayList<StockResult> kospiList = stockDao.getStockList(stockParam);
+
+        // 코스닥
+        stockParam.setMarketCode("kosdaq");
+        stockParam.setPagingParam(pagingParam);
+        ArrayList<StockResult> kosdaqList = stockDao.getStockList(stockParam);
+
+        // 코넥스
+        stockParam.setMarketCode("konex");
+        stockParam.setPagingParam(pagingParam);
+        ArrayList<StockResult> konexList = stockDao.getStockList(stockParam);
+
+        ArrayList<StockResult> stockList = new ArrayList<StockResult>();
+        stockList.addAll(kospiList);
+        stockList.addAll(kosdaqList);
+        stockList.addAll(konexList);
+
+
+        for (StockResult stockResult : stockList) {
+
+            // 일별데이터 업서트 최대 3번 시도
+            boolean isSuccess = false;
+            for (int i = 0; i < 3; i++) {
+
+                try {
+                    stockDailyService.upsertStockDailyFromDaumDaily( stockResult.getStockCode() );
+                    isSuccess = true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    isSuccess = false;
+                }
+
+                if (isSuccess) break;
+            }
+
+            if (!isSuccess) {
+                long exceptionTime = System.currentTimeMillis();
+                log.debug( batch + "에러 : " + exceptionTime);
+                throw new ApplicationRuntimeException(stockResult.getStockName() + "[" + stockResult.getStockCode() + "] 일별데이터 업서트 3회 시도 실패로 배치처리를 중지합니다.");
+            }
+        }
+    }
+
+
+    public void upsertDailyStockDataBatchFromDaumInvestor() {
+
+        String batch = "[BATCH] 일별/투자자별 KOSPI, KOSDAQ, KONEX 종목 업데이트 - ";
+
+        PagingParam pagingParam = new PagingParam();
+        pagingParam.setSortIndex( "stockCode" );
+
+        // 코스피 전종목 조회
+        StockParam stockParam = new StockParam();
+        stockParam.setMarketCode("kospi");
+        stockParam.setPagingParam( pagingParam );
+        ArrayList<StockResult> kospiList = stockDao.getStockList(stockParam);
+
+        // 코스닥
+        stockParam.setMarketCode("kosdaq");
+        stockParam.setPagingParam( pagingParam );
+        ArrayList<StockResult> kosdaqList = stockDao.getStockList(stockParam);
+
+        // 코넥스
+        stockParam.setMarketCode("konex");
+        stockParam.setPagingParam( pagingParam );
+        ArrayList<StockResult> konexList = stockDao.getStockList(stockParam);
+
+        ArrayList<StockResult> stockList = new ArrayList<StockResult>();
+        stockList.addAll( kospiList );
+        stockList.addAll( kosdaqList );
+        stockList.addAll( konexList );
+
+
+        for ( StockResult stockResult : stockList ) {
+
+            // 투자자별데이터 업서트 최대 3번 시도
+            boolean isSuccess = false;
+            for ( int i = 0; i < 3; i++ ) {
+
+                try {
+                    stockDailyService.upsertStockDailyFromDaumInvestor( stockResult.getStockCode() );
+                    isSuccess = true;
+                } catch ( Exception e ) {
+                    e.printStackTrace();
+                    isSuccess = false;
+                }
+
+                if ( isSuccess ) break;
+            }
+
+            if (!isSuccess) {
+                long exceptionTime = System.currentTimeMillis();
+                log.debug(batch + "에러 : " + exceptionTime);
+                throw new ApplicationRuntimeException(stockResult.getStockName() + "[" + stockResult.getStockCode() + "] 일별데이터 업서트 3회 시도 실패로 배치처리를 중지합니다.");
+            }
+        }
     }
 }

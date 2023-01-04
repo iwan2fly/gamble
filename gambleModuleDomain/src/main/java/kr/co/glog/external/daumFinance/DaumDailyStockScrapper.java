@@ -30,10 +30,6 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class DaumDailyStockScrapper {
 
-    private final StockDailyService stockDailyService;
-    private final StockDailyDao stockDailyDao;
-    private final StockDao stockDao;
-
     /**
      * 다음 주식에서 특정 종목의 일자별 가격 문서를 읽어옵니다.
      * @param stockCode
@@ -144,99 +140,5 @@ public class DaumDailyStockScrapper {
 
 
 
-    /**
-     * 특정 종목의 전체 일별 데이터를 StockDaily 테이블에 인서트
-     * @param stockCode
-     */
-    public void insertDailyStockFullData( String stockCode  ) {
 
-        int perPage = 100;
-
-        ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
-        int totalPages = getTotalPages( stockCode, perPage );
-
-        log.debug( "totalPages : " + totalPages );
-
-        for ( int page = 1; page <= totalPages; page++ ) {
-
-            ArrayList<DaumDailyStock> daumDailyStockList = getDailyStockList( stockCode, perPage, page );
-
-            for ( DaumDailyStock daumDailyStock : daumDailyStockList ) {
-                StockDaily stockDaily = stockDailyService.getStockDailyFromDaumDailyStock( daumDailyStock );
-                if ( stockDaily.getStockCode() == null || stockDaily.getStockCode().equals("") ) stockDaily.setStockCode( stockCode );
-                stockDailyList.add( stockDaily );
-            }
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-        }
-
-        for ( StockDaily stockDaily : stockDailyList ) {
-            log.debug( stockDaily.toString() );
-            try {
-                stockDailyDao.insertStockDaily( stockDaily );
-            } catch ( org.springframework.dao.DuplicateKeyException dke ) {
-                log.debug( dke.getMessage() );
-                break;
-            }
-        }
-
-    }
-
-    /**
-     * 특정 종목의 일별 데이터 첫 페이지를 테이블에 업서트
-     * @param stockCode
-     */
-    public void upsertDailyStock( String stockCode  ) throws InterruptedException {
-
-        int perPage = 10;
-
-        // 다음
-        ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
-        ArrayList<DaumDailyStock> daumDailyStockList = null;
-
-        int readCount = 0;
-        boolean isRead = false;
-        while ( !isRead ) {
-
-            try {
-                daumDailyStockList = getDailyStockList(stockCode, perPage, 1);
-                isRead = true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                readCount++;
-                Thread.sleep( 3000 );
-            }
-        }
-
-        // 우리 DB에 맞게 컨버트
-        for ( DaumDailyStock daumDailyStock : daumDailyStockList ) {
-            StockDaily stockDaily = stockDailyService.getStockDailyFromDaumDailyStock( daumDailyStock );
-            stockDailyList.add( stockDaily );
-        }
-
-        for ( int i = 0; i < stockDailyList.size(); i++ ) {
-            StockDaily stockDaily = stockDailyList.get(i);
-
-            log.debug( stockDaily.toString() );
-            try {
-                // 리스트의 첫번째는 가장 최근날짜의 가격, stock 테이블의 현재가격 업데이트
-                if ( i == 0 ) {
-                    Stock stock = new Stock();
-                    stock.setStockCode( stockCode );
-                    stock.setLastTradeDate( stockDaily.getTradeDate() );        // 마지막 거래일
-                    stock.setCurrentPrice( stockDaily.getPriceFinal() );        // 마지막 가격
-                    stockDao.updateStock( stock );
-                }
-                stockDailyDao.saveStockDaily( stockDaily );
-            } catch ( org.springframework.dao.DuplicateKeyException dke ) {
-
-            }
-        }
-
-    }
 }

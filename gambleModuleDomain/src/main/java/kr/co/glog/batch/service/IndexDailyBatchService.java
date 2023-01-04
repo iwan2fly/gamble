@@ -174,7 +174,7 @@ public class IndexDailyBatchService {
     /**
      *  다음 페이지에서 코스피 코스닥 조회해서 upsert
      */
-    public void upsertDailyData() {
+    public void upsertDailyIndexDataBatchFromDaum() {
 
         String batch = "[BATCH] 일별 KOSPI, KOSDAQ 지수 업데이트 - ";
 
@@ -182,8 +182,8 @@ public class IndexDailyBatchService {
         log.debug( batch + "시작 : " + startTime);
 
         try {
-            daumDailyIndexScrapper.upsertDailyIndex("kospi");
-            daumDailyIndexScrapper.upsertDailyIndex("kosdaq");
+            indexDailyService.upsertIndexDailyFromDaum("kospi");
+            indexDailyService.upsertIndexDailyFromDaum("kosdaq");
         } catch ( InterruptedException ie ) {
             long exceptionTime = System.currentTimeMillis();
             log.debug( batch + "에러 : " + exceptionTime);

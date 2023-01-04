@@ -1,7 +1,7 @@
 package kr.co.glog.external.dartApi;
 
 import kr.co.glog.common.exception.ApplicationRuntimeException;
-import kr.co.glog.domain.stock.dao.CompanyFinancialInfoDao;
+import kr.co.glog.domain.stock.dao.DartCompanyFinancialInfoDao;
 import kr.co.glog.domain.stock.entity.DartCompanyFinancialInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class DartFinancialAllApi {
 
-    private final CompanyFinancialInfoDao companyFinancialInfoDao;
+    private final DartCompanyFinancialInfoDao dartCompanyFinancialInfoDao;
 
     // 기본 URL
 
@@ -36,7 +36,7 @@ public class DartFinancialAllApi {
     public void updateCompanyFinancialInfo( String companyCode, String year, String reportCode, String fsDiv ) {
         ArrayList<DartCompanyFinancialInfo> dartCompanyFinancialInfoList = getCompanyFinancialInfo( getDocument( companyCode, year, reportCode, fsDiv, 3 ) );
         for ( DartCompanyFinancialInfo dartCompanyFinancialInfo : dartCompanyFinancialInfoList)
-            companyFinancialInfoDao.updateInsetCompanyFinancialInfo(dartCompanyFinancialInfo);
+            dartCompanyFinancialInfoDao.updateInsetCompanyFinancialInfo(dartCompanyFinancialInfo);
     }
 
     /**

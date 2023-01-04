@@ -12,14 +12,14 @@
 
     <!-- 지수 가격 특정 기간 동안의 표준편차 -->
     <select id="selectStatIndexPriceStdDev" parameterType="IndexDailyParam" resultType="IndexDailyResult" >
-        SELECT  ROUND( SQRT( SUM( POW( priceFinal - #{averagePrice}, 2 ) ) / #{dataCount} ), 2 ) priceStandardDeviation
+        SELECT  ROUND( SQRT( SUM( POW( priceFinal - #{priceAverage}, 2 ) ) / #{dataCount} ), 2 ) priceStandardDeviation
         FROM    indexDaily
         WHERE   tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode}
     </select>
 
     <!-- 지수 거래량 특정 기간 동안의 표준편차 -->
     <select id="selectStatIndexVolumeStdDev" parameterType="IndexDailyParam" resultType="IndexDailyResult" >
-        SELECT  ROUND( SQRT( SUM( POW( volumeTrade - #{averageVolume}, 2 ) ) / #{dataCount} ), 2 ) volumeStandardDeviation
+        SELECT  ROUND( SQRT( SUM( POW( volumeTrade - #{volumeAverage}, 2 ) ) / #{dataCount} ), 2 ) volumeStandardDeviation
         FROM    indexDaily
         WHERE   tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode}
     </select>
@@ -102,6 +102,7 @@
                 <if test="rateChange != null and rateChange != ''">AND indexDaily.rateChange=#{rateChange}</if>
                 <if test="startDate != null and startDate != ''">AND indexDaily.tradeDate <![CDATA[ >= ]]> #{startDate}</if>
                 <if test="endDate != null and endDate != ''">AND indexDaily.tradeDate <![CDATA[ <= ]]> #{endDate}</if>
+                <if test="beforeDate != null and beforeDate != ''">AND indexDaily.tradeDate <![CDATA[ < ]]> #{beforeDate}</if>
             </trim>
         </where>
     </sql>

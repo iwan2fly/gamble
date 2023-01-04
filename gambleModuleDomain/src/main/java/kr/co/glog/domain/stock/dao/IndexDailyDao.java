@@ -43,32 +43,32 @@ public class IndexDailyDao {
      * @param marketCode 시장코드, startDate 작일, endDate 종료일, averagePrice 평균가격
      * @return
      */
-    public IndexDailyResult getStatIndexPriceStdDev(String marketCode, String startDate, String endDate, Float averagePrice ) {
+    public IndexDailyResult getStatIndexPriceStdDev(String marketCode, String startDate, String endDate, Float priceAverage ) {
 
         if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
         if ( endDate == null ) throw new ParameterMissingException( "endDate" );
-        if ( averagePrice == null ) throw new ParameterMissingException( "averagePrice" );
+        if ( priceAverage == null ) throw new ParameterMissingException( "priceAverage" );
 
         // 데이터 전체 건수가 필요함
         IndexDailyResult indexDailyResult = this.getStatIndexCommon( marketCode, startDate, endDate );
 
-        return this.getStatIndexPriceStdDev( marketCode, startDate, endDate, averagePrice, indexDailyResult.getDataCount() );
+        return this.getStatIndexPriceStdDev( marketCode, startDate, endDate, priceAverage, indexDailyResult.getDataCount() );
     }
 
-    public IndexDailyResult getStatIndexPriceStdDev(String marketCode, String startDate, String endDate, Float averagePrice, Integer dataCount ) {
+    public IndexDailyResult getStatIndexPriceStdDev(String marketCode, String startDate, String endDate, Float priceAverage, Integer dataCount ) {
 
         if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
         if ( endDate == null ) throw new ParameterMissingException( "endDate" );
-        if ( averagePrice == null ) throw new ParameterMissingException( "averagePrice" );
+        if ( priceAverage == null ) throw new ParameterMissingException( "priceAverage" );
         if ( dataCount == null ) throw new ParameterMissingException( "dataCount" );
 
         IndexDailyParam indexDailyParam = new IndexDailyParam();
         indexDailyParam.setMarketCode( marketCode );
         indexDailyParam.setStartDate( startDate );
         indexDailyParam.setEndDate( endDate );
-        indexDailyParam.setAveragePrice( averagePrice );
+        indexDailyParam.setPriceAverage( priceAverage );
         indexDailyParam.setDataCount( dataCount );
 
         IndexDailyResult indexDailyResult = indexDailyMapper.selectStatIndexPriceStdDev( indexDailyParam );
@@ -83,32 +83,32 @@ public class IndexDailyDao {
      * @param marketCode 시장코드, startDate 시작일, endDate 종료일, averageVolume 평균 거래량
      * @return
      */
-    public IndexDailyResult selectStatIndexVolumeStdDev( String marketCode, String startDate, String endDate, Long averageVolume ) {
+    public IndexDailyResult selectStatIndexVolumeStdDev( String marketCode, String startDate, String endDate, Long volumeAverage ) {
 
         if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
         if ( endDate == null ) throw new ParameterMissingException( "endDate" );
-        if ( averageVolume == null ) throw new ParameterMissingException( "averageVolume" );
+        if ( volumeAverage == null ) throw new ParameterMissingException( "volumeAverage" );
 
         // 데이터 전체 건수가 필요함
         IndexDailyResult indexDailyResult = this.getStatIndexCommon( marketCode, startDate, endDate );
 
-        return this.selectStatIndexVolumeStdDev( marketCode, startDate, endDate, averageVolume, indexDailyResult.getDataCount() );
+        return this.selectStatIndexVolumeStdDev( marketCode, startDate, endDate, volumeAverage, indexDailyResult.getDataCount() );
     }
 
-    public IndexDailyResult selectStatIndexVolumeStdDev( String marketCode, String startDate, String endDate, Long averageVolume, Integer dataCount ) {
+    public IndexDailyResult selectStatIndexVolumeStdDev( String marketCode, String startDate, String endDate, Long volumeAverage, Integer dataCount ) {
 
         if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
         if ( endDate == null ) throw new ParameterMissingException( "endDate" );
-        if ( averageVolume == null ) throw new ParameterMissingException( "averageVolume" );
+        if ( volumeAverage == null ) throw new ParameterMissingException( "volumeAverage" );
         if ( dataCount == null ) throw new ParameterMissingException( "dataCount" );
 
         IndexDailyParam indexDailyParam = new IndexDailyParam();
         indexDailyParam.setMarketCode( marketCode );
         indexDailyParam.setStartDate( startDate );
         indexDailyParam.setEndDate( endDate );
-        indexDailyParam.setAverageVolume( averageVolume );
+        indexDailyParam.setVolumeAverage( volumeAverage );
         indexDailyParam.setDataCount( dataCount );
 
         log.debug( indexDailyParam.toString() );

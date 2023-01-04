@@ -11,7 +11,6 @@ import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.domain.service.IndexDailyService;
 import kr.co.glog.domain.stock.dao.IndexDailyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
-import kr.co.glog.domain.stock.entity.Stock;
 import kr.co.glog.domain.stock.entity.IndexDaily;
 import kr.co.glog.external.daumFinance.model.DaumDailyIndex;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class DaumDailyIndexScrapper {
 
-    private final IndexDailyService indexDailyService;
     private final IndexDailyDao indexDailyDao;
     private final StockDao stockDao;
 
@@ -140,84 +138,4 @@ public class DaumDailyIndexScrapper {
     }
 
 
-
-    /**
-     * 전체 일별 데이터를 IndexDaily 테이블에 인서트
-     * @param marketCode
-     */
-    public void insertDailyIndexFullData( String marketCode  ) {
-
-        int perPage = 100;
-
-        ArrayList<IndexDaily> indexDailyList = new ArrayList<IndexDaily>();
-        int totalPages = getTotalPages( marketCode, perPage );
-
-        log.debug( "totalPages : " + totalPages );
-
-        for ( int page = 1; page <= totalPages; page++ ) {
-
-            ArrayList<DaumDailyIndex> daumDailyStockList = getDailyIndexList( marketCode, perPage, page );
-
-            for ( DaumDailyIndex daumDailyIndex : daumDailyStockList ) {
-                IndexDaily indexDaily = indexDailyService.getIndexDailyFromDaumDailyIndex( marketCode, daumDailyIndex );
-                indexDailyList.add( indexDaily );
-            }
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-        }
-
-        for ( IndexDaily indexDaily : indexDailyList ) {
-            log.debug( indexDaily.toString() );
-            try {
-                indexDailyDao.insertIndexDaily( indexDaily );
-            } catch ( org.springframework.dao.DuplicateKeyException dke ) {
-                log.debug( dke.getMessage() );
-                break;
-            }
-        }
-
-    }
-
-    /**
-     * 일별 데이터 첫 페이지를 테이블에 업서트
-     * @param marketCode
-     */
-    public void upsertDailyIndex( String marketCode  ) throws InterruptedException {
-
-        int perPage = 10;
-
-        // 다음
-        ArrayList<IndexDaily> indexDailyList = new ArrayList<IndexDaily>();
-        ArrayList<DaumDailyIndex> daumDailyIndexList = null;
-
-        int readCount = 0;
-        boolean isRead = false;
-        while ( !isRead ) {
-
-            try {
-                daumDailyIndexList = getDailyIndexList(marketCode, perPage, 1);
-                isRead = true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                readCount++;
-                Thread.sleep( 3000 );
-            }
-        }
-
-        // 우리 DB에 맞게 컨버트
-        for ( DaumDailyIndex daumDailyIndex : daumDailyIndexList ) {
-            IndexDaily indexDaily = indexDailyService.getIndexDailyFromDaumDailyIndex( marketCode, daumDailyIndex );
-            indexDailyList.add( indexDaily );
-        }
-
-        for ( int i = 0; i < indexDailyList.size(); i++ ) {
-            indexDailyDao.saveIndexDaily( indexDailyList.get(i) );
-        }
-
-    }
 }
