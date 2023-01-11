@@ -17,6 +17,7 @@ public class StockDaily extends EntityModel {
     Long    stockDailyId;
     String  isin;                       // 국제채권식별번호
     String	stockCode;                  // 종목코드
+    String  marketCode;                 // 시장코드
     String  stockName;                  // 종목명
     String 	tradeDate;		            // 날짜
     Integer	priceFinal;		            // 종가

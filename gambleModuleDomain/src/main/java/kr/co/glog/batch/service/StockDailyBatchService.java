@@ -4,12 +4,15 @@ import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.exception.NetworkCommunicationFailureException;
 import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
+import kr.co.glog.domain.service.StatIndexService;
+import kr.co.glog.domain.service.StatStockService;
 import kr.co.glog.domain.service.StockDailyService;
+import kr.co.glog.domain.stock.MarketCode;
+import kr.co.glog.domain.stock.dao.IndexDailyDao;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.StockDaily;
-import kr.co.glog.domain.stock.model.StockParam;
-import kr.co.glog.domain.stock.model.StockResult;
+import kr.co.glog.domain.stock.model.*;
 import kr.co.glog.external.datagokr.fsc.GetStockPriceInfo;
 import kr.co.glog.external.datagokr.fsc.model.GetStockPriceInfoResult;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,8 @@ public class StockDailyBatchService {
     private final StockDao stockDao;
     private final StockDailyService stockDailyService;
     private final StockDailyDao stockDailyDao;
+    private final StatStockService statStockService;
+    private final IndexDailyDao indexDailyDao;
 
 
     /**
@@ -312,4 +317,71 @@ public class StockDailyBatchService {
             }
         }
     }
+
+
+    /**
+     *  오늘의 연간/월간/주간 주식통계 upsert
+     */
+    public void makeStatStockToday() {
+
+        // 데이터가 등록되어있는 가장 최근 날짜로 설정
+        PagingParam pagingParam = new PagingParam();
+        pagingParam.setRows(1);
+        pagingParam.setSortIndex("tradeDate");
+        pagingParam.setSortType("desc");
+
+        IndexDailyParam indexDailyParam = new IndexDailyParam();
+        indexDailyParam.setMarketCode( MarketCode.kospi );
+        indexDailyParam.setBeforeDate( DateUtil.getToday() );
+        indexDailyParam.setPagingParam( pagingParam );
+
+        ArrayList<IndexDailyResult> indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
+        makeStatStock( indexDailyList.get(0).getTradeDate() );
+    }
+
+    /**
+     *  특정 날짜의 연간/월간/주간 주식통계 upsert
+     */
+    public void makeStatStock( String yyyymmdd ) {
+
+        String batch = "[BATCH] 연간/월간/주간 지수통계 upsert - ";
+        long time = System.currentTimeMillis();
+        log.debug( batch + "시작 : " + time);
+
+        try {
+            String startDate = DateUtil.getFirstDateOfWeek(yyyymmdd);
+            String endDate = DateUtil.getLastDateOfWeek(yyyymmdd);
+            StockDailyParam stockDailyParam = new StockDailyParam();
+            stockDailyParam.setStartDate(startDate);
+            stockDailyParam.setEndDate(endDate);
+            ArrayList<StockDailyResult> stockDailyList = stockDailyDao.getStockDailyList(stockDailyParam);
+
+            int count = 0;
+            for (StockDailyResult stockDailyResult : stockDailyList) {
+
+                count++;
+                log.debug( batch + " [" + count + " / " + stockDailyList.size() + "] " + stockDailyResult.getStockName() + " 시작" );
+
+                // 주간
+                statStockService.makeStatStockWeek(stockDailyResult.getStockCode(), yyyymmdd);
+
+                // 월간
+                statStockService.makeStatStockMonth(stockDailyResult.getStockCode(), yyyymmdd.substring(0, 6));
+
+                // 연간
+                statStockService.makeStatStockYear(stockDailyResult.getStockCode(), yyyymmdd.substring(0, 4));
+
+                log.debug( batch + " [" + count + " / " + stockDailyList.size() + "] " + stockDailyResult.getStockName() + " 종료" );
+            }
+        } catch ( Exception e ) {
+            time = System.currentTimeMillis();
+            log.debug( batch + "에러 : " + time);
+            e.printStackTrace();
+        } finally {
+            time = System.currentTimeMillis();
+            log.debug(batch + "종료 : " + time);
+        }
+
+    }
+
 }

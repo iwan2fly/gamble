@@ -280,6 +280,7 @@ public class StockDailyService {
         stockDaily.setIsin( getStockPriceInfoResult.getIsinCd() );                  // isin code
         stockDaily.setTradeDate( getStockPriceInfoResult.getBasDt() ) ;             // 날짜
         stockDaily.setStockCode( getStockPriceInfoResult.getSrtnCd() );             // 종목코드(6자리)
+        stockDaily.setMarketCode( getStockPriceInfoResult.getMrktCtg() );          // 시장코드
         stockDaily.setStockName( getStockPriceInfoResult.getItmsNm() );             // 종목명
         stockDaily.setPriceStart( getStockPriceInfoResult.getMkp() );               // 시가
         stockDaily.setPriceHigh( getStockPriceInfoResult.getHipr() );               // 고가

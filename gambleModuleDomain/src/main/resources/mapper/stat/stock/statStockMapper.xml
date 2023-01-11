@@ -52,6 +52,9 @@
             <if test="priceHighDate != null">priceHighDate = #{priceHighDate},</if>
             <if test="volumeLowDate != null">volumeLowDate = #{volumeLowDate},</if>
             <if test="volumeHighDate != null">volumeHighDate = #{volumeHighDate},</if>
+            <if test="riseCount != null">riseCount = #{riseCount},</if>
+            <if test="fallCount != null">fallCount = #{fallCount},</if>
+            <if test="evenCount != null">evenCount = #{evenCount},</if>
             updateTime = now()
         </trim>
         <choose>
@@ -120,6 +123,9 @@
                 <if test="priceHighDate != null and priceHighDate != ''">AND statStock.priceHighDate=#{priceHighDate}</if>
                 <if test="volumeLowDate != null and volumeLowDate != ''">AND statStock.volumeLowDate=#{volumeLowDate}</if>
                 <if test="volumeHighDate != null and volumeHighDate != ''">AND statStock.volumeHighDate=#{volumeHighDate}</if>
+                <if test="riseCount != null and riseCount != ''">AND statIndex.riseCount=#{riseCount}</if>
+                <if test="fallCount != null and fallCount != ''">AND statIndex.fallCount=#{fallCount}</if>
+                <if test="evenCount != null and evenCount != ''">AND statIndex.evenCount=#{evenCount}</if>
                 <if test="pagingParam.filter != null and pagingParam.filter != ''">AND statStock.statNameCode like CONCAT('%',#{pagingParam.filter},'%')</if>
             </trim>
         </where>
@@ -162,6 +168,9 @@
                 <when test="pagingParam.sortIndex eq 'priceHighDate'">priceHighDate</when>
                 <when test="pagingParam.sortIndex eq 'volumeLowDate'">volumeLowDate</when>
                 <when test="pagingParam.sortIndex eq 'volumeHighDate'">volumeHighDate</when>
+                <when test="pagingParam.sortIndex eq 'riseCount'">riseCount</when>
+                <when test="pagingParam.sortIndex eq 'fallCount'">fallCount</when>
+                <when test="pagingParam.sortIndex eq 'evenCount'">evenCount</when>
                 <otherwise>statStockId</otherwise>
             </choose>
             <choose>

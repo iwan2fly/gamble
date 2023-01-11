@@ -1,14 +1,15 @@
 package kr.co.glog.batch.service;
 
-import kr.co.glog.common.exception.NetworkCommunicationFailureException;
+import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
 import kr.co.glog.domain.service.IndexDailyService;
+import kr.co.glog.domain.service.StatIndexService;
 import kr.co.glog.domain.stock.MarketCode;
 import kr.co.glog.domain.stock.dao.IndexDailyDao;
 import kr.co.glog.domain.stock.entity.IndexDaily;
-import kr.co.glog.domain.stock.entity.IndexDaily;
+import kr.co.glog.domain.stock.model.IndexDailyParam;
+import kr.co.glog.domain.stock.model.IndexDailyResult;
 import kr.co.glog.external.datagokr.fsc.GetMarketIndexInfo;
-import kr.co.glog.external.datagokr.fsc.model.GetMarketIndexInfoResult;
 import kr.co.glog.external.datagokr.fsc.model.GetMarketIndexInfoResult;
 import kr.co.glog.external.daumFinance.DaumDailyIndexScrapper;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,9 @@ public class IndexDailyBatchService {
     private final GetMarketIndexInfo getMarketIndexInfo;          // 일별 지수 시세 - 금융위원회
     private final IndexDailyService indexDailyService;
     private final IndexDailyDao indexDailyDao;
+    private final StatIndexService statIndexService;
 
-    private final DaumDailyIndexScrapper daumDailyIndexScrapper;
+
 
     public void upsertFromKrxDataByDate( String yyyymmdd, String marketCode ) {
 
@@ -167,8 +169,7 @@ public class IndexDailyBatchService {
 
     }
     
-    
-    
+
     
     
     /**
@@ -182,8 +183,14 @@ public class IndexDailyBatchService {
         log.debug( batch + "시작 : " + startTime);
 
         try {
-            indexDailyService.upsertIndexDailyFromDaum("kospi");
-            indexDailyService.upsertIndexDailyFromDaum("kosdaq");
+            // 최근 10개 데이터
+            indexDailyService.upsertIndexDailyFromDaumDaily( MarketCode.kospi );
+            indexDailyService.upsertIndexDailyFromDaumDaily( MarketCode.kosdaq );
+
+            // 오늘자 데이터
+            indexDailyService.upsertIndexDailyFromDaumIndex( MarketCode.kospi );
+            indexDailyService.upsertIndexDailyFromDaumIndex( MarketCode.kosdaq );
+
         } catch ( InterruptedException ie ) {
             long exceptionTime = System.currentTimeMillis();
             log.debug( batch + "에러 : " + exceptionTime);
@@ -192,5 +199,61 @@ public class IndexDailyBatchService {
             log.debug( batch + "종료 : " + endTime);
         }
 
+    }
+
+
+    /**
+     *  오늘의 연간/월간/주간 지수통계 upsert
+     */
+    public void makeStatIndexToday() {
+
+        // 데이터가 등록되어있는 가장 최근 날짜로 설정
+        /*
+        PagingParam pagingParam = new PagingParam();
+        pagingParam.setRows(1);
+        pagingParam.setSortIndex("tradeDate");
+        pagingParam.setSortType("desc");
+
+        IndexDailyParam indexDailyParam = new IndexDailyParam();
+        indexDailyParam.setMarketCode( MarketCode.kospi );
+        indexDailyParam.setBeforeDate( DateUtil.getToday() );
+        indexDailyParam.setPagingParam( pagingParam );
+
+        ArrayList<IndexDailyResult> indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
+        makeStatIndex( indexDailyList.get(0).getTradeDate() );
+        */
+        makeStatIndex( DateUtil.getToday() );
+    }
+
+    /**
+     *  특정 날짜의 연간/월간/주간 지수통계 upsert
+     */
+    public void makeStatIndex( String yyyymmdd ) {
+
+        String batch = "[BATCH] 연간/월간/주간 지수통계 upsert - ";
+        long time = System.currentTimeMillis();
+        log.debug( batch + "시작 : " + time);
+
+        try {
+            // 주간
+            statIndexService.makeStatIndexWeek(MarketCode.kospi, yyyymmdd);
+            statIndexService.makeStatIndexWeek(MarketCode.kosdaq, yyyymmdd);
+
+            // 월간
+            statIndexService.makeStatIndexMonth(MarketCode.kospi, yyyymmdd);
+            statIndexService.makeStatIndexMonth(MarketCode.kosdaq, yyyymmdd);
+
+            // 연간
+            statIndexService.makeStatIndexYear(MarketCode.kospi, yyyymmdd);
+            statIndexService.makeStatIndexYear(MarketCode.kosdaq, yyyymmdd);
+        } catch ( Exception e ) {
+            time = System.currentTimeMillis();
+            log.debug( batch + "에러 : " + time);
+            e.printStackTrace();
+        } finally {
+            time = System.currentTimeMillis();
+            log.debug( batch + "종료 : " + time);
+
+        }
     }
 }

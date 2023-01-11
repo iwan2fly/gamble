@@ -15,5 +15,6 @@ public class StatIndexParam extends StatIndex {
 
     PagingParam pagingParam = new PagingParam();
 
+    Integer endYear;
 
 }

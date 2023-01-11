@@ -46,4 +46,7 @@ public class StatStock extends EntityModel {
     String  priceHighDate;                      // 최고가날짜
     String  volumeLowDate;                      // 최저거래량 날짜
     String  volumeHighDate;                     // 최고거래량 날짜
+    Integer riseCount;                          // 상승회수
+    Integer evenCount;                          // 보합회수
+    Integer fallCount;                          // 하락회수
 }

@@ -4,10 +4,87 @@
 
     <!-- 지수 특정 기간 동안의 최소, 최대, 거래일수, 평균 -->
     <select id="selectStatIndexCommon" parameterType="IndexDailyParam" resultType="IndexDailyResult" >
-        SELECT  MIN(priceLow) priceLow, MAX(priceHigh) priceHigh, ROUND(SUM(priceFinal)/COUNT(*),2) priceAverage, COUNT(*) dataCount,
-                MIN(volumeTrade) volumeLow, MAX(volumeTrade) volumeHigh, ROUND(SUM(volumeTrade)/COUNT(*),2) volumeAverage
-        FROM    indexDaily
-        WHERE   tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode}
+        SELECT  stat1.*,
+                pricePrevious.pricePrevious,
+                priceStart.priceStart,
+                priceFinal.priceFinal,
+                priceLow.priceLowDate,
+                priceHigh.priceHighDate,
+                IFNULL(riseCount, 0) riseCount, IFNULL(evenCount,0) evenCount, IFNULL(fallCount, 0) fallCount
+        FROM (
+            SELECT  marketCode, MIN(priceLow) priceLow, MAX(priceHigh) priceHigh, ROUND(SUM(priceFinal)/COUNT(*),2) priceAverage, COUNT(*) dataCount,
+                    MIN(volumeTrade) volumeLow, MAX(volumeTrade) volumeHigh, ROUND(SUM(volumeTrade)/COUNT(*),2) volumeAverage
+            FROM    indexDaily
+            WHERE   tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode}
+        ) stat1
+        <!-- 상승 건수 -->
+        LEFT JOIN (
+            SELECT marketCode, COUNT(*) riseCount FROM indexDaily WHERE tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode} AND rateChange > 0
+        ) riseCount ON stat1.marketCode = riseCount.marketCode
+        <!-- 보합 건수 -->
+        LEFT JOIN (
+            SELECT marketCode, COUNT(*) evenCount FROM indexDaily WHERE tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode} AND rateChange = 0
+        ) evenCount ON stat1.marketCode = evenCount.marketCode
+        <!-- 하락 건수 -->
+        LEFT JOIN (
+            SELECT marketCode, COUNT(*) fallCount FROM indexDaily WHERE tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode} AND rateChange <![CDATA[ < ]]> 0
+        ) fallCount ON stat1.marketCode = fallCount.marketCode
+        <!-- 이전가격 -->
+        LEFT JOIN (
+            SELECT marketCode, priceFinal pricePrevious
+            FROM indexDaily
+            WHERE marketCode=#{marketCode} AND tradeDate <![CDATA[ < ]]> #{startDate}
+            ORDER BY tradeDate DESC
+            LIMIT 1
+        ) pricePrevious ON stat1.marketCode = pricePrevious.marketCode
+        <!-- 시작가 -->
+        LEFT JOIN (
+            SELECT marketCode, priceFinal priceStart
+            FROM indexDaily
+            WHERE marketCode=#{marketCode} AND tradeDate >= #{startDate}
+            ORDER BY tradeDate ASC
+            LIMIT 1
+        ) priceStart ON stat1.marketCode = priceStart.marketCode
+        <!-- 최종가 -->
+        LEFT JOIN (
+            SELECT marketCode, priceFinal
+            FROM indexDaily
+            WHERE marketCode=#{marketCode} AND tradeDate <![CDATA[ <= ]]> #{endDate}
+            ORDER BY tradeDate DESC
+            LIMIT 1
+        ) priceFinal ON stat1.marketCode = priceFinal.marketCode
+        <!-- 최저가일자 -->
+        LEFT JOIN (
+        SELECT marketCode, tradeDate priceLowDate
+        FROM indexDaily
+        WHERE marketCode=#{marketCode} AND tradeDate BETWEEN #{startDate} AND #{endDate}
+        ORDER BY priceLow ASC, tradeDate DESC
+        LIMIT 1
+        ) priceLow ON stat1.marketCode = priceLow.marketCode
+        <!-- 최고가일자 -->
+        LEFT JOIN (
+        SELECT marketCode, tradeDate priceHighDate
+        FROM indexDaily
+        WHERE marketCode=#{marketCode} AND tradeDate BETWEEN #{startDate} AND #{endDate}
+        ORDER BY priceHigh DESC, tradeDate DESC
+        LIMIT 1
+        ) priceHigh ON stat1.marketCode = priceHigh.marketCode
+        <!-- 거래량 최저일자 -->
+        LEFT JOIN (
+        SELECT marketCode, tradeDate volumeLowDate
+        FROM indexDaily
+        WHERE marketCode=#{marketCode} AND tradeDate BETWEEN #{startDate} AND #{endDate}
+        ORDER BY volumeTrade ASC, tradeDate DESC
+        LIMIT 1
+        ) volumeLow ON stat1.marketCode = volumeLow.marketCode
+        <!-- 거래량 최고일자 -->
+        LEFT JOIN (
+        SELECT marketCode, tradeDate volumeHighDate
+        FROM indexDaily
+        WHERE marketCode=#{marketCode} AND tradeDate BETWEEN  #{startDate} AND #{endDate}
+        ORDER BY volumeTrade DESC, tradeDate DESC
+        LIMIT 1
+        ) volumeHigh ON stat1.marketCode = volumeHigh.marketCode
     </select>
 
     <!-- 지수 가격 특정 기간 동안의 표준편차 -->

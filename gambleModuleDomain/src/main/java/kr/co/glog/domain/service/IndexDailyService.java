@@ -8,7 +8,11 @@ import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.IndexDaily;
 import kr.co.glog.external.datagokr.fsc.model.GetMarketIndexInfoResult;
 import kr.co.glog.external.daumFinance.DaumDailyIndexScrapper;
+import kr.co.glog.external.daumFinance.DaumIndexScrapper;
+import kr.co.glog.external.daumFinance.DaumTimelyIndexScrapper;
 import kr.co.glog.external.daumFinance.model.DaumDailyIndex;
+import kr.co.glog.external.daumFinance.model.DaumIndex;
+import kr.co.glog.external.daumFinance.model.DaumTimelyIndex;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,13 +31,42 @@ public class IndexDailyService {
     private final IndexDailyDao indexDailyDao;
     private final StockDao stockDao;
     private final DaumDailyIndexScrapper daumDailyIndexScrapper;
+    private final DaumIndexScrapper daumIndexScrapper;
+
+
+    /**
+     * 다음 주식 페이지, 지수 상세 데이터를 indexDaily 테이블에 upsert
+     * @param marketCode
+     */
+    public void upsertIndexDailyFromDaumIndex( String marketCode  ) throws InterruptedException {
+
+        DaumIndex daumIndex = null;
+        int readCount = 0;
+        boolean isRead = false;
+        while ( !isRead ) {
+
+            if ( readCount >= 5 ) throw new NetworkCommunicationFailureException( "다음 주식 페이지 지수 목록 조회가 " + readCount + " 번 실패했습니다.");
+
+            try {
+                daumIndex = daumIndexScrapper.getDaumIndex( marketCode );
+                isRead = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                readCount++;
+                Thread.sleep( 5000 );
+            }
+        }
+
+        IndexDaily indexDaily = convertToIndexDailyFromDaumIndex( marketCode, daumIndex );
+        indexDailyDao.saveIndexDaily( indexDaily );
+    }
 
 
     /**
      * 다음 주식 페이지, 일별 데이터 첫 페이지 10개 데이터를 indexDaily 테이블에 upsert
      * @param marketCode
      */
-    public void upsertIndexDailyFromDaum( String marketCode  ) throws InterruptedException {
+    public void upsertIndexDailyFromDaumDaily(String marketCode  ) throws InterruptedException {
 
         int perPage = 10;
 
@@ -129,9 +162,51 @@ public class IndexDailyService {
         indexDaily.setTradeDate( daumDailyIndex.getDate().substring(0, 10).replaceAll("-", "") ) ;
         indexDaily.setPriceFinal( daumDailyIndex.getTradePrice() );
         indexDaily.setPriceChange( daumDailyIndex.getChangePrice() );
-        indexDaily.setRateChange( daumDailyIndex.getChangePrice() / ( daumDailyIndex.getTradePrice() + daumDailyIndex.getChangePrice() ) * 100 ) ;
+        indexDaily.setRateChange( (int)( 10000 * daumDailyIndex.getChangePrice() / ( daumDailyIndex.getTradePrice() - daumDailyIndex.getChangePrice() ) )  / 100f ) ;
 
-        if ( daumDailyIndex.getChange() != null && daumDailyIndex.getChange().equals("FALL") ) indexDaily.setPriceChange( -indexDaily.getPriceChange() );
+        log.debug( "" + ( daumDailyIndex.getTradePrice() - daumDailyIndex.getChangePrice()  ) );
+        log.debug( "" + ( daumDailyIndex.getChangePrice() / ( daumDailyIndex.getTradePrice() - daumDailyIndex.getChangePrice() ) ) );
+        log.debug( "" + ( 10000 * daumDailyIndex.getChangePrice() / ( daumDailyIndex.getTradePrice() - daumDailyIndex.getChangePrice() ) ) );
+        log.debug( "" + ( 10000 * daumDailyIndex.getChangePrice() / ( daumDailyIndex.getTradePrice() - daumDailyIndex.getChangePrice() ) / 100f ) );
+
+
+        log.debug(  daumDailyIndex.getChange() );
+        if ( daumDailyIndex.getChange() != null && daumDailyIndex.getChange().equals("FALL") ) {
+            indexDaily.setPriceChange( -indexDaily.getPriceChange() );
+            indexDaily.setRateChange( -indexDaily.getRateChange() );
+        }
+
+        return indexDaily;
+    }
+
+    /**
+     * DaumIndex -> IndexDaily
+     * @param marketCode
+     * @param daumIndex
+     * @return
+     */
+    public IndexDaily convertToIndexDailyFromDaumIndex(String marketCode, DaumIndex daumIndex ) {
+
+        if ( daumIndex == null ) throw new ParameterMissingException( "daumIndex" );
+
+        log.debug( daumIndex.toString() );
+
+        IndexDaily indexDaily = new IndexDaily();
+        indexDaily.setMarketCode( marketCode );
+        indexDaily.setTradeDate( daumIndex.getTradeDate() ) ;
+        indexDaily.setPriceStart( Float.parseFloat( daumIndex.getOpeningPrice() ) );
+        indexDaily.setPriceHigh( Float.parseFloat( daumIndex.getHighPrice() ) );
+        indexDaily.setPriceLow( Float.parseFloat( daumIndex.getLowPrice() ) );
+        indexDaily.setPriceFinal( Float.parseFloat( daumIndex.getTradePrice() ) );
+        indexDaily.setPriceChange( Float.parseFloat( daumIndex.getChangePrice() ) );
+        indexDaily.setRateChange(  (int)(Float.parseFloat( daumIndex.getChangeRate() ) * 10000 ) / 100f ) ;
+        indexDaily.setVolumeTrade( Long.parseLong( daumIndex.getAccTradeVolume() ) * 1000 );        // 단위가 천이라
+        indexDaily.setPriceTrade( Long.parseLong( daumIndex.getAccTradePrice() ) * 1000000 );       // 단위가 백만이라
+
+        if ( daumIndex.getChange() != null && daumIndex.getChange().equals("FALL") ) {
+            indexDaily.setPriceChange( -indexDaily.getPriceChange() );
+            indexDaily.setRateChange( -indexDaily.getRateChange() );
+        }
 
         return indexDaily;
     }

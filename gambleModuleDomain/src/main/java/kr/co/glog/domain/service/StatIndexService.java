@@ -93,6 +93,20 @@ public class StatIndexService {
 
 
     /**
+     * 전체 연간 데이터 리턴
+     * @param marketCode
+     * @return
+     */
+    public ArrayList<StatIndexResult> getStatIndexYearlyList( String marketCode, Integer endYear ) {
+        StatIndexParam statIndexParam = new StatIndexParam();
+        statIndexParam.setMarketCode( marketCode );
+        statIndexParam.setPeriodCode( PeriodCode.year );
+        statIndexParam.setEndYear( endYear );
+        log.debug( statIndexParam.toString() );
+        return statIndexDao.getStatIndexList( statIndexParam );
+    }
+
+    /**
      * 특정 년도의 월간 데이터 리턴
      * @param marketCode
      * @param year
@@ -104,6 +118,20 @@ public class StatIndexService {
         statIndexParam.setYear( year );
         statIndexParam.setPeriodCode( PeriodCode.month );
         statIndexParam.setYearWeek( year + "00" );
+        return statIndexDao.getStatIndexList( statIndexParam );
+    }
+
+    /**
+     * 특정 년도의 주간 데이터 리턴
+     * @param marketCode
+     * @param year
+     * @return
+     */
+    public ArrayList<StatIndexResult> getStatIndexWeeklyList( String marketCode, Integer year ) {
+        StatIndexParam statIndexParam = new StatIndexParam();
+        statIndexParam.setMarketCode( marketCode );
+        statIndexParam.setYear( year );
+        statIndexParam.setPeriodCode( PeriodCode.week );
         return statIndexDao.getStatIndexList( statIndexParam );
     }
 
@@ -139,30 +167,7 @@ public class StatIndexService {
         }
     }
 
-    /**
-     *  오늘의 연간/월간/주간 지수통계 upsert
-     */
-    public void makeStatIndexToday() {
-        makeStatIndex( DateUtil.getToday() );
-    }
 
-    /**
-     *  특정 날짜의 연간/월간/주간 지수통계 upsert
-     */
-    public void makeStatIndex( String yyyymmdd ) {
-
-        // 주간
-        makeStatIndexWeek(MarketCode.kospi, yyyymmdd);
-        makeStatIndexWeek(MarketCode.kosdaq, yyyymmdd);
-
-        // 월간
-        makeStatIndexMonth(MarketCode.kospi, yyyymmdd);
-        makeStatIndexMonth(MarketCode.kosdaq, yyyymmdd);
-
-        // 연간
-        makeStatIndexYear( MarketCode.kospi, yyyymmdd );
-        makeStatIndexYear( MarketCode.kosdaq, yyyymmdd);
-    }
 
     /**
      * 년간 지수 통계
@@ -254,6 +259,18 @@ public class StatIndexService {
         statIndex.setVolumeLow( indexDailyResult.getVolumeLow() );
         statIndex.setVolumeHigh( indexDailyResult.getVolumeHigh() );
         statIndex.setVolumeAverage( indexDailyResult.getVolumeAverage() );
+        statIndex.setPricePrevious( indexDailyResult.getPricePrevious() );
+        statIndex.setPriceStart( indexDailyResult.getPriceStart() );
+        statIndex.setPriceFinal( indexDailyResult.getPriceFinal() );
+        statIndex.setPriceLowDate( indexDailyResult.getPriceLowDate() );
+        statIndex.setPriceHighDate( indexDailyResult.getPriceHighDate() );
+        statIndex.setVolumeLowDate( indexDailyResult.getVolumeLowDate() );
+        statIndex.setVolumeHighDate( indexDailyResult.getVolumeHighDate() );
+
+        statIndex.setRiseCount( indexDailyResult.getRiseCount() );
+        statIndex.setEvenCount( indexDailyResult.getEvenCount() );
+        statIndex.setFallCount( indexDailyResult.getFallCount() );
+
 
         // 가격 표준편차
         IndexDailyResult priceResult = indexDailyDao.getStatIndexPriceStdDev( marketCode, startDate, endDate, indexDailyResult.getPriceAverage() );
@@ -263,6 +280,7 @@ public class StatIndexService {
         IndexDailyResult volumeResult = indexDailyDao.selectStatIndexVolumeStdDev( marketCode, startDate, endDate, indexDailyResult.getVolumeAverage() );
         statIndex.setVolumeStandardDeviation( volumeResult.getVolumeStandardDeviation() );
 
+        /*
         // 최저가 일자
         PagingParam pagingParam = new PagingParam();
         pagingParam.setSortIndex( "priceLow");
@@ -312,12 +330,18 @@ public class StatIndexService {
         indexDailyParam.setBeforeDate( startDate );
         indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
         statIndex.setPricePrevious( indexDailyList.get(0).getPriceFinal() );
+        */
 
         // 변동가격 / 변동률
         Float pricePrevious = statIndex.getPricePrevious();
         Float priceNow = statIndex.getPriceFinal();
         statIndex.setPriceChange( Math.round( 100 * ( statIndex.getPriceFinal() - statIndex.getPricePrevious() ) ) / 100f );     // 소수점 2자리까지만 남김
         statIndex.setRateChange( Math.round( 10000 * statIndex.getPriceChange() / statIndex.getPricePrevious()  ) / 100f );      // 소수점 2자리까지만 남김
+
+        // 상승종목, 하락종목, 보합종목 숫자
+        // code required
+
+
 
         statIndexDao.saveStatIndex( statIndex );
    }

@@ -50,11 +50,30 @@ public class StatIndexController {
     }
 
 
+    // 특정 연간 데이터 목록 리턴
+    @GetMapping("/yearlyList")
+    public RestResponse yearlyList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer endYear) throws JsonProcessingException {
+        RestResponse restResponse = new RestResponse();
+        ArrayList<StatIndexResult> statIndexList = statIndexService.getStatIndexYearlyList( marketCode, endYear );
+        restResponse.putData( "statIndexList", statIndexList );
+        return restResponse;
+    }
+
+
     // 특정 년도 월간 데이터 목록 리턴
     @GetMapping("/monthlyList")
     public RestResponse monthlyList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
         ArrayList<StatIndexResult> statIndexList = statIndexService.getStatIndexMonthlyList( marketCode, year );
+        restResponse.putData( "statIndexList", statIndexList );
+        return restResponse;
+    }
+
+    // 특정 년도 월간 데이터 목록 리턴
+    @GetMapping("/weeklyList")
+    public RestResponse weeklyList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year ) throws JsonProcessingException {
+        RestResponse restResponse = new RestResponse();
+        ArrayList<StatIndexResult> statIndexList = statIndexService.getStatIndexWeeklyList( marketCode, year );
         restResponse.putData( "statIndexList", statIndexList );
         return restResponse;
     }

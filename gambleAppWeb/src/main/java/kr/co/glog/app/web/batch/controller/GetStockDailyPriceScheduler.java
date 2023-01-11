@@ -375,29 +375,30 @@ public class GetStockDailyPriceScheduler {
      *  금융위원회 자료로 지수/종목 정보 업데이트
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 0 12 * * * ")
+     @Scheduled(cron = "0 0 12 * * * ")
     public void at12() throws InterruptedException {
 
         // 금융위원회 자료로 코스피 지수 업서트
         indexDailyBatchService.upsertFromKrxData10( MarketCode.kospi );
 
         // 금융위원회 자료로 코스닥 지수 업서트
-       indexDailyBatchService.upsertFromKrxData10( MarketCode.kosdaq );
+        indexDailyBatchService.upsertFromKrxData10( MarketCode.kosdaq );
 
-        // 오늘의 지수통계
-        statIndexService.makeStatIndexToday();
+        // 금융위원회 정보로 지수를 업데이트 했으니, 지수통계도 없데이트
+        indexDailyBatchService.makeStatIndexToday();
 
 
-        // 코스피 코스닥 전 종목 조회 후 stock 테이블에 등록
+
+        // 금융위원회 자료로 코스피 코스닥 전 종목 조회 후 stock 테이블에 등록
         stockDailyBatchService.upsertFromKrxData10();
 
-        // 오늘의 전 종목 통계
-        statStockService.makeStatStockToday();
+        // 금융위원회 자료로 코스피 코스닥 전 종목 업데이트 했으니, 종목별 통계도 업데이트
+        stockDailyBatchService.makeStatStockToday();
     }
 
 
     /**
-     * 오후 3시 15분 배치
+     * 오후 3시 35분 배치
      * 다음 주식 정보로 당일 지수 / 종목 정보 업서트
      * @throws InterruptedException
      */
@@ -407,8 +408,16 @@ public class GetStockDailyPriceScheduler {
         // 다음 데이터로 지수 UPSERT
         indexDailyBatchService.upsertDailyIndexDataBatchFromDaum();
 
+        // 다음 데이터 정보로 지수를 업데이트 했으니, 지수통계도 없데이트
+        indexDailyBatchService.makeStatIndexToday();
+
+
+
         // 다음 데이터로 종목 UPSERT
         stockDailyBatchService.upsertDailyStockDataBatchFromDaumDaily();
+
+        // 다음 데이터로 자료로 코스피 코스닥 전 종목 업데이트 했으니, 종목별 통계도 업데이트
+        stockDailyBatchService.makeStatStockToday();
 
     }
 
@@ -421,34 +430,18 @@ public class GetStockDailyPriceScheduler {
     @Scheduled(cron = "0 0 20 * * *")
     public void at20() throws InterruptedException {
 
-        // 외인 / 기관 거래 정보
+        // 다음 외인 / 기관 거래 정보
         stockDailyBatchService.upsertDailyStockDataBatchFromDaumInvestor();
+
+        // 다음 외인 / 기관 정보로 주식을 업데이트 했으니, 주식 동계도 없데이트
+        stockDailyBatchService.makeStatStockToday();
     }
 
 
 
-    @Scheduled(cron = "0 30 14 4 * * ")
+    @Scheduled(cron = "0 28 19 11 * * ")
     public void test() throws InterruptedException {
 
-     //   statIndexService.makeStatIndexAll();
-
-     //    statStockService.makeStatStockAll();
-        /*
-        // 금융위원회 자료로 코스피 지수 업서트
-        indexDailyBatchService.upsertFromKrxData10( MarketCode.kospi );
-
-        // 금융위원회 자료로 코스닥 지수 업서트
-        indexDailyBatchService.upsertFromKrxData10( MarketCode.kosdaq );
-
-        // 지수통계
-        statIndexService.makeStatIndex( "20221229" );
-
-        // 코스피 코스닥 전 종목 조회 후 stock 테이블에 등록
-        stockDailyBatchService.upsertFromKrxData10();
-
-        // 전 종목 통계
-        statStockService.makeStatStock( "20221229" );
-
-         */
+        statStockService.makeStatStockAll();
     }
 }

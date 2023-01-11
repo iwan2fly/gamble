@@ -5,17 +5,17 @@
 
     <insert id="insertStatIndex" parameterType="StatIndex" useGeneratedKeys="true" keyProperty="statIndexId">
         INSERT INTO statIndex
-            (  marketCode, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
+            (  marketCode, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, riseCount, fallCount, evenCount, insertTime, updateTime )
         VALUES
-            (  #{marketCode}, #{periodCode}, #{year}, #{month}, #{yearWeek}, #{week}, #{startDate}, #{endDate}, #{tradeDays}, #{pricePrevious}, #{priceStart}, #{priceFinal}, #{priceLow}, #{priceHigh}, #{priceAverage}, #{priceStandardDeviation}, #{priceChange}, #{rateChange}, #{volumeLow}, #{volumeHigh}, #{volumeAverage}, #{volumeStandardDeviation}, #{priceLowDate}, #{priceHighDate}, #{volumeLowDate}, #{volumeHighDate}, now(), now() )
+            (  #{marketCode}, #{periodCode}, #{year}, #{month}, #{yearWeek}, #{week}, #{startDate}, #{endDate}, #{tradeDays}, #{pricePrevious}, #{priceStart}, #{priceFinal}, #{priceLow}, #{priceHigh}, #{priceAverage}, #{priceStandardDeviation}, #{priceChange}, #{rateChange}, #{volumeLow}, #{volumeHigh}, #{volumeAverage}, #{volumeStandardDeviation}, #{priceLowDate}, #{priceHighDate}, #{volumeLowDate}, #{volumeHighDate}, #{riseCount}, #{fallCount}, #{evenCount}, now(), now() )
     </insert>
 
     <insert id="insertsStatIndex" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statIndexId" keyProperty="statIndexId">
         INSERT INTO statIndex
-            (  marketCode, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
+            (  marketCode, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, riseCount, fallCount, evenCount, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            (  #{item.marketCode}, #{item.periodCode}, #{item.year}, #{item.month}, #{item.yearWeek}, #{item.week}, #{item.startDate}, #{item.endDate}, #{item.tradeDays}, #{item.pricePrevious}, #{item.priceStart}, #{item.priceFinal}, #{item.priceLow}, #{item.priceHigh}, #{item.priceAverage}, #{item.priceStandardDeviation}, #{item.priceChange}, #{item.rateChange}, #{item.volumeLow}, #{item.volumeHigh}, #{item.volumeAverage}, #{item.volumeStandardDeviation}, #{item.priceLowDate}, #{item.priceHighDate}, #{item.volumeLowDate}, #{item.volumeHighDate}, now(), now() )
+            (  #{item.marketCode}, #{item.periodCode}, #{item.year}, #{item.month}, #{item.yearWeek}, #{item.week}, #{item.startDate}, #{item.endDate}, #{item.tradeDays}, #{item.pricePrevious}, #{item.priceStart}, #{item.priceFinal}, #{item.priceLow}, #{item.priceHigh}, #{item.priceAverage}, #{item.priceStandardDeviation}, #{item.priceChange}, #{item.rateChange}, #{item.volumeLow}, #{item.volumeHigh}, #{item.volumeAverage}, #{item.volumeStandardDeviation}, #{item.priceLowDate}, #{item.priceHighDate}, #{item.volumeLowDate}, #{item.volumeHighDate}, #{item.riseCount}, #{item.fallCount}, #{item.evenCount}, now(), now() )
         </foreach>
     </insert>
 
@@ -45,6 +45,9 @@
             <if test="priceHighDate != null">priceHighDate = #{priceHighDate},</if>
             <if test="volumeLowDate != null">volumeLowDate = #{volumeLowDate},</if>
             <if test="volumeHighDate != null">volumeHighDate = #{volumeHighDate},</if>
+            <if test="riseCount != null">riseCount = #{riseCount},</if>
+            <if test="fallCount != null">fallCount = #{fallCount},</if>
+            <if test="evenCount != null">evenCount = #{evenCount},</if>
             updateTime = now()
         </trim>
         <choose>
@@ -106,6 +109,10 @@
                 <if test="priceHighDate != null and priceHighDate != ''">AND statIndex.priceHighDate=#{priceHighDate}</if>
                 <if test="volumeLowDate != null and volumeLowDate != ''">AND statIndex.volumeLowDate=#{volumeLowDate}</if>
                 <if test="volumeHighDate != null and volumeHighDate != ''">AND statIndex.volumeHighDate=#{volumeHighDate}</if>
+                <if test="riseCount != null and riseCount != ''">AND statIndex.riseCount=#{riseCount}</if>
+                <if test="fallCount != null and fallCount != ''">AND statIndex.fallCount=#{fallCount}</if>
+                <if test="evenCount != null and evenCount != ''">AND statIndex.evenCount=#{evenCount}</if>
+                <if test="endYear != null and endYear != ''">AND statIndex.year <![CDATA[ <= ]]> #{endYear}</if>
                 <if test="pagingParam.filter != null and pagingParam.filter != ''">AND statIndex.statNameCode like CONCAT('%',#{pagingParam.filter},'%')</if>
             </trim>
         </where>
@@ -141,6 +148,9 @@
                 <when test="pagingParam.sortIndex eq 'priceHighDate'">priceHighDate</when>
                 <when test="pagingParam.sortIndex eq 'volumeLowDate'">volumeLowDate</when>
                 <when test="pagingParam.sortIndex eq 'volumeHighDate'">volumeHighDate</when>
+                <when test="pagingParam.sortIndex eq 'riseCount'">riseCount</when>
+                <when test="pagingParam.sortIndex eq 'fallCount'">fallCount</when>
+                <when test="pagingParam.sortIndex eq 'evenCount'">evenCount</when>
                 <otherwise>statIndexId</otherwise>
             </choose>
             <choose>
