@@ -16,6 +16,10 @@ let obj = {
         statIndexMonthlyList: {},
         statIndexWeeklyList: {},
         statIndexDailyList: {},
+        rateOfRiseList: {},
+        rateOfFallList: {},
+        volumeTradeDescList: {},
+        volumeTradeAscList: {},
     },
     watch : {
 
@@ -31,6 +35,10 @@ let obj = {
             this.getStatIndexMonthlyList();
             this.getStatIndexWeeklyList();
             this.getStatIndexDailyList();
+            this.getRateOfRiseList();
+            this.getRateOfFallList();
+            this.getVolumeTradeDescList();
+            this.getVolumeTradeAscList();
         },
         // 지수 통계 : 년간 / 월간 / 주간
         getStatIndex: function() {
@@ -40,22 +48,15 @@ let obj = {
             param.periodCode = serverParam.periodCode;
             param.year = serverParam.year;
 
-            let targetUrl = 'yearly';
-            if ( param.periodCode == 'month' ) {
-                param.month = serverParam.month;
-                targetUrl = 'monthly';
-            } else if ( param.periodCode == 'week' ) {
-                param.yearWeek = serverParam.yearWeek
-                targetUrl = 'weekly';
-            }
-
-            _get( '/rest/domain/krx/statIndex/' + targetUrl, param, function( json ) {
-                if ( json.responseCode == RestResponseStatus.OK ) {
+            let callback = function( json ) {
+                if (json.responseCode == RestResponseStatus.OK) {
                     v.statIndex = json.object.statIndex;
                 } else {
-                    alert( json.responseMessage );
+                    alert(json.responseMessage);
                 }
-            } );
+            }
+
+           _index.getStatIndex( param, callback );
         },
         // 연간 지수 통계 목록
         getStatIndexYearlyList: function() {
@@ -64,14 +65,16 @@ let obj = {
             param.marketCode = serverParam.marketCode;
             param.endYear = serverParam.year;
 
-            _get( '/rest/domain/krx/statIndex/yearlyList', param, function( json ) {
+            let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
                     v.statIndexYearlyList = json.object.statIndexList;
                     v.drawStatIndexChart( 'year', 'statIndexChartYearly' );
                 } else {
                     alert( json.responseMessage );
                 }
-            } );
+            }
+
+            _index.getStatIndexYearlyList( param, callback );
         },
         // 특정 년도 월간 지수 통계 목록
         getStatIndexMonthlyList: function() {
@@ -80,14 +83,15 @@ let obj = {
             param.marketCode = serverParam.marketCode;
             param.year = serverParam.year;
 
-            _get( '/rest/domain/krx/statIndex/monthlyList', param, function( json ) {
+            let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
-                    v.statIndexMonthlyList = json.object.statIndexList;
-                    v.drawStatIndexChart( 'month', 'statIndexChartMonthly' );
+                    v.statIndexMonthlyList =  json.object.statIndexList;
                 } else {
                     alert( json.responseMessage );
                 }
-            } );
+            }
+
+            _index.getStatIndexMonthlyList( param, callback );
         },
         // 특정 년도 주간 지수 통계 목록
         getStatIndexWeeklyList: function() {
@@ -96,14 +100,15 @@ let obj = {
             param.marketCode = serverParam.marketCode;
             param.year = serverParam.year;
 
-            _get( '/rest/domain/krx/statIndex/weeklyList', param, function( json ) {
+            let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
                     v.statIndexWeeklyList = json.object.statIndexList;
-                    v.drawStatIndexChart( 'week', 'statIndexChartWeekly' );
                 } else {
                     alert( json.responseMessage );
                 }
-            } );
+            }
+
+            _index.getStatIndexWeeklyList( param, callback );
         },
         // 특정 년도 일별 지수 통계 목록
         getStatIndexDailyList: function() {
@@ -113,15 +118,98 @@ let obj = {
             param.startDate = serverParam.year + "0101";
             param.endDate = serverParam.year + "1231";
 
-            _get( '/rest/domain/krx/indexDaily/getList', param, function( json ) {
+            let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
                     v.statIndexDailyList = json.object.indexDailyList;
-                    v.drawStatIndexChart( 'day', 'statIndexChartDaily' );
+                    v.drawStatIndexChart( 'day', 'statIndexChart' );
                 } else {
                     alert( json.responseMessage );
                 }
-            } );
+            }
+
+            _index.getStatIndexDailyList( param, callback );
         },
+        // 상승률 상위 주식 리스트
+        getRateOfRiseList : function() {
+            let param = {};
+            param.marketCode = serverParam.marketCode;
+            param.startDate = serverParam.year + "0101";
+            param.endDate = serverParam.year + "1231";
+            param.periodCode = 'year';
+            param.sortIndex = 'rateChange';
+            param.sortType = 'desc';
+
+            let callback = function( json ) {
+                if ( json.responseCode == RestResponseStatus.OK ) {
+                    v.rateOfRiseList = json.object.statStockList;
+                } else {
+                    alert( json.responseMessage );
+                }
+            }
+
+            _stock.getRateOfChangePriceList( param, callback );
+        },
+        // 상승률 상위 주식 리스트
+        getRateOfFallList : function() {
+            let param = {};
+            param.marketCode = serverParam.marketCode;
+            param.startDate = serverParam.year + "0101";
+            param.endDate = serverParam.year + "1231";
+            param.periodCode = 'year';
+            param.sortIndex = 'rateChange';
+            param.sortType = 'asc';
+
+            let callback = function( json ) {
+                if ( json.responseCode == RestResponseStatus.OK ) {
+                    v.rateOfFallList = json.object.statStockList;
+                } else {
+                    alert( json.responseMessage );
+                }
+            }
+
+            _stock.getRateOfChangePriceList( param, callback );
+        },
+        // 거래량 상위 주식 리스트
+        getVolumeTradeDescList : function() {
+            let param = {};
+            param.marketCode = serverParam.marketCode;
+            param.startDate = serverParam.year + "0101";
+            param.endDate = serverParam.year + "1231";
+            param.periodCode = 'year';
+            param.sortIndex = 'volumeTrade';
+            param.sortType = 'desc';
+
+            let callback = function( json ) {
+                if ( json.responseCode == RestResponseStatus.OK ) {
+                    v.volumeTradeDescList = json.object.statStockList;
+                } else {
+                    alert( json.responseMessage );
+                }
+            }
+
+            _stock.getVolumeTradeList( param, callback );
+        },
+        // 거래량 하위 주식 리스트
+        getVolumeTradeAscList : function() {
+            let param = {};
+            param.marketCode = serverParam.marketCode;
+            param.startDate = serverParam.year + "0101";
+            param.endDate = serverParam.year + "1231";
+            param.periodCode = 'year';
+            param.sortIndex = 'volumeTrade';
+            param.sortType = 'asc';
+
+            let callback = function( json ) {
+                if ( json.responseCode == RestResponseStatus.OK ) {
+                    v.volumeTradeAscList = json.object.statStockList;
+                } else {
+                    alert( json.responseMessage );
+                }
+            }
+
+            _stock.getVolumeTradeList( param, callback );
+        },
+        // 주식 일봉/주봉/월봉/연봉 차트 그리기
         drawStatIndexChart : function( period, dom ) {
 
             // 목록 선택

@@ -264,6 +264,7 @@ public class StatIndexService {
         statIndex.setPriceFinal( indexDailyResult.getPriceFinal() );
         statIndex.setPriceLowDate( indexDailyResult.getPriceLowDate() );
         statIndex.setPriceHighDate( indexDailyResult.getPriceHighDate() );
+        statIndex.setVolumeTrade(( indexDailyResult.getVolumeTrade() ) );
         statIndex.setVolumeLowDate( indexDailyResult.getVolumeLowDate() );
         statIndex.setVolumeHighDate( indexDailyResult.getVolumeHighDate() );
 

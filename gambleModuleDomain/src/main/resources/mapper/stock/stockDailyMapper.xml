@@ -13,6 +13,7 @@
     <!-- 주식 특정 기간 동안의 최소, 최대, 거래일수, 평균 -->
     <select id="selectStatStockCommon" parameterType="StockDailyParam" resultType="StockDailyResult" >
         SELECT  stat1.*,
+                lastStock.stockName, lastStock.marketCode,
                 pricePrevious.pricePrevious,
                 priceStart.priceStart,
                 priceFinal.priceFinal,
@@ -21,12 +22,20 @@
                 IFNULL(riseCount, 0) riseCount, IFNULL(evenCount,0) evenCount, IFNULL(fallCount, 0) fallCount
         FROM (
             SELECT  stockCode, MIN(priceLow) priceLow, MAX(priceHigh) priceHigh, ROUND(SUM(priceFinal)/COUNT(*), 0) priceAverage, COUNT(*) dataCount,
-                    MIN(volumeTrade) volumeLow, MAX(volumeTrade) volumeHigh, ROUND(SUM(volumeTrade)/COUNT(*), 0) volumeAverage,
+                    SUM(volumeTrade) volumeTrade, MIN(volumeTrade) volumeLow, MAX(volumeTrade) volumeHigh, ROUND(SUM(volumeTrade)/COUNT(*), 0) volumeAverage,
                     MIN(foreignerStockCount) foreignerLow, MAX(foreignerStockCount) foreignerHigh, ROUND(SUM(foreignerStockCount)/COUNT(*), 0) foreignerAverage
             FROM    stockDaily
-            WHERE   tradeDate BETWEEN #{startDate} AND #{endDate} AND stockCode=#{stockCode}
+            WHERE   stockCode=#{stockCode} AND tradeDate BETWEEN #{startDate} AND #{endDate}
             GROUP BY stockCode
         ) stat1
+        <!-- 마지막 값 : 이름, 시장코드 등 -->
+        LEFT JOIN (
+            SELECT  stockName, marketCode
+            FROM    stockDaily
+            WHERE   stockCode=#{stockCode} AND tradeDate <![CDATA[ <= ]]> #{endDate}
+            ORDER BY tradeDate desc
+            LIMIT 1
+        ) lastStock ON stat1.stockCode = lastStock.stockCode
         <!-- 상승 건수 -->
         LEFT JOIN (
             SELECT stockCode, COUNT(*) riseCount FROM stockDaily WHERE tradeDate BETWEEN #{startDate} AND #{endDate} AND stockCode=#{stockCode} AND rateChange > 0

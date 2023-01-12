@@ -1,0 +1,480 @@
+{{>web/layouts/fullNavHeader}}
+
+<script>
+    let serverParam = {
+        marketCode : '',
+        periodCode : '',
+        year: '',
+        month : '',
+        week : '',
+        yearWeek : '',
+    };
+
+    serverParam.marketCode = '{{serverParam.marketCode}}'
+    serverParam.periodCode = '{{serverParam.periodCode}}'
+    serverParam.year = '{{serverParam.year}}'
+    serverParam.month = '{{#serverParam.month}}{{serverParam.month}}{{/serverParam.month}}'
+    serverParam.week = '{{#serverParam.week}}{{serverParam.week}}{{/serverParam.week}}'
+    serverParam.yearWeek = '{{#serverParam.yearWeek}}{{serverParam.yearWeek}}{{/serverParam.yearWeek}}';
+</script>
+
+<!-- Page Sidebar Ends-->
+<div class="page-body" id="body">
+
+    <!--
+    <div class="container-fluid">
+        <div class="page-header dash-breadcrumb">
+            <div class="row">
+                <div class="col-6">
+                    <h3 class="f-w-600">
+                        <span v-text="serverParam.marketCode == 'kospi' ? '코스피' : '코스닥'"></span>
+                        <span v-text="serverParam.year + '년'"></span>
+                        <span v-if="serverParam.periodCode == 'month'" v-text="' > ' + serverParam.month + '월'"></span>
+                        <span v-if="serverParam.periodCode == 'week'" v-text="' > ' + serverParam.yearWeek + '주'"></span>
+                    </h3>
+                </div>
+                <div class="col-6">
+                    <div class="breadcrumb-sec">
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="index.html"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a></li>
+                            <li class="breadcrumb-item">Dashboard</li>
+                            <li class="breadcrumb-item active">Project</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+
+    <!-- Container-fluid starts-->
+    <div class="container-fluid">
+
+            <div class="card">
+                <div class="card-header">
+                    <h5><span v-text="statIndex.priceFinal"></span>
+                        <code :class="statIndex.priceChange > 0 ? 'text-danger' : statIndex.priceChange < 0 ? 'text-primary' : ''" v-text="statIndex.priceChange"></code>
+                        <code :class="statIndex.priceChange > 0 ? 'text-danger' : statIndex.priceChange < 0 ? 'text-primary' : ''" v-text="statIndex.rateChange + '%'"></code>
+                    </h5>
+                    <span>
+                        <span v-text="yyyymmdd(statIndex.startDate)"></span> ~ <span v-text="yyyymmdd(statIndex.endDate)"></span>
+                        <span>(<span class="text-info" v-text="statIndex.tradeDays + '일'"></span>)</span>
+                    </span>
+                </div>
+
+                <div class="card-body p-t-0">
+                </div>
+
+                <div class="card-body p-t-0">
+                    <span v-text="statIndex.marketCode"></span>
+                    <div class="col-sm-12">marketCode : <span v-text="statIndex.marketCode"></span></div>
+                    <div class="col-sm-12">month : <span v-text="statIndex.month"></span></div>
+                    <div class="col-sm-12">periodCode : <span v-text="statIndex.periodCode"></span></div>
+                    <div class="col-sm-12">year : <span v-text="statIndex.year"></span></div>
+                    <div class="col-sm-12">yearWeek : <span v-text="statIndex.yearWeek"></span></div>
+                    <div class="col-sm-12">startDate : <span v-text="statIndex.startDate"></span></div>
+                    <div class="col-sm-12">endDate : <span v-text="statIndex.endDate"></span></div>
+                    <div class="col-sm-12">priceAverage : <span v-text="statIndex.priceAverage"></span></div>
+                    <div class="col-sm-12">priceChange : <span v-text="statIndex.priceChange"></span></div>
+                    <div class="col-sm-12">priceFinal : <span v-text="statIndex.priceFinal"></span></div>
+                    <div class="col-sm-12">priceHigh : <span v-text="statIndex.priceHigh"></span></div>
+                    <div class="col-sm-12">priceHighDate : <span v-text="statIndex.priceHighDate"></span></div>
+                    <div class="col-sm-12">priceLow : <span v-text="statIndex.priceLow"></span></div>
+                    <div class="col-sm-12">priceLowDate : <span v-text="statIndex.priceLowDate"></span></div>
+                    <div class="col-sm-12">pricePrevious : <span v-text="statIndex.pricePrevious"></span></div>
+                    <div class="col-sm-12">priceStandardDeviation : <span v-text="statIndex.priceStandardDeviation"></span></div>
+
+                    <div class="col-sm-12">priceStart : <span v-text="statIndex.priceStart"></span></div>
+                    <div class="col-sm-12">rateChange : <span v-text="statIndex.rateChange"></span></div>
+                    <div class="col-sm-12">tradeDays : <span v-text="statIndex.tradeDays"></span></div>
+                    <div class="col-sm-12">volumeAverage : <span v-text="statIndex.volumeAverage"></span></div>
+                    <div class="col-sm-12">volumeHigh : <span v-text="statIndex.volumeHigh"></span></div>
+                    <div class="col-sm-12">volumeHighDate : <span v-text="statIndex.volumeHighDate"></span></div>
+                    <div class="col-sm-12">volumeLow : <span v-text="statIndex.volumeLow"></span></div>
+                    <div class="col-sm-12">volumeLowDate : <span v-text="statIndex.volumeLowDate"></span></div>
+                </div>
+            </div>
+
+    </div>
+    <!-- Container-fluid Ends-->
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-8 col-md-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5 v-text="serverParam.year"></h5>
+                        <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
+                            <div class="btn-group btn-group-square">
+                                <button class="btn btn-outline-light txt-dark" type="button" @click="drawStatIndexChart( 'day', 'statIndexChart')">일봉</button>
+                                <button class="btn btn-outline-light txt-dark" type="button" @click="drawStatIndexChart( 'week', 'statIndexChart')">주봉</button>
+                                <button class="btn btn-outline-light txt-dark" type="button" @click="drawStatIndexChart( 'month', 'statIndexChart')">월봉</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-t-0">
+                        <div id="statIndexChart" style="height:300px">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>최근년도</h5>
+                        <div class="card-header-right">
+
+                        </div>
+                    </div>
+                    <div class="card-body p-t-0">
+                        <div id="statIndexChartYearly" style="height:300px">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-lg-3 col-sm-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>시가</h5>
+                        <div class="card-header-right">
+
+                        </div>
+                    </div>
+                    <div :class="(statIndex.priceStart - statIndex.pricePrevious) > 0 ? 'text-danger' : (statIndex.priceStart - statIndex.pricePrevious) < 0 ? 'text-primary' : ''" class="card-body p-b-0 align-self-end">
+                        <h3 v-text="statIndex.priceStart"></h3>
+                    </div>
+                    <div :class="(statIndex.priceStart - statIndex.pricePrevious) > 0 ? 'text-danger' : (statIndex.priceStart - statIndex.pricePrevious) < 0 ? 'text-primary' : ''" class="card-body p-t-0 align-self-end">
+                        <span v-text="(statIndex.priceStart - statIndex.pricePrevious).toFixed(2)"></span>
+                        <span v-text="Math.round( 10000 * ( statIndex.priceStart - statIndex.pricePrevious ) / statIndex.pricePrevious ) / 100 + ' %'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>고가</h5>
+                        <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
+                            <code v-text="yyyymmdd(statIndex.priceHighDate)"></code>
+                        </div>
+                    </div>
+                    <div :class="(statIndex.priceHigh - statIndex.pricePrevious) > 0 ? 'text-danger' : (statIndex.priceHigh - statIndex.pricePrevious) < 0 ? 'text-primary' : ''" class="card-body p-b-0 align-self-end">
+                        <h3 v-text="statIndex.priceHigh"></h3>
+                    </div>
+                    <div :class="(statIndex.priceHigh - statIndex.pricePrevious) > 0 ? 'text-danger' : (statIndex.priceHigh - statIndex.pricePrevious) < 0 ? 'text-primary' : ''" class="card-body p-t-0 align-self-end">
+                        <span v-text="(statIndex.priceHigh - statIndex.pricePrevious).toFixed(2)"></span>
+                        <span v-text="Math.round( 10000 * ( statIndex.priceHigh - statIndex.pricePrevious ) / statIndex.pricePrevious ) / 100 + ' %'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>저가</h5>
+                        <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
+                            <code v-text="yyyymmdd(statIndex.priceLowDate)"></code>
+                        </div>
+                    </div>
+                    <div :class="(statIndex.priceLow - statIndex.pricePrevious) > 0 ? 'text-danger' : (statIndex.priceLow - statIndex.pricePrevious) < 0 ? 'text-primary' : ''" class="card-body p-b-0 align-self-end">
+                        <h3 v-text="statIndex.priceLow"></h3>
+                    </div>
+                    <div :class="(statIndex.priceLow - statIndex.pricePrevious) > 0 ? 'text-danger' : (statIndex.priceLow - statIndex.pricePrevious) < 0 ? 'text-primary' : ''" class="card-body p-t-0 align-self-end">
+                        <span v-text="(statIndex.priceLow - statIndex.pricePrevious).toFixed(2)"></span>
+                        <span v-text="Math.round( 10000 * ( statIndex.priceLow - statIndex.pricePrevious ) / statIndex.pricePrevious ) / 100 + ' %'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>종가</h5>
+                        <div class="card-header-right">
+
+                        </div>
+                    </div>
+                    <div :class="statIndex.priceChange > 0 ? 'text-danger' : statIndex.priceChange < 0 ? 'text-primary' : ''" class="card-body p-b-0 align-self-end">
+                        <h3 v-text="statIndex.priceFinal"></h3>
+                    </div>
+                    <div :class="statIndex.priceChange > 0 ? 'text-danger' : statIndex.priceChange < 0 ? 'text-primary' : ''" class="card-body p-t-0 align-self-end">
+                        <span v-text="statIndex.priceChange"></span>
+                        <span v-text="Math.round( 10000 * statIndex.priceChange / statIndex.pricePrevious ) / 100 + ' %'"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-lg-3 col-sm-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>전체거래량</h5>
+                        <div class="card-header-right">
+
+                        </div>
+                    </div>
+                    <div class="card-body p-b-0 align-self-end">
+                        <h3 v-text="toCurrency( statIndex.volumeTrade / 1000000 )"></h3>
+                    </div>
+                    <div class="card-body p-t-0 align-self-end">
+                        <code>(단위 : 백만)</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>최고거래량</h5>
+                        <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
+                            <code v-text="yyyymmdd(statIndex.volumeHighDate)"></code>
+                        </div>
+                    </div>
+                    <div class="card-body p-b-0 align-self-end">
+                        <h3 v-text="toCurrency( statIndex.volumeHigh / 1000 )"></h3>
+                    </div>
+                    <div class="card-body p-t-0 align-self-end">
+                        <code>(단위 : 천)</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>최저거래량</h5>
+                        <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
+                            <code v-text="yyyymmdd(statIndex.volumeLowDate)"></code>
+                        </div>
+                    </div>
+                    <div class="card-body p-b-0 align-self-end">
+                        <h3 v-text="toCurrency( statIndex.volumeLow / 1000 )"></h3>
+                    </div>
+                    <div class="card-body p-t-0 align-self-end">
+                        <code>(단위 : 천)</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>평균거래량</h5>
+                        <div class="card-header-right">
+
+                        </div>
+                    </div>
+                    <div class="card-body p-b-0 align-self-end">
+                        <h3 v-text="toCurrency( statIndex.volumeAverage / 1000 )"></h3>
+                    </div>
+                    <div class="card-body p-t-0 align-self-end">
+                        <code>(단위 : 천)</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-lg-3 col-sm-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>거래일</h5>
+                        <div class="card-header-right">
+
+                        </div>
+                    </div>
+                    <div class="card-body align-self-end">
+                        <h3 v-text="statIndex.tradeDays + ' 일'"></h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>상승일</h5>
+                        <div class="card-header-right">
+
+                        </div>
+                    </div>
+                    <div class="card-body text-danger align-self-end text-danger">
+                        <h3 v-text="statIndex.riseCount + ' 일'"></h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>보합일</h5>
+                        <div class="card-header-right">
+
+                        </div>
+                    </div>
+                    <div class="card-body align-self-end">
+                        <h3 v-text="statIndex.evenCount + ' 일'"></h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>하락일</h5>
+                        <div class="card-header-right">
+
+                        </div>
+                    </div>
+                    <div class="card-body text-primary align-self-end">
+                        <h3 v-text="statIndex.fallCount + ' 일'"></h3>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-md-6 col-xl-3 col-12 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>상승율상위</h5>
+                        <div class="card-header-right">
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th scope="col">종목명</th>
+                                    <th scope="col">상승률</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="item in rateOfRiseList">
+                                    <th scope="row" v-text="item.stockName"></th>
+                                    <td v-text="item.rateChange + '%'"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3 col-12 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>하락율상위</h5>
+                        <div class="card-header-right" >
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th scope="col">종목명</th>
+                                    <th scope="col">하락률</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="item in rateOfFallList">
+                                    <th scope="row" v-text="item.stockName"></th>
+                                    <td v-text="item.rateChange + '%'"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3 col-612 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>거래량상위</h5>
+                        <div class="card-header-right">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th scope="col">종목명</th>
+                                    <th scope="col">거래량</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="item in volumeTradeDescList">
+                                    <th scope="row" v-text="item.stockName"></th>
+                                    <td v-text="item.volumeTrade"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3 col-12 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header p-b-0">
+                        <h5>거래량하위</h5>
+                        <div class="card-header-right">
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th scope="col">종목명</th>
+                                    <th scope="col">거래량</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="item in volumeTradeAscList">
+                                    <th scope="row" v-text="item.stockName"></th>
+                                    <td v-text="item.volumeTrade"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="/lib/local/data/index.js"></script>
+<script src="/lib/local/data/stock.js"></script>
+<script src="/js/web/svc/krx/indexes/reportPeriodIndex.js"></script>
+
+
+{{>web/layouts/fullNavFooter}}
+
+

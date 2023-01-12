@@ -13,7 +13,9 @@ import org.apache.ibatis.type.Alias;
 public class StatStock extends EntityModel {
 
     Long    statStockId;
-    String	stockCode;                            // 주식코드
+    String  marketCode;                         // 시장코드
+    String	stockCode;                          // 주식코드
+    String  stockName;                          // 주식이름
     String  periodCode;                         // 주기코드
     Integer year;		                        // 년도
     Integer month;                              // 월
@@ -31,6 +33,7 @@ public class StatStock extends EntityModel {
     Integer priceStandardDeviation;             // 가격 표준편차
     Integer priceChange;                        // 변동금액
     Float   rateChange;                         // 변동률
+    Long    volumeTrade;                        // 거래량
     Long    volumeLow;                          // 최저거래량
     Long    volumeHigh;                         // 최고거래량
     Long    volumeAverage;                      // 평균거래량

@@ -8,6 +8,8 @@ import kr.co.glog.domain.stat.stock.dao.StatStockDao;
 import kr.co.glog.domain.stat.stock.entity.StatStock;
 import kr.co.glog.domain.stat.stock.model.StatStockParam;
 import kr.co.glog.domain.stat.stock.model.StatStockResult;
+import kr.co.glog.domain.stat.stock.model.StatStockParam;
+import kr.co.glog.domain.stat.stock.model.StatStockResult;
 import kr.co.glog.domain.stock.MarketCode;
 import kr.co.glog.domain.stock.PeriodCode;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
@@ -90,6 +92,50 @@ public class StatStockService {
     }
 
 
+    /**
+     * 전체 연간 데이터 리턴
+     * @param stockCode
+     * @return
+     */
+    public ArrayList<StatStockResult> getStatStockYearlyList(String stockCode, Integer endYear ) {
+        StatStockParam statStockParam = new StatStockParam();
+        statStockParam.setStockCode( stockCode );
+        statStockParam.setPeriodCode( PeriodCode.year );
+        statStockParam.setEndYear( endYear );
+        log.debug( statStockParam.toString() );
+        return statStockDao.getStatStockList( statStockParam );
+    }
+
+    /**
+     * 특정 년도의 월간 데이터 리턴
+     * @param stockCode
+     * @param year
+     * @return
+     */
+    public ArrayList<StatStockResult> getStatStockMonthlyList( String stockCode, Integer year ) {
+        StatStockParam statStockParam = new StatStockParam();
+        statStockParam.setStockCode( stockCode );
+        statStockParam.setYear( year );
+        statStockParam.setPeriodCode( PeriodCode.month );
+        statStockParam.setYearWeek( year + "00" );
+        return statStockDao.getStatStockList( statStockParam );
+    }
+
+    /**
+     * 특정 년도의 주간 데이터 리턴
+     * @param stockCode
+     * @param year
+     * @return
+     */
+    public ArrayList<StatStockResult> getStatStockWeeklyList( String stockCode, Integer year ) {
+        StatStockParam statStockParam = new StatStockParam();
+        statStockParam.setStockCode( stockCode );
+        statStockParam.setYear( year );
+        statStockParam.setPeriodCode( PeriodCode.week );
+        return statStockDao.getStatStockList( statStockParam );
+    }
+
+
 
     /**
      *  2020년부터 연간/월간/주간 주식 upsert
@@ -97,20 +143,20 @@ public class StatStockService {
     public void makeStatStockAll() {
 
         // 연간
-        /*
+
         makeStatStockYear( "2020" );
         makeStatStockYear( "2021" );
         makeStatStockYear( "2022" );
-        */
-        // 월간
 
+        // 월간
+/*
         for ( int year = 2020; year <= 2023; year++ ) {
             for (int i = 1; i <= 12; i++) {
                 String month = i < 10 ? "0" + i : "" + i;
                 makeStatStockMonth( "" + year + month );
             }
         }
-
+*/
         /*
         int date = 20221016;
         while ( date < 20230102 ) {
@@ -234,6 +280,7 @@ public class StatStockService {
         statStock.setPriceLow( stockDailyResult.getPriceLow() );
         statStock.setPriceHigh( stockDailyResult.getPriceHigh() );
         statStock.setPriceAverage( stockDailyResult.getPriceAverage() );
+        statStock.setVolumeTrade(( stockDailyResult.getVolumeTrade() ) );
         statStock.setVolumeLow( stockDailyResult.getVolumeLow() );
         statStock.setVolumeHigh( stockDailyResult.getVolumeHigh() );
         statStock.setVolumeAverage( stockDailyResult.getVolumeAverage() );
@@ -270,64 +317,6 @@ public class StatStockService {
             StockDailyResult foreignerResult = stockDailyDao.selectStatStockForeignerStdDev(stockCode, startDate, endDate, stockDailyResult.getForeignerAverage(), stockDailyResult.getDataCount() );
             statStock.setForeignerStandardDeviation(foreignerResult.getForeignerStandardDeviation());
         }
-
-        /*
-        // 최저가 일자
-        PagingParam pagingParam = new PagingParam();
-        pagingParam.setSortIndex( "priceLow");
-        pagingParam.setSortType("asc");
-        pagingParam.setRows(1);
-        StockDailyParam stockDailyParam = new StockDailyParam();
-        stockDailyParam.setPagingParam( pagingParam );
-        stockDailyParam.setStockCode( stockCode );
-        stockDailyParam.setStartDate( startDate );
-        stockDailyParam.setEndDate( endDate );
-        ArrayList<StockDailyResult> stockDailyList = stockDailyDao.getStockDailyList( stockDailyParam );
-        statStock.setPriceLowDate( stockDailyList.get(0).getTradeDate() );
-
-        // 최고가 일자
-        pagingParam.setSortIndex( "priceHigh");
-        pagingParam.setSortType("desc");
-        pagingParam.setRows(1);
-        stockDailyParam.setPagingParam( pagingParam );
-        stockDailyList = stockDailyDao.getStockDailyList( stockDailyParam );
-        statStock.setPriceHighDate( stockDailyList.get(0).getTradeDate() );
-
-
-        // 최저거래량 / 최고거래량 일자
-        pagingParam.setSortIndex( "volumeTotal");
-        pagingParam.setSortType("desc");
-        pagingParam.setRows(0);
-        stockDailyParam.setPagingParam( pagingParam );
-        stockDailyList = stockDailyDao.getStockDailyList( stockDailyParam );
-        statStock.setVolumeHighDate( stockDailyList.get(0).getTradeDate() );
-        statStock.setVolumeLowDate( stockDailyList.get( stockDailyList.size()-1).getTradeDate() );
-
-
-        // 시가 / 종가 / 외국인 보유량 시작/종료
-        pagingParam.setSortIndex( "tradeDate");
-        pagingParam.setSortType("asc");
-        pagingParam.setRows(0);
-        stockDailyParam.setPagingParam( pagingParam );
-        stockDailyList = stockDailyDao.getStockDailyList( stockDailyParam );
-        statStock.setPriceStart( stockDailyList.get(0).getPriceStart() );
-        statStock.setPriceFinal( stockDailyList.get( stockDailyList.size()-1).getPriceFinal() );
-        statStock.setForeignerStart( stockDailyList.get(0).getForeignerStockCount() );
-        statStock.setForeignerFinal( stockDailyList.get( stockDailyList.size()-1).getForeignerStockCount() );
-
-        // 이전 종가 ( 전일 종가 )
-        pagingParam.setSortIndex( "tradeDate");
-        pagingParam.setSortType("desc");
-        pagingParam.setRows(1);
-        stockDailyParam.setPagingParam( pagingParam );
-        stockDailyParam.setStartDate( null );
-        stockDailyParam.setEndDate( null );
-        stockDailyParam.setBeforeDate( startDate );
-        stockDailyList = stockDailyDao.getStockDailyList( stockDailyParam );
-        statStock.setPricePrevious( stockDailyList != null && stockDailyList.size() > 0 ? stockDailyList.get(0).getPriceFinal() : null );
-        statStock.setForeignerPrevious( stockDailyList != null && stockDailyList.size() > 0 ? stockDailyList.get(0).getForeignerStockCount() : null );
-        */
-
 
         // 변동가격 / 변동률
         Integer pricePrevious = statStock.getPricePrevious();

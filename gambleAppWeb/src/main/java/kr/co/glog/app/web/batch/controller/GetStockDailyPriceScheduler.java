@@ -439,9 +439,10 @@ public class GetStockDailyPriceScheduler {
 
 
 
-    @Scheduled(cron = "0 28 19 11 * * ")
+    @Scheduled(cron = "0 35 20 12 * * ")
     public void test() throws InterruptedException {
 
         statStockService.makeStatStockAll();
+   //     stockDailyBatchService.makeStatStockToday();
     }
 }

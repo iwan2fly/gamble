@@ -15,5 +15,5 @@ public class StatStockParam extends StatStock {
 
     PagingParam pagingParam = new PagingParam();
 
-
+    Integer endYear;
 }

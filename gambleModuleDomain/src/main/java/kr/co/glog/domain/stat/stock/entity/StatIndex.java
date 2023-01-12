@@ -31,6 +31,7 @@ public class StatIndex extends EntityModel {
     Float   priceStandardDeviation;             // 가격 표준편차
     Float   priceChange;                        // 변동금액
     Float   rateChange;                         // 변동률
+    Long    volumeTrade;                        // 거래량
     Long    volumeLow;                          // 최저거래량
     Long    volumeHigh;                         // 최고거래량
     Long    volumeAverage;                      // 평균거래량

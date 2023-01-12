@@ -1,9 +1,14 @@
 package kr.co.glog.app.web.rest.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.model.RestResponse;
 import kr.co.glog.domain.service.StatIndexService;
+import kr.co.glog.domain.stat.stock.dao.StatStockDao;
 import kr.co.glog.domain.stat.stock.model.StatIndexResult;
+import kr.co.glog.domain.stat.stock.model.StatStockParam;
+import kr.co.glog.domain.stat.stock.model.StatStockResult;
+import kr.co.glog.domain.stock.PeriodCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +25,10 @@ import java.util.ArrayList;
 public class StatIndexController {
 
     private final StatIndexService statIndexService;
+    private final StatStockDao statStockDao;
 
 
-    // 특정 연간 데이터 리턴
+    // 특정연도 지수 데이터 리턴
     @GetMapping("/yearly")
     public RestResponse yearly(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
@@ -31,7 +37,7 @@ public class StatIndexController {
         return restResponse;
     }
 
-    // 특정 월간 데이터 리턴
+    // 특정월 지수 데이터 리턴
     @GetMapping("/monthly")
     public RestResponse monthly(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year, Integer month ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
@@ -40,7 +46,7 @@ public class StatIndexController {
         return restResponse;
     }
 
-    // 특정 주간 데이터 리턴
+    // 특정주 지수 데이터 리턴
     @GetMapping("/weekly")
     public RestResponse weekly(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, String yearWeek ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
@@ -50,7 +56,7 @@ public class StatIndexController {
     }
 
 
-    // 특정 연간 데이터 목록 리턴
+    // 특정년도 이전의 연간 지수 데이터 목록 리턴
     @GetMapping("/yearlyList")
     public RestResponse yearlyList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer endYear) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
@@ -69,7 +75,7 @@ public class StatIndexController {
         return restResponse;
     }
 
-    // 특정 년도 월간 데이터 목록 리턴
+    // 특정 년도 주간 데이터 목록 리턴
     @GetMapping("/weeklyList")
     public RestResponse weeklyList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
@@ -77,6 +83,7 @@ public class StatIndexController {
         restResponse.putData( "statIndexList", statIndexList );
         return restResponse;
     }
+
 
 
 }
