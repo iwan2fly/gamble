@@ -2,6 +2,7 @@ package kr.co.glog.domain.stock.dao;
 
 import kr.co.glog.common.exception.ParameterMissingException;
 import kr.co.glog.domain.stock.entity.Stock;
+import kr.co.glog.domain.stock.entity.StockDaily;
 import kr.co.glog.domain.stock.mapper.StockMapper;
 import kr.co.glog.domain.stock.model.StockParam;
 import kr.co.glog.domain.stock.model.StockResult;
@@ -97,6 +98,30 @@ public class StockDao {
         }
 
         return stock;
+    }
+
+    public Stock saveStock( StockDaily stockDaily ) {
+        if ( stockDaily == null ) throw new ParameterMissingException( "stockDaily" );
+
+        Stock stock = new Stock( stockDaily );
+
+        if ( stockDaily.getStockCode() == null ) {
+            stockMapper.insertStock( stock );
+        } else {
+            stockMapper.updateStock( stock );
+        }
+
+        return stock;
+    }
+
+    public int updateInsert( Stock stock ) {
+        int result = updateStock( stock );
+
+        if ( result == 00 ) {
+            result = insertStock( stock );
+        }
+
+        return result;
     }
 
     public void deleteStock( String stockCode ) {

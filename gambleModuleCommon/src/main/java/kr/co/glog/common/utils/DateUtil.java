@@ -940,12 +940,17 @@ public class DateUtil {
 
 		 */
 
-		System.out.println( WeekFields.of( DayOfWeek.SUNDAY, 4 ) );
+		String yearWeek = DateUtil.getYearWeek( "20230116" );
+		String startDate = DateUtil.getFirstDateOfWeek( "20230116" );
+		String endDate = DateUtil.getLastDateOfWeek( "20230116" );
 
-		System.out.println( "20191229 : " + getDayOfWeek( "20191229" ) );
-		System.out.println( "20191229 : " + getYearWeek( "20191229" ) );
-		System.out.println( "20201227 : " + getDayOfWeek( "20201227" ) );
-		System.out.println( "20201227 : " + getYearWeek( "20201227" ) );
+
+
+		System.out.println( yearWeek );
+		System.out.println( startDate );
+		System.out.println( endDate );
+		System.out.println( DateUtil.getYearWeek( startDate ) );
+
 		/*
 		System.out.println( DateUtil.get20000101() );
 		System.out.println( DateUtil.daysFromNow( new Timestamp( System.currentTimeMillis() ) ) );
@@ -961,4 +966,6 @@ public class DateUtil {
 	}
 
 }
+
+
 

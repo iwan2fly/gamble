@@ -19,6 +19,7 @@ public class StockDailyResult extends StockDaily {
     Integer   priceAverage;               // 평균값
     Integer   priceStandardDeviation;     // 가격 표준편차
     Integer   pricePrevious;              // 이전가격
+    Long      priceTotalPrevious;         // 이전시총
 
     Long    volumeLow;                  // 최소거래량
     Long    volumeHigh;                 // 최대거래량
@@ -40,5 +41,9 @@ public class StockDailyResult extends StockDaily {
     Integer riseCount;                          // 상승회수
     Integer evenCount;                          // 보합회수
     Integer fallCount;                          // 하락회수
+
+    String  startDate;              // 시작일자
+    String  endDate;                // 종료일자
+
 
 }

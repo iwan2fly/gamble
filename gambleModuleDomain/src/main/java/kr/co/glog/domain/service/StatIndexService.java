@@ -1,6 +1,7 @@
 package kr.co.glog.domain.service;
 
 
+import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.exception.ParameterMissingException;
 import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
@@ -147,8 +148,10 @@ public class StatIndexService {
         makeStatIndexYear( MarketCode.kosdaq, "20210101" );
         makeStatIndexYear( MarketCode.kospi, "20220101" );
         makeStatIndexYear( MarketCode.kosdaq, "20220101" );
+        makeStatIndexYear( MarketCode.kospi, "20230101" );
+        makeStatIndexYear( MarketCode.kosdaq, "20230101" );
 
-        for ( int year = 2020; year < 2023; year++ ) {
+        for ( int year = 2020; year <= 2023; year++ ) {
             for (int i = 1; i <= 12; i++) {
                 String month = i < 10 ? "0" + i : "" + i;
                 makeStatIndexMonth(MarketCode.kospi, year+ month + "01");
@@ -157,7 +160,7 @@ public class StatIndexService {
         }
 
         int date = 20200101;
-        while ( date < 20230101 ) {
+        while ( date <= 20230113 ) {
             String dateStr = "" + date;
             makeStatIndexWeek(MarketCode.kospi, dateStr);
             makeStatIndexWeek(MarketCode.kosdaq, dateStr);
@@ -231,8 +234,6 @@ public class StatIndexService {
         StatIndex statIndex = new StatIndex();
         statIndex.setMarketCode( marketCode );
         statIndex.setPeriodCode( periodCode);
-        statIndex.setStartDate( startDate );
-        statIndex.setEndDate( endDate );
         statIndex.setYearWeek( yearWeek == null ? startDate.substring(0, 4) + "00" : yearWeek );
         statIndex.setWeek( yearWeek == null ? null : Integer.parseInt(yearWeek.substring(4,6) ) );
 
@@ -252,6 +253,13 @@ public class StatIndexService {
 
         // 일반 통계, 최소/최고/평균 등
         IndexDailyResult indexDailyResult = indexDailyDao.getStatIndexCommon( marketCode, startDate, endDate );
+
+        // 평균값이 산출되지 않으면 표준편차를 구할 수 없음. 데이터가 없는 경우
+        if ( indexDailyResult.getPriceAverage() == null ) {
+            log.debug("평균값이 없습니다. 데이터가 없는 것으로 추정됩니다.");
+            return;
+        }
+
         statIndex.setTradeDays( indexDailyResult.getDataCount() );
         statIndex.setPriceLow( indexDailyResult.getPriceLow() );
         statIndex.setPriceHigh( indexDailyResult.getPriceHigh() );
@@ -271,6 +279,9 @@ public class StatIndexService {
         statIndex.setRiseCount( indexDailyResult.getRiseCount() );
         statIndex.setEvenCount( indexDailyResult.getEvenCount() );
         statIndex.setFallCount( indexDailyResult.getFallCount() );
+
+        statIndex.setStartDate( indexDailyResult.getStartDate() );
+        statIndex.setEndDate( indexDailyResult.getEndDate() );
 
 
         // 가격 표준편차

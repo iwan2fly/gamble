@@ -1,0 +1,117 @@
+{{>web/layouts/fullNavHeader}}
+
+
+<script>
+    let _serverParam = {
+        marketCode : '',
+        targetDate: '',
+    };
+
+    serverParam.marketCode = '{{serverParam.marketCode}}';
+    serverParam.targetDate = '{{serverParam.targetDate}}';
+
+</script>
+
+<!-- Page Sidebar Ends-->
+<div class="page-body" id="body">
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-md-6 col-xl-4 col-12 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>상승율상위</h5>
+                        <div class="card-header-right">
+
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th scope="col">종목명</th>
+                                <th scope="col">상승률</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="item in priceDescList">
+                                <th scope="row" v-text="item.stockName"></th>
+                                <td v-text="item.rateChange + '%'"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4 col-12 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>하락율상위</h5>
+                        <div class="card-header-right" >
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th scope="col">종목명</th>
+                                <th scope="col">하락률</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="item in priceAscList">
+                                <th scope="row" v-text="item.stockName"></th>
+                                <td v-text="item.rateChange + '%'"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4 col-612 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>거래량상위</h5>
+                        <div class="card-header-right">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th scope="col">종목명</th>
+                                <th scope="col">거래량</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="item in volumeDescList">
+                                <th scope="row" v-text="item.stockName"></th>
+                                <td v-text="item.volumeTrade"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="/lib/local/data/stock.js"></script>
+<script src="/js/web/svc/krx/indexes/ranking/day.js"></script>
+
+{{>web/layouts/fullNavFooter}}
+
+

@@ -33,4 +33,7 @@ public class IndexDailyResult extends IndexDaily {
     Integer riseCount;          // 상승회수
     Integer evenCount;          // 보합회수
     Integer fallCount;          // 하락회수
+
+    String  startDate;              // 시작일자
+    String  endDate;                // 종료일자
 }

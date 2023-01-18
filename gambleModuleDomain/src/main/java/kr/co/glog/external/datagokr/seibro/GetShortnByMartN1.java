@@ -3,7 +3,9 @@ package kr.co.glog.external.datagokr.seibro;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.domain.service.StockService;
+import kr.co.glog.domain.stock.MarketCode;
 import kr.co.glog.domain.stock.dao.CompanyDao;
+import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.Stock;
 import kr.co.glog.external.ExternalKey;
 import kr.co.glog.external.datagokr.seibro.model.GetShortByMartN1Result;
@@ -23,8 +25,8 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class GetShortnByMartN1 {
 
-    private final CompanyDao companyDao;
     private final StockService stockService;
+    private final StockDao stockDao;
 
     // 기본 URL
     public static String url = "http://api.seibro.or.kr/openapi/service/StockSvc/getShotnByMartN1?serviceKey=##serviceKey##&martTpcd=##martTpcd##&pageNo=##pageNo##&numOfRows=##numOfRows##";
@@ -36,9 +38,9 @@ public class GetShortnByMartN1 {
             Stock stock = new Stock();
             stock.setStockCode( result.getShotnIsin() );
             stock.setStockName( result.getKorSecnNm() );
-            stock.setMarketCode("kospi");
+            stock.setMarketCode(MarketCode.kospi );
 
-            stockService.updateInsert( stock );
+            stockDao.updateInsert( stock );
         }
 
         ArrayList<GetShortByMartN1Result> kosdaqList = getShorByMartN1List( "12", 1, 2000 );
@@ -46,9 +48,9 @@ public class GetShortnByMartN1 {
             Stock stock = new Stock();
             stock.setStockCode( result.getShotnIsin() );
             stock.setStockName( result.getKorSecnNm() );
-            stock.setMarketCode("kosdaq");
+            stock.setMarketCode( MarketCode.kosdaq );
 
-            stockService.updateInsert( stock );
+            stockDao.updateInsert( stock );
         }
 
 
@@ -57,9 +59,9 @@ public class GetShortnByMartN1 {
             Stock stock = new Stock();
             stock.setStockCode( result.getShotnIsin() );
             stock.setStockName( result.getKorSecnNm() );
-            stock.setMarketCode("kotc");
+            stock.setMarketCode( MarketCode.kotc );
 
-            stockService.updateInsert( stock );
+            stockDao.updateInsert( stock );
         }
 
         ArrayList<GetShortByMartN1Result> konexList = getShorByMartN1List( "14", 1, 2000 );
@@ -67,9 +69,9 @@ public class GetShortnByMartN1 {
             Stock stock = new Stock();
             stock.setStockCode( result.getShotnIsin() );
             stock.setStockName( result.getKorSecnNm() );
-            stock.setMarketCode("konex");
+            stock.setMarketCode( MarketCode.konex );
 
-            stockService.updateInsert( stock );
+            stockDao.updateInsert( stock );
         }
 
         ArrayList<GetShortByMartN1Result> etcList = getShorByMartN1List( "50", 1, 2000 );
@@ -77,9 +79,9 @@ public class GetShortnByMartN1 {
             Stock stock = new Stock();
             stock.setStockCode( result.getShotnIsin() );
             stock.setStockName( result.getKorSecnNm() );
-            stock.setMarketCode("etc");
+            stock.setMarketCode( MarketCode.etc );
 
-            stockService.updateInsert( stock );
+            stockDao.updateInsert( stock );
         }
 
     }

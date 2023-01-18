@@ -88,7 +88,7 @@ public class StatStockController {
 
     // 특정년도 주식 가격변동률 목록 리턴
     @GetMapping("/rateOfChangePriceList")
-    public RestResponse rateOfChangePriceList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, String startDate, String endDate, String sortType, Integer dataCount ) throws JsonProcessingException {
+    public RestResponse rateOfChangePriceList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year, Integer month, String yearWeek, String sortType, Integer dataCount ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
 
         if ( dataCount == null || dataCount > 100 ) dataCount = 10;
@@ -101,8 +101,9 @@ public class StatStockController {
         StatStockParam statStockParam = new StatStockParam();
         statStockParam.setMarketCode( marketCode );
         statStockParam.setPeriodCode( periodCode );
-        statStockParam.setStartDate( startDate );
-        statStockParam.setEndDate( endDate );
+        statStockParam.setYear( year );
+        statStockParam.setMonth( month );
+        statStockParam.setYearWeek( yearWeek );
 
         statStockParam.setPagingParam( pagingParam );
 
@@ -113,7 +114,7 @@ public class StatStockController {
 
     // 특정년도 주식 거래량 목록 리턴
     @GetMapping("/volumeTradeList")
-    public RestResponse volumeTradeList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, String startDate, String endDate, String sortType, Integer dataCount ) throws JsonProcessingException {
+    public RestResponse volumeTradeList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year, Integer month, String yearWeek, String sortType, Integer dataCount ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
 
         if ( dataCount == null || dataCount > 100 ) dataCount = 10;
@@ -126,8 +127,10 @@ public class StatStockController {
         StatStockParam statStockParam = new StatStockParam();
         statStockParam.setMarketCode( marketCode );
         statStockParam.setPeriodCode( periodCode );
-        statStockParam.setStartDate( startDate );
-        statStockParam.setEndDate( endDate );
+        statStockParam.setYear( year );
+        statStockParam.setMonth( month );
+        statStockParam.setYearWeek( yearWeek );
+        statStockParam.setTradeYn( "Y" );
 
         statStockParam.setPagingParam( pagingParam );
 

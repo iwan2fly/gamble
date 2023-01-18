@@ -99,7 +99,7 @@ public class AllStockScrapper {
         ArrayList<IncludedStock> includedStockList = getAllStock( market );
 
         for ( IncludedStock includedStock : includedStockList ) {
-            Stock stock = stockService.getStockFromIncludedStock( includedStock );
+            Stock stock = new Stock( includedStock );
             stockList.add( stock );
         }
 

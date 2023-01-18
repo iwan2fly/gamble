@@ -6,7 +6,7 @@
     <select id="selectStockListBetween" parameterType="StockDailyParam" resultType="StockDailyResult" >
         SELECT 	stockCode
         FROM 	stockDaily
-        WHERE   tradeDate between #{startDate} AND #{endDate}
+        WHERE   marketCode = #{marketCode} AND tradeDate between #{startDate} AND #{endDate}
         GROUP BY stockCode
     </select>
 
@@ -14,23 +14,30 @@
     <select id="selectStatStockCommon" parameterType="StockDailyParam" resultType="StockDailyResult" >
         SELECT  stat1.*,
                 lastStock.stockName, lastStock.marketCode,
-                pricePrevious.pricePrevious,
+                pricePrevious.pricePrevious, pricePrevious.priceTotalPrevious,
                 priceStart.priceStart,
                 priceFinal.priceFinal,
+                CASE WHEN priceFinal.priceTotal is null THEN priceFinal.priceFinal * stock.stockCount ELSE priceFinal.priceTotal END priceTotal,
                 priceLow.priceLowDate,
                 priceHigh.priceHighDate,
                 IFNULL(riseCount, 0) riseCount, IFNULL(evenCount,0) evenCount, IFNULL(fallCount, 0) fallCount
         FROM (
             SELECT  stockCode, MIN(priceLow) priceLow, MAX(priceHigh) priceHigh, ROUND(SUM(priceFinal)/COUNT(*), 0) priceAverage, COUNT(*) dataCount,
                     SUM(volumeTrade) volumeTrade, MIN(volumeTrade) volumeLow, MAX(volumeTrade) volumeHigh, ROUND(SUM(volumeTrade)/COUNT(*), 0) volumeAverage,
-                    MIN(foreignerStockCount) foreignerLow, MAX(foreignerStockCount) foreignerHigh, ROUND(SUM(foreignerStockCount)/COUNT(*), 0) foreignerAverage
+                    MIN(foreignerStockCount) foreignerLow, MAX(foreignerStockCount) foreignerHigh, ROUND(SUM(foreignerStockCount)/COUNT(*), 0) foreignerAverage,
+                    MIN(tradeDate) startDate, MAX(tradeDate) endDate
             FROM    stockDaily
-            WHERE   stockCode=#{stockCode} AND tradeDate BETWEEN #{startDate} AND #{endDate}
+            WHERE   stockCode=#{stockCode} AND tradeDate BETWEEN #{startDate} AND #{endDate} AND volumeTrade > 0
             GROUP BY stockCode
         ) stat1
+        LEFT JOIN (
+            SELECT stockCode, stockCount
+            FROM stock
+            WHERE   stockCode=#{stockCode}
+        ) stock ON stat1.stockCode = stock.stockCode
         <!-- 마지막 값 : 이름, 시장코드 등 -->
         LEFT JOIN (
-            SELECT  stockName, marketCode
+            SELECT  stockCode, stockName, marketCode
             FROM    stockDaily
             WHERE   stockCode=#{stockCode} AND tradeDate <![CDATA[ <= ]]> #{endDate}
             ORDER BY tradeDate desc
@@ -50,7 +57,7 @@
         ) fallCount ON stat1.stockCode = fallCount.stockCode
         <!-- 이전 가격 -->
         LEFT JOIN (
-            SELECT stockCode, priceFinal pricePrevious
+            SELECT stockCode, priceFinal pricePrevious, priceTotal priceTotalPrevious
             FROM stockDaily
             WHERE stockCode=#{stockCode} AND tradeDate <![CDATA[ < ]]> #{startDate}
             ORDER BY tradeDate DESC
@@ -66,7 +73,7 @@
         ) priceStart ON stat1.stockCode = priceStart.stockCode
         <!-- 최종가, 외국인 최종 보유량 -->
         LEFT JOIN (
-            SELECT stockCode, priceFinal
+            SELECT stockCode, priceFinal, priceTotal
             FROM stockDaily
             WHERE stockCode=#{stockCode} AND tradeDate <![CDATA[ <= ]]> #{endDate}
             ORDER BY tradeDate DESC
@@ -134,17 +141,17 @@
     
     <insert id="insertStockDaily" parameterType="StockDaily" useGeneratedKeys="true" keyProperty="stockDailyId">
         INSERT INTO stockDaily
-            ( isin, stockCode, tradeDate, marketCode, stockName, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, priceTotal, volumeTotal, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
+            ( isin, stockCode, tradeDate, marketCode, stockName, pricePrevious, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, priceTotal, volumeTotal, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
         VALUES
-            ( #{isin}, #{stockCode}, #{tradeDate}, #{marketCode}, #{stockName}, #{priceFinal}, #{priceChange}, #{priceStart}, #{priceHigh}, #{priceLow}, #{priceTrade}, #{volumeTrade}, #{priceTotal}, #{volumeTotal}, #{rateChange}, #{volumeOrg}, #{volumeForeigner}, #{foreignerStockCount}, #{foreignerHoldRate}, now(), now() )
+            ( #{isin}, #{stockCode}, #{tradeDate}, #{marketCode}, #{stockName}, #{pricePrevious}, #{priceFinal}, #{priceChange}, #{priceStart}, #{priceHigh}, #{priceLow}, #{priceTrade}, #{volumeTrade}, #{priceTotal}, #{volumeTotal}, #{rateChange}, #{volumeOrg}, #{volumeForeigner}, #{foreignerStockCount}, #{foreignerHoldRate}, now(), now() )
     </insert>
 
     <insert id="insertsStockDaily" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="stockDailyId" keyProperty="stockDailyId">
         INSERT INTO stock
-            ( isin, stockCode, tradeDate, marketCode, stockName, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, priceTotal, volumeTotal, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
+            ( isin, stockCode, tradeDate, marketCode, stockName, pricePrevious, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, priceTotal, volumeTotal, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            ( #{item.isin}, #{item.stockCode}, #{item.tradeDate}, #{item.marketCode}, #{item.stockName}, #{item.priceFinal}, #{item.priceChange}, #{item.priceStart}, #{item.priceHigh}, #{item.priceLow}, #{item.priceTrade}, #{item.volumeTrade}, #{item.priceTotal}, #{item.volumeTotal},  #{item.rateChange}, #{item.volumeOrg}, #{item.volumeForeigner}, #{item.foreignerStockCount}, #{item.foreignerHoldRate}, now(), now() )
+            ( #{item.isin}, #{item.stockCode}, #{item.tradeDate}, #{item.marketCode}, #{item.stockName}, #{item.pricePrevious}, #{item.priceFinal}, #{item.priceChange}, #{item.priceStart}, #{item.priceHigh}, #{item.priceLow}, #{item.priceTrade}, #{item.volumeTrade}, #{item.priceTotal}, #{item.volumeTotal},  #{item.rateChange}, #{item.volumeOrg}, #{item.volumeForeigner}, #{item.foreignerStockCount}, #{item.foreignerHoldRate}, now(), now() )
         </foreach>
     </insert>
 
@@ -155,6 +162,7 @@
             <if test="isin != null">isin = #{isin},</if>
             <if test="marketCode != null">marketCode = #{marketCode},</if>
             <if test="stockName != null">stockName = #{stockName},</if>
+            <if test="pricePrevious != null">pricePrevious = #{pricePrevious},</if>
             <if test="priceFinal != null">priceFinal = #{priceFinal},</if>
             <if test="priceChange != null">priceChange = #{priceChange},</if>
             <if test="priceStart != null">priceStart = #{priceStart},</if>
@@ -202,6 +210,7 @@
                 <if test="marketCode != null and marketCode != ''">AND stockDaily.marketCode=#{marketCode}</if>
                 <if test="tradeDate != null and tradeDate != ''">AND stockDaily.tradeDate=#{tradeDate}</if>
                 <if test="stockName != null and stockName != ''">AND stockDaily.stockName=#{stockName}</if>
+                <if test="pricePrevious != null and pricePrevious != ''">AND stockDaily.pricePrevious=#{pricePrevious}</if>
                 <if test="priceFinal != null and priceFinal != ''">AND stockDaily.priceFinal=#{priceFinal}</if>
                 <if test="priceChange != null and priceChange != ''">AND stockDaily.priceChange=#{priceChange}</if>
                 <if test="priceStart != null and priceStart != ''">AND stockDaily.priceStart=#{priceStart}</if>
@@ -232,6 +241,7 @@
                 <when test="pagingParam.sortIndex eq 'marketCode'">marketCode</when>
                 <when test="pagingParam.sortIndex eq 'tradeDate'">tradeDate</when>
                 <when test="pagingParam.sortIndex eq 'stockName'">stockName</when>
+                <when test="pagingParam.sortIndex eq 'pricePrevious'">pricePrevious</when>
                 <when test="pagingParam.sortIndex eq 'priceFinal'">priceFinal</when>
                 <when test="pagingParam.sortIndex eq 'priceChange'">priceChange</when>
                 <when test="pagingParam.sortIndex eq 'priceStart'">priceStart</when>

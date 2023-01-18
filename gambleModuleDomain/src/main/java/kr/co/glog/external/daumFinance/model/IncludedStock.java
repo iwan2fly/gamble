@@ -11,7 +11,7 @@ public class IncludedStock {
     String  code;
     String  name;
     String  symbolCode;
-    Integer tradePrice;
+    Integer    tradePrice;
     String  change;
     Integer changePrice;
     String  changeRate;

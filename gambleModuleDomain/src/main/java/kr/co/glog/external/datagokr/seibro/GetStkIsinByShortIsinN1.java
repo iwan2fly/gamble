@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.exception.UnexpectedDataException;
 import kr.co.glog.domain.service.StockService;
+import kr.co.glog.domain.stock.MarketCode;
 import kr.co.glog.domain.stock.dao.CompanyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.Stock;
@@ -39,7 +40,7 @@ public class GetStkIsinByShortIsinN1 {
 
         // 코스피 시장의 종목들에 대해서
         StockParam stockParam = new StockParam();
-        stockParam.setMarketCode("kospi");
+        stockParam.setMarketCode( MarketCode.kospi );
         stockList = stockDao.getStockList(stockParam );
         for ( StockResult stockResult : stockList ) {
 
@@ -63,11 +64,11 @@ public class GetStkIsinByShortIsinN1 {
             stock.setIssueDate( result.getIssuDt() );
             stock.setStockTypeCode( result.getSecnKacdNm() );
 
-            stockService.updateInsert( stock );
+            stockDao.updateInsert( stock );
             Thread.sleep(300);
         }
 
-        stockParam.setMarketCode("kosdaq");
+        stockParam.setMarketCode( MarketCode.kosdaq );
         stockList = stockDao.getStockList(stockParam );
         for ( StockResult stockResult : stockList ) {
 
@@ -84,11 +85,11 @@ public class GetStkIsinByShortIsinN1 {
             stock.setIssueDate( result.getIssuDt() );
             stock.setStockTypeCode( result.getSecnKacdNm() );
 
-            stockService.updateInsert( stock );
+            stockDao.updateInsert( stock );
             Thread.sleep(300);
         }
 
-        stockParam.setMarketCode("konex");
+        stockParam.setMarketCode( MarketCode.konex );
         stockList = stockDao.getStockList(stockParam );
         for ( StockResult stockResult : stockList ) {
 
@@ -105,7 +106,7 @@ public class GetStkIsinByShortIsinN1 {
             stock.setIssueDate( result.getIssuDt() );
             stock.setStockTypeCode( result.getSecnKacdNm() );
 
-            stockService.updateInsert( stock );
+            stockDao.updateInsert( stock );
             Thread.sleep(300);
         }
 

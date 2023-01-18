@@ -16,4 +16,5 @@ public class StatStockParam extends StatStock {
     PagingParam pagingParam = new PagingParam();
 
     Integer endYear;
+    String  tradeYn;           // 거래량이 있는것만을 조회할 때 tradeYn ='Y'
 }

@@ -5,8 +5,6 @@ import kr.co.glog.domain.stock.entity.StockDaily;
 import kr.co.glog.domain.stock.mapper.StockDailyMapper;
 import kr.co.glog.domain.stock.model.StockDailyParam;
 import kr.co.glog.domain.stock.model.StockDailyResult;
-import kr.co.glog.domain.stock.model.StockDailyParam;
-import kr.co.glog.domain.stock.model.StockDailyResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -27,13 +25,14 @@ public class StockDailyDao {
      * @param endDate
      * @return
      */
-    public ArrayList<StockDailyResult> getStockListBetween ( String startDate, String endDate ) {
+    public ArrayList<StockDailyResult> getStockListBetween ( String marketCode, String startDate, String endDate ) {
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
         if ( endDate == null ) throw new ParameterMissingException( "endDate" );
 
         StockDailyParam stockDailyParam = new StockDailyParam();
         stockDailyParam.setStartDate( startDate );
         stockDailyParam.setEndDate( endDate );
+        stockDailyParam.setMarketCode( marketCode );
         return stockDailyMapper.selectStockListBetween( stockDailyParam );
     }
 
@@ -267,7 +266,7 @@ public class StockDailyDao {
         return stockDaily;
     }
 
-    public StockDaily saveStockDaily(StockDaily stockDaily) {
+    public StockDaily insertUpdateStockDaily(StockDaily stockDaily) {
         if ( stockDaily == null ) throw new ParameterMissingException( "StockDaily" );
         if ( stockDaily.getStockCode() == null || stockDaily.getTradeDate() == null ) throw new ParameterMissingException( "종목코드와 날짜는 필수값입니다.");
 
@@ -275,6 +274,19 @@ public class StockDailyDao {
             stockDailyMapper.insertStockDaily(stockDaily);
         } catch ( org.springframework.dao.DuplicateKeyException dke ) {
             stockDailyMapper.updateStockDaily(stockDaily);
+        }
+
+        return stockDaily;
+    }
+
+    public StockDaily updateInsertStockDaily(StockDaily stockDaily) {
+        if ( stockDaily == null ) throw new ParameterMissingException( "StockDaily" );
+        if ( stockDaily.getStockCode() == null || stockDaily.getTradeDate() == null ) throw new ParameterMissingException( "종목코드와 날짜는 필수값입니다.");
+
+        try {
+            stockDailyMapper.updateStockDaily(stockDaily);
+        } catch ( Exception e ) {
+            stockDailyMapper.insertStockDaily(stockDaily);
         }
 
         return stockDaily;

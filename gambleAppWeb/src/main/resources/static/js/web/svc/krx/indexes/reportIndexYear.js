@@ -10,16 +10,16 @@ let obj = {
 
     },
     data : {
-        serverParam : {},
+        periodCode: "year",
         statIndex: {},
         statIndexYearlyList: {},
         statIndexMonthlyList: {},
         statIndexWeeklyList: {},
         statIndexDailyList: {},
-        rateOfRiseList: {},
-        rateOfFallList: {},
-        volumeTradeDescList: {},
-        volumeTradeAscList: {},
+        priceDescList: {},
+        priceAscList: {},
+        volumeDescList: {},
+
     },
     watch : {
 
@@ -29,24 +29,22 @@ let obj = {
     },
     methods: {
         init : function () {
-            this.serverParam = serverParam;
             this.getStatIndex();
             this.getStatIndexYearlyList();
             this.getStatIndexMonthlyList();
             this.getStatIndexWeeklyList();
             this.getStatIndexDailyList();
-            this.getRateOfRiseList();
-            this.getRateOfFallList();
-            this.getVolumeTradeDescList();
-            this.getVolumeTradeAscList();
+            this.getPriceDescList();
+            this.getPriceAscList();
+            this.getVolumeDescList();
         },
         // 지수 통계 : 년간 / 월간 / 주간
         getStatIndex: function() {
 
             let param = {};
-            param.marketCode = serverParam.marketCode;
-            param.periodCode = serverParam.periodCode;
-            param.year = serverParam.year;
+            param.marketCode = _serverParam.marketCode;
+            param.periodCode = this.periodCode;
+            param.year = _serverParam.year;
 
             let callback = function( json ) {
                 if (json.responseCode == RestResponseStatus.OK) {
@@ -62,8 +60,8 @@ let obj = {
         getStatIndexYearlyList: function() {
 
             let param = {};
-            param.marketCode = serverParam.marketCode;
-            param.endYear = serverParam.year;
+            param.marketCode = _serverParam.marketCode;
+            param.endYear = _serverParam.year;
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
@@ -80,8 +78,8 @@ let obj = {
         getStatIndexMonthlyList: function() {
 
             let param = {};
-            param.marketCode = serverParam.marketCode;
-            param.year = serverParam.year;
+            param.marketCode = _serverParam.marketCode;
+            param.year = _serverParam.year;
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
@@ -97,8 +95,8 @@ let obj = {
         getStatIndexWeeklyList: function() {
 
             let param = {};
-            param.marketCode = serverParam.marketCode;
-            param.year = serverParam.year;
+            param.marketCode = _serverParam.marketCode;
+            param.year = _serverParam.year;
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
@@ -114,9 +112,9 @@ let obj = {
         getStatIndexDailyList: function() {
 
             let param = {};
-            param.marketCode = serverParam.marketCode;
-            param.startDate = serverParam.year + "0101";
-            param.endDate = serverParam.year + "1231";
+            param.marketCode = _serverParam.marketCode;
+            param.startDate = _serverParam.year + "0101";
+            param.endDate = _serverParam.year + "1231";
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
@@ -130,84 +128,61 @@ let obj = {
             _index.getStatIndexDailyList( param, callback );
         },
         // 상승률 상위 주식 리스트
-        getRateOfRiseList : function() {
+        getPriceDescList : function() {
             let param = {};
-            param.marketCode = serverParam.marketCode;
-            param.startDate = serverParam.year + "0101";
-            param.endDate = serverParam.year + "1231";
-            param.periodCode = 'year';
+            param.marketCode = _serverParam.marketCode;
+            param.periodCode = this.periodCode;
+            param.year = _serverParam.year;
             param.sortIndex = 'rateChange';
             param.sortType = 'desc';
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
-                    v.rateOfRiseList = json.object.statStockList;
+                    v.priceDescList = json.object.statStockList;
                 } else {
                     alert( json.responseMessage );
                 }
             }
 
-            _stock.getRateOfChangePriceList( param, callback );
+            _stock.getPriceDescList( param, callback );
         },
         // 상승률 상위 주식 리스트
-        getRateOfFallList : function() {
+        getPriceAscList : function() {
             let param = {};
-            param.marketCode = serverParam.marketCode;
-            param.startDate = serverParam.year + "0101";
-            param.endDate = serverParam.year + "1231";
-            param.periodCode = 'year';
+            param.marketCode = _serverParam.marketCode;
+            param.periodCode = this.periodCode;
+            param.year = _serverParam.year;
             param.sortIndex = 'rateChange';
             param.sortType = 'asc';
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
-                    v.rateOfFallList = json.object.statStockList;
+                    v.priceAscList = json.object.statStockList;
                 } else {
                     alert( json.responseMessage );
                 }
             }
 
-            _stock.getRateOfChangePriceList( param, callback );
+            _stock.getPriceAscList( param, callback );
         },
         // 거래량 상위 주식 리스트
-        getVolumeTradeDescList : function() {
+        getVolumeDescList : function() {
             let param = {};
-            param.marketCode = serverParam.marketCode;
-            param.startDate = serverParam.year + "0101";
-            param.endDate = serverParam.year + "1231";
-            param.periodCode = 'year';
+            param.marketCode = _serverParam.marketCode;
+            param.periodCode = this.periodCode;
+            param.year = _serverParam.year;
             param.sortIndex = 'volumeTrade';
             param.sortType = 'desc';
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
-                    v.volumeTradeDescList = json.object.statStockList;
+                    v.volumeDescList = json.object.statStockList;
                 } else {
                     alert( json.responseMessage );
                 }
             }
 
-            _stock.getVolumeTradeList( param, callback );
-        },
-        // 거래량 하위 주식 리스트
-        getVolumeTradeAscList : function() {
-            let param = {};
-            param.marketCode = serverParam.marketCode;
-            param.startDate = serverParam.year + "0101";
-            param.endDate = serverParam.year + "1231";
-            param.periodCode = 'year';
-            param.sortIndex = 'volumeTrade';
-            param.sortType = 'asc';
-
-            let callback = function( json ) {
-                if ( json.responseCode == RestResponseStatus.OK ) {
-                    v.volumeTradeAscList = json.object.statStockList;
-                } else {
-                    alert( json.responseMessage );
-                }
-            }
-
-            _stock.getVolumeTradeList( param, callback );
+            _stock.getVolumeDescList( param, callback );
         },
         // 주식 일봉/주봉/월봉/연봉 차트 그리기
         drawStatIndexChart : function( period, dom ) {

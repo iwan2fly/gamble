@@ -13,7 +13,8 @@
                 IFNULL(riseCount, 0) riseCount, IFNULL(evenCount,0) evenCount, IFNULL(fallCount, 0) fallCount
         FROM (
             SELECT  marketCode, MIN(priceLow) priceLow, MAX(priceHigh) priceHigh, ROUND(SUM(priceFinal)/COUNT(*),2) priceAverage, COUNT(*) dataCount,
-                    SUM(volumeTrade) volumeTrade, MIN(volumeTrade) volumeLow, MAX(volumeTrade) volumeHigh, ROUND(SUM(volumeTrade)/COUNT(*),2) volumeAverage
+                    SUM(volumeTrade) volumeTrade, MIN(volumeTrade) volumeLow, MAX(volumeTrade) volumeHigh, ROUND(SUM(volumeTrade)/COUNT(*),2) volumeAverage,
+                    MIN(tradeDate) startDate, MAX(tradeDate) endDate
             FROM    indexDaily
             WHERE   tradeDate BETWEEN #{startDate} AND #{endDate} AND marketCode=#{marketCode}
         ) stat1

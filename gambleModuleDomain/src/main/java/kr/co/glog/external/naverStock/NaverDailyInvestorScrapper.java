@@ -187,7 +187,7 @@ public class NaverDailyInvestorScrapper {
             ArrayList<DaumInvestorStock> daumInvestorStockList = getDailyInvestorList( stockCode, perPage, page );
 
             for ( DaumInvestorStock daumInvestorStock : daumInvestorStockList ) {
-                StockDaily stockDaily = stockDailyService.convertToStockDailyFromDaumInvestorStock( daumInvestorStock );
+                StockDaily stockDaily = new StockDaily( daumInvestorStock );
                 stockDaily.setStockCode( stockCode );
                 stockDailyList.add( stockDaily );
             }
@@ -224,7 +224,7 @@ public class NaverDailyInvestorScrapper {
 
         ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
         for ( DaumInvestorStock daumInvestorStock : daumInvestorStockList ) {
-            StockDaily stockDaily = stockDailyService.convertToStockDailyFromDaumInvestorStock( daumInvestorStock );
+            StockDaily stockDaily = new StockDaily( daumInvestorStock );
             if ( stockDaily.getStockCode() == null ) stockDaily.setStockCode( stockCode );
             stockDailyList.add( stockDaily );
         }

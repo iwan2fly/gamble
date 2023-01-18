@@ -1,12 +1,13 @@
 package kr.co.glog.domain.service;
 
 
-import kr.co.glog.common.exception.ParameterMissingException;
+import kr.co.glog.common.utils.DateUtil;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.Stock;
 import kr.co.glog.domain.stock.entity.StockDaily;
 import kr.co.glog.domain.stock.model.StockResult;
+import kr.co.glog.external.datagokr.fsc.GetStockPriceInfo;
 import kr.co.glog.external.datagokr.fsc.model.GetStockPriceInfoResult;
 import kr.co.glog.external.daumFinance.DaumDailyInvestorScrapper;
 import kr.co.glog.external.daumFinance.DaumDailyStockScrapper;
@@ -32,6 +33,63 @@ public class StockDailyService {
     private final DaumDailyInvestorScrapper daumDailyInvestorScrapper;
     private final StockDailyDao stockDailyDao;
     private final StockDao stockDao;
+    private final GetStockPriceInfo getStockPriceInfo;          // 일별 주식 시세 - 금융위원회
+
+    /**
+     * KRX의 특정 종목의 전체 일별 데이터를 upsert
+     * @param stockCode
+     * @throws InterruptedException
+     */
+    public void upsertDailyStockFromKrx( String stockCode ) throws InterruptedException {
+
+        ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
+        ArrayList<GetStockPriceInfoResult> priceList = getStockPriceInfo.getStockPriceInfo( stockCode );
+
+        // DB에 맞게 변환
+        for ( GetStockPriceInfoResult result : priceList ) {
+            StockDaily stockDaily = new StockDaily( result );
+            stockDailyList.add( stockDaily );
+        }
+
+        // 변환된 녀석을 저장
+        for ( StockDaily stockDaily : stockDailyList ) {
+            stockDailyDao.updateInsertStockDaily( stockDaily );
+        }
+    }
+
+    /**
+     * KRX의 특정 종목의 전체 일별 데이터를 upsert
+     * @param targetDate
+     * @throws InterruptedException
+     */
+    public void upsertDailyDateFromKrx( String targetDate ) throws InterruptedException {
+
+        ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
+        ArrayList<GetStockPriceInfoResult> priceList = getStockPriceInfo.getDatePriceInfo( targetDate );
+
+        // DB에 맞게 변환
+        for ( GetStockPriceInfoResult result : priceList ) {
+            StockDaily stockDaily = new StockDaily( result );
+            stockDailyList.add( stockDaily );
+        }
+
+        // 변환된 녀석을 저장
+        for ( StockDaily stockDaily : stockDailyList ) {
+            stockDailyDao.updateInsertStockDaily( stockDaily );
+        }
+
+        // 조회하는 날짜가 어제 데이터이면 stock 테이블도 업데이트하자.
+        // 금융위원회 주식정보는 어제(사실은 1영업일 전) 데이터가 가장 최신
+        if ( targetDate.equals( DateUtil.getYesterday() ) ) {
+            for (StockDaily stockDaily : stockDailyList) {
+                Stock stock = new Stock(stockDaily);
+                stockDao.updateInsert( stock );
+            }
+        }
+
+
+    }
+
 
     /**
      * 특정 종목의 전체 일별 데이터를 StockDaily 테이블에 인서트
@@ -53,7 +111,7 @@ public class StockDailyService {
             ArrayList<DaumDailyStock> daumDailyStockList = daumDailyStockScrapper.getDailyStockList( stockCode, perPage, page );
 
             for ( DaumDailyStock daumDailyStock : daumDailyStockList ) {
-                StockDaily stockDaily = convertToStockDailyFromDaumDailyStock( daumDailyStock );
+                StockDaily stockDaily = new StockDaily( daumDailyStock );
                 if ( stockDaily.getStockCode() == null || stockDaily.getStockCode().equals("") ) stockDaily.setStockCode( stockCode );
                 stockDailyList.add( stockDaily );
             }
@@ -69,6 +127,7 @@ public class StockDailyService {
         for ( StockDaily stockDaily : stockDailyList ) {
 
             // 주식명, 시장코드 가져오려고 조회
+            // 현재 식
             StockResult stockResult = null;
             try {
                 stockResult = stockDao.getStock( stockDaily.getStockCode() );
@@ -79,10 +138,15 @@ public class StockDailyService {
             if ( stockResult != null ) {
                 stockDaily.setStockName(stockResult.getStockName());
                 stockDaily.setMarketCode(stockResult.getMarketCode());
+                if ( stockDaily.getVolumeTotal() == null && stockResult.getStockCount() != null ) {
+                    stockDaily.setVolumeTotal( stockResult.getStockCount() );
+                    if ( stockDaily.getVolumeTotal() != null )  stockDaily.setPriceTotal( stockResult.getStockCount() * stockDaily.getPriceFinal() );
+                }
             }
 
             try {
                 stockDailyDao.insertStockDaily( stockDaily );
+                stockDao.saveStock( stockDaily );
             } catch ( org.springframework.dao.DuplicateKeyException dke ) {
                 log.debug( dke.getMessage() );
                 break;
@@ -110,7 +174,7 @@ public class StockDailyService {
             ArrayList<DaumInvestorStock> daumInvestorStockList = daumDailyInvestorScrapper.getDailyInvestorList( stockCode, perPage, page );
 
             for ( DaumInvestorStock daumInvestorStock : daumInvestorStockList ) {
-                StockDaily stockDaily = convertToStockDailyFromDaumInvestorStock( daumInvestorStock );
+                StockDaily stockDaily = new StockDaily( daumInvestorStock );
                 stockDaily.setStockCode( stockCode );
                 stockDailyList.add( stockDaily );
             }
@@ -130,12 +194,14 @@ public class StockDailyService {
             try {
                 stockResult = stockDao.getStock( stockDaily.getStockCode() );
             } catch ( Exception e ) {
-
+                e.printStackTrace();
             }
 
             if ( stockResult != null ) {
-                stockDaily.setStockName(stockResult.getStockName());
-                stockDaily.setMarketCode(stockResult.getMarketCode());
+                stockDaily.setStockName( stockResult.getStockName() );
+                stockDaily.setMarketCode( stockResult.getMarketCode() );
+                if ( stockDaily.getVolumeTotal() == null ) stockDaily.setVolumeTotal( stockResult.getStockCount() );
+                if ( stockDaily.getVolumeTotal() != null ) stockDaily.setPriceTotal( stockResult.getStockCount() * stockDaily.getPriceFinal() );
             }
 
             try {
@@ -179,14 +245,14 @@ public class StockDailyService {
 
         // 우리 DB에 맞게 컨버트
         for ( DaumDailyStock daumDailyStock : daumDailyStockList ) {
-            StockDaily stockDaily = convertToStockDailyFromDaumDailyStock( daumDailyStock );
+            StockDaily stockDaily = new StockDaily( daumDailyStock );
             stockDailyList.add( stockDaily );
         }
 
         for ( int i = 0; i < stockDailyList.size(); i++ ) {
             StockDaily stockDaily = stockDailyList.get(i);
 
-            // 주식명, 시장코드 가져오려고 조회
+            // 현재 Stock 테이블 정보 읽어옴
             StockResult stockResult = null;
             try {
                 stockResult = stockDao.getStock( stockDaily.getStockCode() );
@@ -197,6 +263,10 @@ public class StockDailyService {
             if ( stockResult != null ) {
                 stockDaily.setStockName(stockResult.getStockName());
                 stockDaily.setMarketCode(stockResult.getMarketCode());
+                if ( stockDaily.getVolumeTotal() == null && stockResult.getStockCount() != null ) {
+                    stockDaily.setVolumeTotal( stockResult.getStockCount() );
+                    if ( stockDaily.getVolumeTotal() != null )  stockDaily.setPriceTotal( stockResult.getStockCount() * stockDaily.getPriceFinal() );
+                }
             }
 
             try {
@@ -208,7 +278,7 @@ public class StockDailyService {
                     stock.setCurrentPrice( stockDaily.getPriceFinal() );        // 마지막 가격
                     stockDao.updateStock( stock );
                 }
-                stockDailyDao.saveStockDaily( stockDaily );
+                stockDailyDao.insertUpdateStockDaily( stockDaily );
             } catch ( org.springframework.dao.DuplicateKeyException dke ) {
 
             }
@@ -228,7 +298,7 @@ public class StockDailyService {
 
         ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
         for ( DaumInvestorStock daumInvestorStock : daumInvestorStockList ) {
-            StockDaily stockDaily = convertToStockDailyFromDaumInvestorStock( daumInvestorStock );
+            StockDaily stockDaily = new StockDaily( daumInvestorStock );
             if ( stockDaily.getStockCode() == null ) stockDaily.setStockCode( stockCode );      // 해당 페이지의 데이터에는 stockCode가 없어서 세팅
             stockDailyList.add( stockDaily );
         }
@@ -247,6 +317,12 @@ public class StockDailyService {
             if ( stockResult != null ) {
                 stockDaily.setStockName(stockResult.getStockName());
                 stockDaily.setMarketCode(stockResult.getMarketCode());
+                /*  다음 inverstor stock 에 priceFinal 이 없음, stockCount 도 없음
+                if ( stockDaily.getVolumeTotal() == null && stockResult.getStockCount() != null ) {
+                    stockDaily.setVolumeTotal( stockResult.getStockCount() );
+                    if ( stockDaily.getVolumeTotal() != null )  stockDaily.setPriceTotal( stockResult.getStockCount() * stockDaily.getPriceFinal() );
+                }
+                */
             }
 
             try {
@@ -270,80 +346,5 @@ public class StockDailyService {
 
     }
 
-
-
-
-    /**
-     * DaumDailyStock -> StockDaily
-     * @param daumDailyStock
-     */
-    public StockDaily convertToStockDailyFromDaumDailyStock(DaumDailyStock daumDailyStock ) {
-
-        if ( daumDailyStock == null ) throw new ParameterMissingException( "daumDailyStock" );
-
-        StockDaily stockDaily = new StockDaily();
-        stockDaily.setStockCode( daumDailyStock.getSymbolCode() != null ? daumDailyStock.getSymbolCode().substring( 1 ) : "" );
-        stockDaily.setTradeDate( daumDailyStock.getDate().substring(0, 10).replaceAll("-", "") ) ;
-        stockDaily.setPriceFinal( daumDailyStock.getTradePrice() );
-        stockDaily.setPriceChange( daumDailyStock.getChangePrice() );
-        stockDaily.setPriceStart( daumDailyStock.getOpeningPrice() );
-        stockDaily.setPriceHigh( daumDailyStock.getHighPrice() );
-        stockDaily.setPriceLow( daumDailyStock.getLowPrice() );
-        stockDaily.setVolumeTrade( daumDailyStock.getAccTradeVolume() );
-        stockDaily.setPriceTrade( daumDailyStock.getAccTradePrice() );
-        stockDaily.setRateChange( Float.parseFloat( daumDailyStock.getChangeRate() ) * 100 );
-
-        if ( daumDailyStock.getChange() != null && daumDailyStock.getChange().equals("FALL") ) stockDaily.setPriceChange( -stockDaily.getPriceChange() );
-
-        return stockDaily;
-    }
-
-    /**
-     * DaumInvestorStock -> StockDaily
-     * @param daumInvestorStock
-     */
-    public StockDaily convertToStockDailyFromDaumInvestorStock(DaumInvestorStock daumInvestorStock ) {
-
-        if ( daumInvestorStock == null ) throw new ParameterMissingException( "daumInvestorStock" );
-        log.debug( daumInvestorStock.toString() );
-
-        StockDaily stockDaily = new StockDaily();
-        stockDaily.setTradeDate( daumInvestorStock.getDate().substring(0, 10).replaceAll("-", "") ) ;
-        stockDaily.setVolumeOrg( daumInvestorStock.getInstitutionStraightPurchaseVolume() );
-        stockDaily.setVolumeForeigner( daumInvestorStock.getForeignStraightPurchaseVolume() );
-        stockDaily.setForeignerStockCount( daumInvestorStock.getForeignOwnShares() );
-        stockDaily.setForeignerHoldRate( daumInvestorStock.getForeignOwnSharesRate() * 100 );
-
-        return stockDaily;
-    }
-
-    /**
-     * GetPriceStockInfoResult -> StockDaily
-     * @param getStockPriceInfoResult
-     */
-    public StockDaily convertToStockDailyFromFscStockInfo(GetStockPriceInfoResult getStockPriceInfoResult) {
-
-        if ( getStockPriceInfoResult == null ) throw new ParameterMissingException( "getPriceStockInfoResult" );
-        log.debug( getStockPriceInfoResult.toString() );
-
-        StockDaily stockDaily = new StockDaily();
-        stockDaily.setIsin( getStockPriceInfoResult.getIsinCd() );                  // isin code
-        stockDaily.setTradeDate( getStockPriceInfoResult.getBasDt() ) ;             // 날짜
-        stockDaily.setStockCode( getStockPriceInfoResult.getSrtnCd() );             // 종목코드(6자리)
-        stockDaily.setMarketCode( getStockPriceInfoResult.getMrktCtg() );           // 시장코드
-        stockDaily.setStockName( getStockPriceInfoResult.getItmsNm() );             // 종목명
-        stockDaily.setPriceStart( getStockPriceInfoResult.getMkp() );               // 시가
-        stockDaily.setPriceHigh( getStockPriceInfoResult.getHipr() );               // 고가
-        stockDaily.setPriceLow( getStockPriceInfoResult.getLopr() );                // 저가
-        stockDaily.setPriceFinal( getStockPriceInfoResult.getClpr() );              // 종가
-        stockDaily.setPriceChange( getStockPriceInfoResult.getVs() );               // 대비
-        stockDaily.setRateChange( getStockPriceInfoResult.getFltRt() * 100 / 100f );             // 등락율
-        stockDaily.setVolumeTrade( getStockPriceInfoResult.getTrqu() );             // 거래량
-        stockDaily.setPriceTrade( getStockPriceInfoResult.getTrPrc() );             // 거래대금
-        stockDaily.setVolumeTotal( getStockPriceInfoResult.getLstgStCnt() );        // 주식수
-        stockDaily.setPriceTotal( getStockPriceInfoResult.getMrktTotAmt() );        // 시총
-
-        return stockDaily;
-    }
 }
 

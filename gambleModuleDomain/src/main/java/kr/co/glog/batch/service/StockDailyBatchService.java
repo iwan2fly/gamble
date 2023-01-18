@@ -4,7 +4,6 @@ import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.exception.NetworkCommunicationFailureException;
 import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
-import kr.co.glog.domain.service.StatIndexService;
 import kr.co.glog.domain.service.StatStockService;
 import kr.co.glog.domain.service.StockDailyService;
 import kr.co.glog.domain.stock.MarketCode;
@@ -43,67 +42,33 @@ public class StockDailyBatchService {
     public void upsertFromKrxDataAll() {
 
         String batch = "[BATCH] 일별 종목 거래데이터 전체 업데이트 - 금융위원회 주식정보";
+        String startDate = "20200101";
+        String endDate = DateUtil.getToday();
 
         long time = System.currentTimeMillis();
         log.debug( batch + "시작 : " + time);
 
         try {
             time = System.currentTimeMillis();
-            log.debug( batch + "삼성전자 데이터로 모든 날짜 목록 확보시작 : " + time);
+            log.debug( batch + "삼성전자 데이터로 날짜 목록 확보시작 : " + time);
 
             // 삼성전자 데이터로, 모든 날짜 목록을 만들자
-            Document document = getStockPriceInfo.getDocument( "", "KR7005930003", "", "20200124", "20210107", 1, 10000 );
-            // Document document = getStockPriceInfo.getDocument( "", "KR7005930003", "20220124", "", "", 1, 10000 );
+            Document document = getStockPriceInfo.getDocument( "", "005930", "", startDate, endDate, 1, 20000 );
             ArrayList<GetStockPriceInfoResult> samsungList = getStockPriceInfo.getStockPriceInfoList( document );
-
             time = System.currentTimeMillis();
-            log.debug( batch + "삼성전자 데이터로 모든 날짜 목록 확보완료 : " + time);
+            log.debug( batch + "삼성전자 데이터로  날짜 목록 확보완료 : " + time);
 
-            // 날짜 하나하나씩, 전체 종목 데이터를 조회하자
+            // 날짜 하나하나씩, 전체 종목 데이터를 처리하자
             for ( GetStockPriceInfoResult samsungResult : samsungList ) {
 
                 // 목록 초기화
                 ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
 
                 time = System.currentTimeMillis();
-                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 조회 시작 : " + time);
-
-                // 특정 날짜의 전체 종목 데이터 가져옴
-                int failCount = 0;
-                while ( true ) {
-                    try {
-                        document = getStockPriceInfo.getDocument("", "", samsungResult.getBasDt(), "", "", 1, 10000);
-                        break;
-                    } catch (NetworkCommunicationFailureException ncfe) {
-                        failCount++;
-                        Thread.sleep( 5000 );
-                        if ( failCount >= 3 ) throw ncfe;
-                    }
-                }
-
+                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 처리 시작 : " + time);
+                stockDailyService.upsertDailyDateFromKrx( samsungResult.getBasDt() );
                 time = System.currentTimeMillis();
-                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 조회 종료 : " + time);
-
-                ArrayList<GetStockPriceInfoResult> list = getStockPriceInfo.getStockPriceInfoList( document );
-
-                // StockDaily 형태로 변환
-                time = System.currentTimeMillis();
-                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 변환 시작 : " + time);
-                for ( GetStockPriceInfoResult result : list ) {
-                    StockDaily stockDaily = stockDailyService.convertToStockDailyFromFscStockInfo( result );
-                    stockDailyList.add( stockDaily );
-                }
-                time = System.currentTimeMillis();
-                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 변환 종료 : " + time);
-
-                // 변환된 녀석을 저장
-                for ( StockDaily stockDaily : stockDailyList ) {
-                    time = System.currentTimeMillis();
-                    log.debug( batch + "특정종목 (" + stockDaily.getStockName() + ") 데이터 저장 시작 : " + time);
-                    stockDailyDao.saveStockDaily( stockDaily );
-                    time = System.currentTimeMillis();
-                    log.debug( batch + "특정종목 (" + stockDaily.getStockName() + ") 데이터 저장 종료 : " + time);
-                }
+                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 처리 종료 : " + time);
             }
 
         } catch ( Exception e ) {
@@ -116,7 +81,6 @@ public class StockDailyBatchService {
         }
 
     }
-
 
 
     /**
@@ -137,57 +101,71 @@ public class StockDailyBatchService {
 
 
             // 삼성전자 데이터로, 모든 최근 10일 목록을 만들자
-            Document document = getStockPriceInfo.getDocument( "", "KR7005930003", "", beginDate, endDate, 1, 10000 );
+            Document document = getStockPriceInfo.getDocument( "", "005930", "", beginDate, endDate, 1, 10 );
             ArrayList<GetStockPriceInfoResult> samsungList = getStockPriceInfo.getStockPriceInfoList( document );
 
             time = System.currentTimeMillis();
             log.debug( batch + "삼성전자 데이터로 10일 목록 확보완료 : " + time);
 
-            // 날짜 하나하나씩, 전체 종목 데이터를 조회하자
+            // 날짜 하나하나씩, 전체 종목 데이터를 처리하자
             for ( GetStockPriceInfoResult samsungResult : samsungList ) {
 
                 // 목록 초기화
                 ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
 
                 time = System.currentTimeMillis();
-                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 조회 시작 : " + time);
+                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 처리 시작 : " + time);
+                stockDailyService.upsertDailyDateFromKrx( samsungResult.getBasDt() );
+                time = System.currentTimeMillis();
+                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 처리 종료 : " + time);
+            }
 
-                // 특정 날짜의 전체 종목 데이터 가져옴
-                int failCount = 0;
-                while ( true ) {
-                    try {
-                        document = getStockPriceInfo.getDocument("", "", samsungResult.getBasDt(), "", "", 1, 10000);
-                        break;
-                    } catch (NetworkCommunicationFailureException ncfe) {
-                        failCount++;
-                        Thread.sleep( 5000 );
-                        if ( failCount >= 3 ) throw ncfe;
-                    }
-                }
+        } catch ( Exception e ) {
+            time = System.currentTimeMillis();
+            log.debug( batch + "에러 : " + time);
+            e.printStackTrace();
+        } finally {
+            time = System.currentTimeMillis();
+            log.debug( batch + "종료 : " + time);
+        }
+
+    }
+
+    /**
+     * KRX 데이터로, 특정월 데이터 업서트
+     */
+    public void upsertFromKrxDataMonthOf( String yearMonth ) {
+
+        String batch = "[BATCH] 일별 종목 거래데이터 " + yearMonth + "월 업데이트 - 금융위원회 주식정보";
+
+        long time = System.currentTimeMillis();
+        log.debug( batch + "시작 : " + time);
+
+        try {
+            time = System.currentTimeMillis();
+            log.debug( batch + "삼성전자 데이터로 " + yearMonth + "월 목록 확보시작 : " + time);
+            String startDate = yearMonth + "01";
+            String endDate = yearMonth + "31";
+
+
+            // 삼성전자 데이터로, 모든 최근 10일 목록을 만들자
+            Document document = getStockPriceInfo.getDocument( "", "005930", "", startDate, endDate, 1, 40 );
+            ArrayList<GetStockPriceInfoResult> samsungList = getStockPriceInfo.getStockPriceInfoList( document );
+
+            time = System.currentTimeMillis();
+            log.debug( batch + "삼성전자 데이터로 " + yearMonth + "월 목록 확보완료 : " + time);
+
+            // 날짜 하나하나씩, 전체 종목 데이터를 처리하자
+            for ( GetStockPriceInfoResult samsungResult : samsungList ) {
+
+                // 목록 초기화
+                ArrayList<StockDaily> stockDailyList = new ArrayList<StockDaily>();
 
                 time = System.currentTimeMillis();
-                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 조회 종료 : " + time);
-
-                ArrayList<GetStockPriceInfoResult> list = getStockPriceInfo.getStockPriceInfoList( document );
-
-                // StockDaily 형태로 변환
+                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 처리 시작 : " + time);
+                stockDailyService.upsertDailyDateFromKrx( samsungResult.getBasDt() );
                 time = System.currentTimeMillis();
-                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 변환 시작 : " + time);
-                for ( GetStockPriceInfoResult result : list ) {
-                    StockDaily stockDaily = stockDailyService.convertToStockDailyFromFscStockInfo( result );
-                    stockDailyList.add( stockDaily );
-                }
-                time = System.currentTimeMillis();
-                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 변환 종료 : " + time);
-
-                // 변환된 녀석을 저장
-                for ( StockDaily stockDaily : stockDailyList ) {
-                    time = System.currentTimeMillis();
-                    log.debug( batch + "특정종목 (" + stockDaily.getStockName() + ") 데이터 저장 시작 : " + time);
-                    stockDailyDao.saveStockDaily( stockDaily );
-                    time = System.currentTimeMillis();
-                    log.debug( batch + "특정종목 (" + stockDaily.getStockName() + ") 데이터 저장 종료 : " + time);
-                }
+                log.debug( batch + "특정날짜 (" + samsungResult.getBasDt() + ") 데이터 처리 종료 : " + time);
             }
 
         } catch ( Exception e ) {
@@ -218,17 +196,17 @@ public class StockDailyBatchService {
 
         // 코스피 전종목 조회
         StockParam stockParam = new StockParam();
-        stockParam.setMarketCode("kospi");
+        stockParam.setMarketCode( MarketCode.kospi );
         stockParam.setPagingParam(pagingParam);
         ArrayList<StockResult> kospiList = stockDao.getStockList(stockParam);
 
         // 코스닥
-        stockParam.setMarketCode("kosdaq");
+        stockParam.setMarketCode( MarketCode.kosdaq );
         stockParam.setPagingParam(pagingParam);
         ArrayList<StockResult> kosdaqList = stockDao.getStockList(stockParam);
 
         // 코넥스
-        stockParam.setMarketCode("konex");
+        stockParam.setMarketCode( MarketCode.konex );
         stockParam.setPagingParam(pagingParam);
         ArrayList<StockResult> konexList = stockDao.getStockList(stockParam);
 
@@ -273,17 +251,17 @@ public class StockDailyBatchService {
 
         // 코스피 전종목 조회
         StockParam stockParam = new StockParam();
-        stockParam.setMarketCode("kospi");
+        stockParam.setMarketCode( MarketCode.kospi );
         stockParam.setPagingParam( pagingParam );
         ArrayList<StockResult> kospiList = stockDao.getStockList(stockParam);
 
         // 코스닥
-        stockParam.setMarketCode("kosdaq");
+        stockParam.setMarketCode( MarketCode.kosdaq );
         stockParam.setPagingParam( pagingParam );
         ArrayList<StockResult> kosdaqList = stockDao.getStockList(stockParam);
 
         // 코넥스
-        stockParam.setMarketCode("konex");
+        stockParam.setMarketCode( MarketCode.konex );
         stockParam.setPagingParam( pagingParam );
         ArrayList<StockResult> konexList = stockDao.getStockList(stockParam);
 
@@ -332,7 +310,7 @@ public class StockDailyBatchService {
 
         IndexDailyParam indexDailyParam = new IndexDailyParam();
         indexDailyParam.setMarketCode( MarketCode.kospi );
-        indexDailyParam.setBeforeDate( DateUtil.getToday() );
+        indexDailyParam.setEndDate( DateUtil.getToday() );
         indexDailyParam.setPagingParam( pagingParam );
 
         ArrayList<IndexDailyResult> indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
@@ -351,27 +329,26 @@ public class StockDailyBatchService {
         try {
             String startDate = DateUtil.getFirstDateOfWeek(yyyymmdd);
             String endDate = DateUtil.getLastDateOfWeek(yyyymmdd);
-            StockDailyParam stockDailyParam = new StockDailyParam();
-            stockDailyParam.setStartDate(startDate);
-            stockDailyParam.setEndDate(endDate);
-            ArrayList<StockDailyResult> stockDailyList = stockDailyDao.getStockDailyList(stockDailyParam);
+            ArrayList<StockDailyResult> stockDailyList = stockDailyDao.getStockListBetween( MarketCode.kospi, startDate, endDate );
+            ArrayList<StockDailyResult> kosdaqList = stockDailyDao.getStockListBetween( MarketCode.kosdaq, startDate, endDate );
+            stockDailyList.addAll( kosdaqList );
 
             int count = 0;
             for (StockDailyResult stockDailyResult : stockDailyList) {
 
                 count++;
-                log.debug( batch + " [" + count + " / " + stockDailyList.size() + "] " + stockDailyResult.getStockName() + " 시작" );
-
-                // 주간
-                statStockService.makeStatStockWeek(stockDailyResult.getStockCode(), yyyymmdd);
-
-                // 월간
-                statStockService.makeStatStockMonth(stockDailyResult.getStockCode(), yyyymmdd.substring(0, 6));
+                log.debug( batch + " [" + count + " / " + stockDailyList.size() + "] " + stockDailyResult.getStockCode() + " 시작" );
 
                 // 연간
                 statStockService.makeStatStockYear(stockDailyResult.getStockCode(), yyyymmdd.substring(0, 4));
 
-                log.debug( batch + " [" + count + " / " + stockDailyList.size() + "] " + stockDailyResult.getStockName() + " 종료" );
+                // 월간
+                statStockService.makeStatStockMonth(stockDailyResult.getStockCode(), yyyymmdd.substring(0, 6));
+
+                // 주간
+                statStockService.makeStatStockWeek(stockDailyResult.getStockCode(), yyyymmdd);
+
+                log.debug( batch + " [" + count + " / " + stockDailyList.size() + "] " + stockDailyResult.getStockCode() + " 종료" );
             }
         } catch ( Exception e ) {
             time = System.currentTimeMillis();

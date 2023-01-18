@@ -142,16 +142,15 @@ public class GetStockDailyPriceScheduler {
         // 코스피, 코스닥, 코넥스 전종목 조회
         StockParam stockParam = new StockParam();
         stockParam.setPagingParam( pagingParam );
-        stockParam.setMarketCode("kospi");
-        stockParam.setStartStockCode("140700");
+        stockParam.setMarketCode( MarketCode.kospi );
 
         ArrayList<StockResult> kospiList = stockDao.getStockList(stockParam);
         stockParam.setPagingParam( pagingParam );
-        stockParam.setMarketCode("kosdaq");
+        stockParam.setMarketCode( MarketCode.kosdaq );
 
         ArrayList<StockResult> kosdaqList = stockDao.getStockList(stockParam);
         stockParam.setPagingParam( pagingParam );
-        stockParam.setMarketCode("konex");
+        stockParam.setMarketCode( MarketCode.konex );
 
         ArrayList<StockResult> konexList = stockDao.getStockList(stockParam);
         ArrayList<StockResult> stockList = new ArrayList<StockResult>();
@@ -439,10 +438,56 @@ public class GetStockDailyPriceScheduler {
 
 
 
-    @Scheduled(cron = "0 35 20 12 * * ")
+    @Scheduled(cron = "0 1 18 18 * * ")
     public void test() throws InterruptedException {
 
-        statStockService.makeStatStockAll();
-   //     stockDailyBatchService.makeStatStockToday();
+     //   statIndexService.makeStatIndexAll();
+//        statStockService.makeStatStockYear( "2023" );
+
+        for ( int i = 1; i <= 12; i++ ) {
+            String month = i < 9 ? "0"+ i : ""+i;
+            stockDailyBatchService.upsertFromKrxDataMonthOf( 2021 + month );
+        }
+
+        for ( int i = 1; i <= 12; i++ ) {
+            String month = i < 9 ? "0"+ i : ""+i;
+            stockDailyBatchService.upsertFromKrxDataMonthOf( 2020 + month );
+        }
+
+        // 다음 데이터로 종목 UPSERT
+//        stockDailyBatchService.upsertDailyStockDataBatchFromDaumDaily();
+  //    stockDailyService.upsertStockDailyFromDaumDaily( "000020" );
+
+    //    stockDailyBatchService.upsertDailyStockDataBatchFromDaumDaily();
+ //      stockDailyBatchService.makeStatStockToday();
+
+
+      //    stockDailyService.upsertDailyStockFromKrx( "049960" );
+        stockDailyService.upsertDailyDateFromKrx( "20230117" );
+        // stockDailyService.insertDailyStockAllFromDaumInvestor( "049960" );
+
+        /*
+        statStockService.makeStatStockYear( "2020" );
+        statStockService.makeStatStockYear( "2021" );
+        statStockService.makeStatStockYear( "2022" );
+
+        // 월간
+        for ( int year = 2020; year <= 2022; year++ ) {
+            for (int i = 1; i <= 12; i++) {
+                String month = i < 10 ? "0" + i : "" + i;
+                statStockService.makeStatStockMonth( "" + year + month );
+            }
+        }
+
+
+        int date = 20230101;
+        while ( date < 20230113 ) {
+            String dateStr = "" + date;
+            statStockService.makeStatStockWeek( dateStr );
+
+            dateStr = DateUtil.addDate( dateStr, "D", "yyyyMMdd", 7 );
+            date = Integer.parseInt( dateStr );
+        }
+*/
     }
 }

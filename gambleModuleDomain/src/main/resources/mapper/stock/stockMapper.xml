@@ -70,7 +70,6 @@
                 <if test="suspendYn != null and suspendYn != ''">AND stock.suspendYn=#{suspendYn}</if>
                 <if test="lastTradeDate != null and lastTradeDate != ''">AND stock.lastTradeDate=#{lastTradeDate}</if>
                 <if test="stockName != null and stockName != ''">AND stock.stockName=#{stockName}</if>
-                <if test="stockCode != null and stockCode != ''">AND stock.stockCode=#{stockCode}</if>
                 <if test="currentPrice != null and currentPrice != ''">AND stock.currentPrice=#{currentPrice}</if>
                 <if test="marketCode != null and marketCode != ''">AND stock.marketCode=#{marketCode}</if>
                 <if test="stockCount != null and stockCount != ''">AND stock.stockCount=#{stockCount}</if>
@@ -79,7 +78,6 @@
                 <if test="foreignersStockLimit != null and foreignersStockLimit != ''">AND stock.foreignersStockLimit=#{foreignersStockLimit}</if>
                 <if test="foreignersStockCount != null and foreignersStockCount != ''">AND stock.foreignersStockCount=#{foreignersStockCount}</if>
                 <if test="startStockCode != null and startStockCode != ''">AND stock.stockCode >= #{startStockCode}</if>
-
                 <if test="pagingParam.filter != null and pagingParam.filter != ''">AND stock.stockName like CONCAT('%',#{pagingParam.filter},'%')</if>
             </trim>
         </where>

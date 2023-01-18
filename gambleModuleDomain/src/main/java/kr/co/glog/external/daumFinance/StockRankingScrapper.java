@@ -155,7 +155,7 @@ public class StockRankingScrapper {
             ArrayList<RankingStock> rankingStockList = getRankingStockList( market, page );
 
             for ( RankingStock rankingStock : rankingStockList ) {
-                Stock stock = stockService.getStockFromRankingStock( rankingStock );
+                Stock stock = new Stock( rankingStock );
                 stockList.add( stock );
             }
 

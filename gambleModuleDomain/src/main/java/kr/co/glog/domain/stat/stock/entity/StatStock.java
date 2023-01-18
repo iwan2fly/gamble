@@ -32,13 +32,15 @@ public class StatStock extends EntityModel {
     Integer priceAverage;                       // 평균가
     Integer priceStandardDeviation;             // 가격 표준편차
     Integer priceChange;                        // 변동금액
+    Long    priceTotal;                         // 기간 마지막 시총
+    Long    priceTotalPrevious;                 // 기간 이전 마지막 시총
     Float   rateChange;                         // 변동률
     Long    volumeTrade;                        // 거래량
     Long    volumeLow;                          // 최저거래량
     Long    volumeHigh;                         // 최고거래량
     Long    volumeAverage;                      // 평균거래량
     Long    volumeStandardDeviation;            // 거래량 표준편차
-    Long    foreignerPrevious;                    // 외국인 보유량 이전
+    Long    foreignerPrevious;                  // 외국인 보유량 이전
     Long    foreignerStart;                     // 외국인 보유량 최초
     Long    foreignerLow;                       // 외국인 보유량 최소
     Long    foreignerHigh;                      // 외국인 보유량 최대

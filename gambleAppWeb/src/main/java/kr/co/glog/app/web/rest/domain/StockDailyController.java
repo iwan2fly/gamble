@@ -54,7 +54,7 @@ public class StockDailyController {
     public RestResponse save(HttpServletRequest request, HttpServletResponse response, @RequestBody StockDaily stockDaily ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
 
-        StockDaily savedStockDaily = stockDailyDao.saveStockDaily( stockDaily );
+        StockDaily savedStockDaily = stockDailyDao.insertUpdateStockDaily( stockDaily );
 
         restResponse.putData( "stockDaily", savedStockDaily );
         return restResponse;
