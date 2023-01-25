@@ -471,7 +471,7 @@ public class GetStockDailyPriceScheduler {
         statStockService.makeStatStockYear( "2021" );
         statStockService.makeStatStockYear( "2022" );
 
-        // 월간
+        // 월간waw
         for ( int year = 2020; year <= 2022; year++ ) {
             for (int i = 1; i <= 12; i++) {
                 String month = i < 10 ? "0" + i : "" + i;

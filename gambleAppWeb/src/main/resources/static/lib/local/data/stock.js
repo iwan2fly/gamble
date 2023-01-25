@@ -35,4 +35,4 @@ let _stock = {
         _get('/rest/domain/krx/statStock/volumeTradeList', param, callback);
     },
 
-}d
+}
