@@ -104,19 +104,6 @@ function sendCommandAxios(method, url, params, callback, args, object ) {
         config.data = params;
     }
 
-	// 쿠키에 user-token 키 값이 있으면 헤더에 세팅합니다.
-
-	let userToken = null;
-	if( object != null && object.authToken != null && object.authToken != undefined) {
-		userToken = object.authToken;
-	} else {
-		userToken = getCookie('user-token');
-	}
-
-	if (!!userToken) {
-		config.headers['cpt-auth-token'] = userToken;
-	}
-
     axios( config )
         .then( function( response ) {
         
@@ -152,44 +139,6 @@ function sendCommandAxios(method, url, params, callback, args, object ) {
     	        console.log('Error', error.message);
     	    	alert( error.message );
     	    }
-    	    // console.log(error.config);
-            /*
-            appResult.status = error.status;
-            appResult.message = error.message;
-            appResult.resultMessage = error.message;
-                        
-            const _NETWORK_ERROR = 'Network Error';
-            if (error.message === _NETWORK_ERROR) {
-                console.log("E1");
-                vAlert('서버의 응답이 지연되어 재시도 중입니다. 잠시 기다려 주시기 바랍니다.');
-                __CONNECT_ERR = true;
-
-            } else if (error.response && error.response.status === 401) {
-                console.log("E2");
-                var code = error.response.data.logoutReason;
-                var msg = '';
-                if (code === '0') msg = '로그 아웃 되었습니다.\n다시 로그인 후 사용하시기 바랍니다.';
-                else if (code === '1') msg = '동일 아이디 접속에 의해 로그아웃 되었습니다.';
-                else if (code === '2') msg = '관리자에 의해 로그아웃 되었습니다.';
-                else if (code === '3') msg = '세션 만료에 의해 로그아웃 되었습니다.';
-                else msg = '알 수 없는 이유로 로그아웃 되었습니다.';
-                vAlert(msg, '', function() {
-                    goLogin();
-                });
-            } else {
-                console.log("E3");
-                // vAlert("시스템이 지연되고 있습니다.<br />잠시 후 다시 시도해 주시기 바랍니다.<br />code : "+jqXHR.status+"<br />"+"message : "+jqXHR.responseText+"<br />"+"error : "+errorThrown);
-
-                if (error.message.indexOf("timeout") > -1) {
-                    //vAlert("시스템이 지연되고 있습니다.<br />잠시 후 다시 시도해 주시기 바랍니다.<br />");
-                    error.resultMessage = "시스템이 지연되고 있습니다.\n잠시 후 다시 시도해 주시기 바랍니다.";
-                }
-            }
-
-            //if (callback) callback(error, args);
-            if (callback) callback(appResult, args);
-            
-            */
         });
 }
 

@@ -2,19 +2,59 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.glog.domain.stock.mapper.CompanyFinanceMapper">
 
+    <!-- DART 데이터를 companyFinance 데이터로 복사하기 -->
+    <insert id="insertFromDart" parameterType="companyFinance">
+        INSERT INTO companyFinance ( companyCode, stockCode, year, quarter, subject, account, amount, sortOrder, insertTime, updateTime)
+        SELECT  companyCode, stockCode, year,
+                CASE
+                    WHEN reportCode = '11013' THEN 1
+                    WHEN reportCode = '11012' THEN 2
+                    WHEN reportCode = '11014' THEN 3
+                    WHEN reportCode = '11011' THEN 5
+                END quarter,
+                subjectName subject,
+                accountName account,
+                CASE
+                    WHEN kiAmount = '-' THEN null
+                    ELSE REPLACE( kiAmount, ',','')
+                END amount,
+		        infoOrder sortOrder,
+		        NOW(), NOW()
+        FROM dartCompanyFinancialInfo
+        WHERE year=#{year} AND reportCode=#{reportCode}
+    </insert>
+
+    <!-- 1,2,3 분기와 연도 전체 데이터로 4분기 데이터 만들기 -->
+    <insert id="makeQuarter4" parameterType="companyFinance">
+        INSERT INTO companyFinance ( companyCode, stockCode, yearQuarter, year, quarter, subject, account, amount, sortOrder, insertTime, updateTime)
+        SELECT total.companyCode, total.stockCode, concat( total.year, 4 ), total.year, 4, total.subject, total.account, totalAmount - q123Amount q4Amount, total.sortORder, NOW(), NOW()
+        FROM (
+                 SELECT companyCode, stockCode,YEAR, SUBJECT, ACCOUNT, sortOrder, amount totalAmount
+                 FROM	companyFinance
+                 WHERE YEAR=#{year} AND QUARTER = 5
+             ) total
+                 JOIN (
+            SELECT companyCode, SUBJECT, ACCOUNT, SUM(amount) q123Amount
+            FROM	companyFinance
+            WHERE YEAR=#{year} AND QUARTER IN ( 1, 2, 3 )
+            GROUP BY companyCode, SUBJECT, ACCOUNT
+        ) q123
+        ON total.companyCode = q123.companyCode and total.subject = q123.subject AND total.account = q123.account
+    </insert>
+
     <insert id="insertCompanyFinance" parameterType="companyFinance" keyProperty="companyFinanceCode">
         INSERT INTO companyFinance
-            ( companyCode, year, quarter, subject, account, amount, sortOrder, insertTime, updateTime)
+            ( companyCode, stockCode, yearQuarter, year, quarter, subject, account, amount, sortOrder, insertTime, updateTime)
         VALUES
-            ( #{companyCode}, #{year}, #{quarter}, #{subject}, #{account}, #{amount}, #{sortOrder}, now(), now() )
+            ( #{companyCode}, #{stockCode}, CONCAT( #{year}, #{quarter} ), #{year}, #{quarter}, #{subject}, #{account}, #{amount}, #{sortOrder}, now(), now() )
     </insert>
 
     <insert id="insertsCompanyFinance" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="sotckId" keyProperty="companyFinanceCode">
         INSERT INTO companyFinance
-        ( companyCode, year, quarter, subject, account, amount, sortOrder, insertTime, updateTime)
+        ( companyCode, stockCode, yearQuarter, year, quarter, subject, account, amount, sortOrder, insertTime, updateTime)
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            ( #{companyCode}, #{item.year}, #{item.quarter}, #{item.subject}, #{item.account}, #{item.amount}, #{item.sortOrder}, now(), now() )
+            ( #{companyCode}, #{item.stockCode}, CONCAT( #{item.year}, #{item.quarter} ), #{item.year}, #{item.quarter}, #{item.subject}, #{item.account}, #{item.amount}, #{item.sortOrder}, now(), now() )
         </foreach>
     </insert>
 
@@ -46,11 +86,15 @@
         <where>
             <trim prefixOverrides = "AND | OR">
                 <if test="companyCode != null and companyCode != ''">AND companyFinance.companyCode=#{companyCode}</if>
+                <if test="stockCode != null and stockCode != ''">AND companyFinance.stockCode=#{stockCode}</if>
+                <if test="yearQuarter != null and yearQuarter != ''">AND companyFinance.yearQuarter=#{yearQuarter}</if>
                 <if test="year != null and year != ''">AND companyFinance.year=#{year}</if>
                 <if test="quarter != null and quarter != ''">AND companyFinance.quarter=#{quarter}</if>
                 <if test="subject != null and subject != ''">AND companyFinance.subject=#{subject}</if>
                 <if test="account != null and account != ''">AND companyFinance.account=#{account}</if>
                 <if test="amount != null and amount != ''">AND companyFinance.amount=#{amount}</if>
+                <if test="recentQuarter != null and recentQuarter != ''">AND companyFinance.yearQuarter=( SELECT MAX(yearQuarter) FROM companyFinance )</if>
+                <if test="recentYear != null and recentYear != ''">AND companyFinance.year=( SELECT MAX(year) FROM companyFinance WHERE companyCode=#{companyCode} AND quarter=5 ) AND quarter=5</if>
                 <if test="pagingParam.filter != null and pagingParam.filter != ''">AND companyFinance.companyCode like CONCAT('%',#{pagingParam.filter},'%')</if>
             </trim>
         </where>
@@ -60,6 +104,8 @@
         <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
             <choose>
                 <when test="pagingParam.sortIndex eq 'companyCode'">companyCode</when>
+                <when test="pagingParam.sortIndex eq 'stockCode'">stockCode</when>
+                <when test="pagingParam.sortIndex eq 'yearQuarter'">yearQuarter</when>
                 <when test="pagingParam.sortIndex eq 'year'">year</when>
                 <when test="pagingParam.sortIndex eq 'quarter'">year desc, quarter</when>
                 <when test="pagingParam.sortIndex eq 'subject'">subject</when>
@@ -71,6 +117,9 @@
                 <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
                 <otherwise>ASC</otherwise>
             </choose>
+        </if>
+        <if test='recentYear != null || recentQuarter != null'>
+            ORDER BY subject ASC, sortOrder DESC
         </if>
         <if test="pagingParam.rows gt 0">
             LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}

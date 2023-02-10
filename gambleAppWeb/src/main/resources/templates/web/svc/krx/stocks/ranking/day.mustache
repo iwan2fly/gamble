@@ -4,11 +4,11 @@
 <script>
     let _serverParam = {
         marketCode : '',
-        targetDate: '',
+        tradeDate: '',
     };
 
-    serverParam.marketCode = '{{serverParam.marketCode}}';
-    serverParam.targetDate = '{{serverParam.targetDate}}';
+    _serverParam.marketCode = '{{serverParam.marketCode}}';
+    _serverParam.tradeDate = '{{serverParam.tradeDate}}';
 
 </script>
 
@@ -110,7 +110,7 @@
 </div>
 
 <script src="/lib/local/data/stock.js"></script>
-<script src="/js/web/svc/krx/indexes/ranking/day.js"></script>
+<script src="/js/web/svc/krx/stocks/ranking/day.js"></script>
 
 {{>web/layouts/fullNavFooter}}
 

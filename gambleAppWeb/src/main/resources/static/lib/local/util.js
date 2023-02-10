@@ -235,14 +235,6 @@ function toDate( yyyymmdd ) {
 	return date;
 }
 
-// Date object 를  문자열로
-function dateToStr( date, delimeter ) {
-	if ( date == null || date == '' ) return "";
-	if ( delimeter == null ) delimeter = '';
-	dateStr = moment(date).format('YYYY' + delimeter + 'MM' + delimeter + 'DD');
-	return dateStr;
-}
-
 // 두 날짜 차이
 function dateDiff( start, end ) {
 	return Math.abs( ( start.getTime() - end.getTime() ) / 1000 / 60 / 60 / 24 );

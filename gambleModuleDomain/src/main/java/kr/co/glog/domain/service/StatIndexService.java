@@ -1,7 +1,6 @@
 package kr.co.glog.domain.service;
 
 
-import kr.co.glog.common.exception.ApplicationRuntimeException;
 import kr.co.glog.common.exception.ParameterMissingException;
 import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
@@ -12,13 +11,14 @@ import kr.co.glog.domain.stat.stock.model.StatIndexResult;
 import kr.co.glog.domain.stock.MarketCode;
 import kr.co.glog.domain.stock.PeriodCode;
 import kr.co.glog.domain.stock.dao.IndexDailyDao;
-import kr.co.glog.domain.stock.model.IndexDailyParam;
 import kr.co.glog.domain.stock.model.IndexDailyResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 
 /**
@@ -98,11 +98,10 @@ public class StatIndexService {
      * @param marketCode
      * @return
      */
-    public ArrayList<StatIndexResult> getStatIndexYearlyList( String marketCode, Integer endYear ) {
+    public ArrayList<StatIndexResult> getStatIndexYearlyList( String marketCode ) {
         StatIndexParam statIndexParam = new StatIndexParam();
         statIndexParam.setMarketCode( marketCode );
         statIndexParam.setPeriodCode( PeriodCode.year );
-        statIndexParam.setEndYear( endYear );
         log.debug( statIndexParam.toString() );
         return statIndexDao.getStatIndexList( statIndexParam );
     }
@@ -113,7 +112,7 @@ public class StatIndexService {
      * @param year
      * @return
      */
-    public ArrayList<StatIndexResult> getStatIndexMonthlyList( String marketCode, Integer year ) {
+    public ArrayList<StatIndexResult> getStatIndexMonthlyListOfYear(String marketCode, Integer year ) {
         StatIndexParam statIndexParam = new StatIndexParam();
         statIndexParam.setMarketCode( marketCode );
         statIndexParam.setYear( year );
@@ -123,18 +122,58 @@ public class StatIndexService {
     }
 
     /**
+     * 시작월과 종료월 사이의 월간 데이터 리턴
+     * @param startYearMonth
+     * @param endYearMonth
+     * @return
+     */
+    public ArrayList<StatIndexResult> getStatIndexMonthlyList(String marketCode, String startYearMonth, String endYearMonth ) {
+
+        StatIndexParam statIndexParam = new StatIndexParam();
+        statIndexParam.setPeriodCode( PeriodCode.month );
+        statIndexParam.setMarketCode( marketCode );
+        statIndexParam.setStartYearMonth( startYearMonth );
+        statIndexParam.setEndYearMonth(endYearMonth);
+
+        return statIndexDao.getStatIndexList( statIndexParam );
+    }
+
+    /**
      * 특정 년도의 주간 데이터 리턴
      * @param marketCode
      * @param year
      * @return
      */
-    public ArrayList<StatIndexResult> getStatIndexWeeklyList( String marketCode, Integer year ) {
+    public ArrayList<StatIndexResult> getStatIndexWeeklyListOfYear(String marketCode, Integer year ) {
         StatIndexParam statIndexParam = new StatIndexParam();
         statIndexParam.setMarketCode( marketCode );
         statIndexParam.setYear( year );
         statIndexParam.setPeriodCode( PeriodCode.week );
         return statIndexDao.getStatIndexList( statIndexParam );
     }
+
+    public ArrayList<StatIndexResult> getStatIndexWeeklyList(String marketCode, String endYearWeek, Integer rows ) {
+
+        PagingParam pagingParam = new PagingParam();
+        pagingParam.setRows(53);
+        pagingParam.setSortIndex( "yearWeek");
+        pagingParam.setSortType("desc");
+
+        StatIndexParam statIndexParam = new StatIndexParam();
+        statIndexParam.setPagingParam( pagingParam );
+        statIndexParam.setPeriodCode( PeriodCode.week );
+        statIndexParam.setMarketCode( marketCode );
+        statIndexParam.setEndYearWeek(endYearWeek);
+
+        ArrayList<StatIndexResult> list = statIndexDao.getStatIndexList( statIndexParam );
+        Collections.reverse( list );
+        return list;
+    }
+
+
+
+
+
 
 
 
@@ -234,19 +273,23 @@ public class StatIndexService {
         StatIndex statIndex = new StatIndex();
         statIndex.setMarketCode( marketCode );
         statIndex.setPeriodCode( periodCode);
-        statIndex.setYearWeek( yearWeek == null ? startDate.substring(0, 4) + "00" : yearWeek );
         statIndex.setWeek( yearWeek == null ? null : Integer.parseInt(yearWeek.substring(4,6) ) );
 
         statIndex.setMonth( 0 );
 
         if ( periodCode.equals( PeriodCode.year ) ) {
             statIndex.setYear( Integer.parseInt( startDate.substring(0, 4) ) );
+            statIndex.setYearMonth( statIndex.getYear() + "00" );
+            statIndex.setYearWeek( statIndex.getYear() + "00" );
         } else if ( periodCode.equals( PeriodCode.month ) ) {
             statIndex.setYear( Integer.parseInt( startDate.substring(0, 4) ) );
             statIndex.setMonth( Integer.parseInt( startDate.substring(4, 6) ) );
+            statIndex.setYearMonth( startDate.substring(0,6) );
+            statIndex.setYearWeek( statIndex.getYear() + "00" );
         } else if ( periodCode.equals( PeriodCode.week ) ) {
             statIndex.setYear( Integer.parseInt( yearWeek.substring(0, 4) ) );
-            statIndex.setMonth( Integer.parseInt( yearWeek.substring(4, 6) ) );
+            statIndex.setMonth( DateUtil.getWeekOfYear( startDate ) );
+            statIndex.setYearMonth( DateUtil.getYearWeek( startDate ) );
             statIndex.setYearWeek( DateUtil.getYearWeek( startDate ) );
             statIndex.setWeek( DateUtil.getWeekOfYear( startDate ) );
         }
@@ -292,57 +335,6 @@ public class StatIndexService {
         IndexDailyResult volumeResult = indexDailyDao.selectStatIndexVolumeStdDev( marketCode, startDate, endDate, indexDailyResult.getVolumeAverage() );
         statIndex.setVolumeStandardDeviation( volumeResult.getVolumeStandardDeviation() );
 
-        /*
-        // 최저가 일자
-        PagingParam pagingParam = new PagingParam();
-        pagingParam.setSortIndex( "priceLow");
-        pagingParam.setSortType("asc");
-        pagingParam.setRows(1);
-        IndexDailyParam indexDailyParam = new IndexDailyParam();
-        indexDailyParam.setPagingParam( pagingParam );
-        indexDailyParam.setMarketCode( marketCode );
-        indexDailyParam.setStartDate( startDate );
-        indexDailyParam.setEndDate( endDate );
-        ArrayList<IndexDailyResult> indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
-        statIndex.setPriceLowDate( indexDailyList.get(0).getTradeDate() );
-
-        // 최고가 일자
-        pagingParam.setSortIndex( "priceHigh");
-        pagingParam.setSortType("desc");
-        pagingParam.setRows(1);
-        indexDailyParam.setPagingParam( pagingParam );
-        indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
-        statIndex.setPriceHighDate( indexDailyList.get(0).getTradeDate() );
-
-        // 최저거래량 / 최고거래량 일자
-        pagingParam.setSortIndex( "volumeTrade");
-        pagingParam.setSortType("desc");
-        pagingParam.setRows(0);
-        indexDailyParam.setPagingParam( pagingParam );
-        indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
-        statIndex.setVolumeHighDate( indexDailyList.get(0).getTradeDate() );
-        statIndex.setVolumeLowDate( indexDailyList.get( indexDailyList.size()-1).getTradeDate() );
-
-        // 시가 / 종가
-        pagingParam.setSortIndex( "tradeDate");
-        pagingParam.setSortType("asc");
-        pagingParam.setRows(0);
-        indexDailyParam.setPagingParam( pagingParam );
-        indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
-        statIndex.setPriceStart( indexDailyList.get(0).getPriceStart() );
-        statIndex.setPriceFinal( indexDailyList.get( indexDailyList.size()-1).getPriceFinal() );
-
-        // 이전 종가 ( 전일 종가 )
-        pagingParam.setSortIndex( "tradeDate");
-        pagingParam.setSortType("desc");
-        pagingParam.setRows(1);
-        indexDailyParam.setPagingParam( pagingParam );
-        indexDailyParam.setStartDate( null );
-        indexDailyParam.setEndDate( null );
-        indexDailyParam.setBeforeDate( startDate );
-        indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
-        statIndex.setPricePrevious( indexDailyList.get(0).getPriceFinal() );
-        */
 
         // 변동가격 / 변동률
         Float pricePrevious = statIndex.getPricePrevious();
@@ -355,7 +347,7 @@ public class StatIndexService {
 
 
 
-        statIndexDao.saveStatIndex( statIndex );
+        statIndexDao.insertUpdateStatIndex( statIndex );
    }
 
 

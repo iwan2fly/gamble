@@ -3,12 +3,12 @@
 <script>
     let _serverParam = {
         marketCode : '',
-        year : '',
+        year: '',
+        yearWeek : '',
     };
 
     _serverParam.marketCode = '{{serverParam.marketCode}}';
-    _serverParam.year = '{{serverParam.year}}';
-
+    _serverParam.yearWeek = '{{serverParam.yearWeek}}';
 </script>
 
 <!-- Page Sidebar Ends-->
@@ -20,7 +20,7 @@
         <div class="card">
             <div class="card-header">
                 <h2>
-                    <span v-text="_serverParam.year"></span>년</span>월
+                    <span v-text="_serverParam.year"></span>년 <span v-text="_serverParam.week"></span>주
                     <span v-text="statIndex.marketCode == 'kospi' ? '코스피' : '코스닥'"></span>
                 </h2>
                 <span>
@@ -53,13 +53,13 @@
             <div class="col-md-6 des-xl-50 box-col-6">
                 <div class="card">
                     <div class="card-header p-b-0">
-                        <h5>최근 년도</h5>
+                        <h5>최근 53주</h5>
                         <div class="card-header-right">
 
                         </div>
                     </div>
                     <div class="card-body p-t-0">
-                        <div id="statIndexChartMonthly" style="height:300px">
+                        <div id="statIndexChartWeekly" style="height:300px">
                         </div>
                     </div>
                 </div>
@@ -379,7 +379,7 @@
 <script src="/lib/local/chartUtil.js"></script>
 <script src="/lib/local/data/index.js"></script>
 <script src="/lib/local/data/stock.js"></script>
-<script src="/js/web/svc/krx/indexes/reportIndexYear.js"></script>
+<script src="/js/web/svc/krx/indexes/reportIndexWeek.js"></script>
 
 
 {{>web/layouts/fullNavFooter}}

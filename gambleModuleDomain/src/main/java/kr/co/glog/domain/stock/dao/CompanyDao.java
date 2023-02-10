@@ -31,7 +31,7 @@ public class CompanyDao {
     }
 
     public CompanyResult getCompany(String companyCode ) {
-        if ( companyCode == null ) throw new ParameterMissingException( "companyCode" );
+        if ( companyCode == null ) return new CompanyResult();
 
         CompanyResult CompanyResult = null;
         CompanyParam CompanyParam = new CompanyParam();

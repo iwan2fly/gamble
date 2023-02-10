@@ -17,4 +17,8 @@ public class StatStockParam extends StatStock {
 
     Integer endYear;
     String  tradeYn;           // 거래량이 있는것만을 조회할 때 tradeYn ='Y'
+    String  startYearMonth;
+    String  endYearMonth;
+    String  startYearWeek;
+    String  endYearWeek;
 }

@@ -25,6 +25,26 @@ public class CompanyFinanceController {
     private final CompanyFinanceDao companyFinanceDao;
 
 
+    // 최근 분기 데이터 목록 리턴
+    @GetMapping("/getRecentQuarter")
+    public RestResponse getRecentQuarter(HttpServletRequest request, HttpServletResponse response, String companyCode ) throws JsonProcessingException {
+        RestResponse restResponse = new RestResponse();
+
+        ArrayList<CompanyFinanceResult> companyFinanceList = companyFinanceDao.getRecentQuarterList( companyCode );
+        restResponse.putData( "list", companyFinanceList );
+        return restResponse;
+    }
+
+    // 최근 년도 데이터 목록 리턴
+    @GetMapping("/getRecentYear")
+    public RestResponse getRecentYear(HttpServletRequest request, HttpServletResponse response, String companyCode ) throws JsonProcessingException {
+        RestResponse restResponse = new RestResponse();
+
+        ArrayList<CompanyFinanceResult> companyFinanceList = companyFinanceDao.getRecentYearList( companyCode );
+        restResponse.putData( "list", companyFinanceList );
+        return restResponse;
+    }
+
     // 특정 데이터 리턴
     @GetMapping("/get")
     public RestResponse get(HttpServletRequest request, HttpServletResponse response, String companyCode, int year, int quarter, String subject, String account ) throws JsonProcessingException {

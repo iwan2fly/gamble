@@ -19,6 +19,7 @@ public class StatStock extends EntityModel {
     String  periodCode;                         // 주기코드
     Integer year;		                        // 년도
     Integer month;                              // 월
+    String  yearMonth;                          // 년월
     String  yearWeek;                           // 년주차
     Integer week;                               // 주차
     String  startDate;                          // 주기의 시작일자
@@ -32,9 +33,14 @@ public class StatStock extends EntityModel {
     Integer priceAverage;                       // 평균가
     Integer priceStandardDeviation;             // 가격 표준편차
     Integer priceChange;                        // 변동금액
+    Long    priceTrade;                         // 거래대금
     Long    priceTotal;                         // 기간 마지막 시총
     Long    priceTotalPrevious;                 // 기간 이전 마지막 시총
+    Long    priceChangeMax;                     // 가격 최고 최저 차이
     Float   rateChange;                         // 변동률
+    Float   rateChangeMax;                      // 변동최저최고 사이 비율
+    Long    volumeTotal;                        // 전체주식수
+    Long    volumeTotalPrevious;                // 이전 전체주식수
     Long    volumeTrade;                        // 거래량
     Long    volumeLow;                          // 최저거래량
     Long    volumeHigh;                         // 최고거래량

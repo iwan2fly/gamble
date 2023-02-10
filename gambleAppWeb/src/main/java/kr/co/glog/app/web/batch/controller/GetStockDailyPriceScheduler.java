@@ -331,7 +331,7 @@ public class GetStockDailyPriceScheduler {
      *  DART 의 고유번호로 특정회사 재무정보 가져와서 있는 건 업데이트하고, 없는 건 등록
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 17 17 30 * * ")
+    @Scheduled(cron = "0 11 9 3 * * ")
     public void updateCompanyFinancialInfo() throws InterruptedException {
 
          /*
@@ -374,7 +374,7 @@ public class GetStockDailyPriceScheduler {
      *  금융위원회 자료로 지수/종목 정보 업데이트
      * @throws InterruptedException
      */
-     @Scheduled(cron = "0 0 12 * * * ")
+     @Scheduled(cron = "0 30 11 * * * ")
     public void at12() throws InterruptedException {
 
         // 금융위원회 자료로 코스피 지수 업서트
@@ -401,7 +401,7 @@ public class GetStockDailyPriceScheduler {
      * 다음 주식 정보로 당일 지수 / 종목 정보 업서트
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 35 15 * * *")
+    @Scheduled(cron = "0 32 15 * * *")
     public void at1535() throws InterruptedException {
 
         // 다음 데이터로 지수 UPSERT
@@ -411,13 +411,11 @@ public class GetStockDailyPriceScheduler {
         indexDailyBatchService.makeStatIndexToday();
 
 
-
         // 다음 데이터로 종목 UPSERT
         stockDailyBatchService.upsertDailyStockDataBatchFromDaumDaily();
 
         // 다음 데이터로 자료로 코스피 코스닥 전 종목 업데이트 했으니, 종목별 통계도 업데이트
         stockDailyBatchService.makeStatStockToday();
-
     }
 
     /**
@@ -438,13 +436,32 @@ public class GetStockDailyPriceScheduler {
 
 
 
-    @Scheduled(cron = "0 1 18 18 * * ")
+    @Scheduled(cron = "0 46 19 3 * * ")
     public void test() throws InterruptedException {
 
-     //   statIndexService.makeStatIndexAll();
-//        statStockService.makeStatStockYear( "2023" );
+        // 금융위원회 정보로 지수를 업데이트 했으니, 지수통계도 없데이트
+        indexDailyBatchService.makeStatIndexToday();
 
-        for ( int i = 1; i <= 12; i++ ) {
+        // 다음 데이터로 자료로 코스피 코스닥 전 종목 업데이트 했으니, 종목별 통계도 업데이트
+       // stockDailyBatchService.makeStatStockToday();
+
+    //    stockDailyBatchService.upsertFromKrxDataMonthOf( "202301" );
+
+   //     statStockService.makeStatStockYear( "2023" );
+    //    statStockService.makeStatStockMonth( "202301" );
+/*
+        int date = 20230102;
+        while ( date < 20230127 ) {
+            String dateStr = "" + date;
+            statStockService.makeStatStockWeek( dateStr );
+
+            dateStr = dateUtil.addDate( dateStr, "D", "yyyyMMdd", 7 );
+            date = Integer.parseInt( dateStr );
+        }
+
+ */
+/*
+        for ( int i = 1; i < 2; i++ ) {
             String month = i < 9 ? "0"+ i : ""+i;
             stockDailyBatchService.upsertFromKrxDataMonthOf( 2021 + month );
         }
@@ -453,7 +470,7 @@ public class GetStockDailyPriceScheduler {
             String month = i < 9 ? "0"+ i : ""+i;
             stockDailyBatchService.upsertFromKrxDataMonthOf( 2020 + month );
         }
-
+*/
         // 다음 데이터로 종목 UPSERT
 //        stockDailyBatchService.upsertDailyStockDataBatchFromDaumDaily();
   //    stockDailyService.upsertStockDailyFromDaumDaily( "000020" );
@@ -463,7 +480,7 @@ public class GetStockDailyPriceScheduler {
 
 
       //    stockDailyService.upsertDailyStockFromKrx( "049960" );
-        stockDailyService.upsertDailyDateFromKrx( "20230117" );
+       // stockDailyService.upsertDailyDateFromKrx( "20230117" );
         // stockDailyService.insertDailyStockAllFromDaumInvestor( "049960" );
 
         /*
@@ -485,7 +502,7 @@ public class GetStockDailyPriceScheduler {
             String dateStr = "" + date;
             statStockService.makeStatStockWeek( dateStr );
 
-            dateStr = DateUtil.addDate( dateStr, "D", "yyyyMMdd", 7 );
+            dateStr = dateUtil.addDate( dateStr, "D", "yyyyMMdd", 7 );
             date = Integer.parseInt( dateStr );
         }
 */

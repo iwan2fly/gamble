@@ -5,17 +5,17 @@
 
     <insert id="insertStatIndex" parameterType="StatIndex" useGeneratedKeys="true" keyProperty="statIndexId">
         INSERT INTO statIndex
-            (  marketCode, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, volumeTrade, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, riseCount, fallCount, evenCount, insertTime, updateTime )
+            (  marketCode, periodCode, year, month, yearMonth, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, rateChangeMax, volumeTrade, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, riseCount, fallCount, evenCount, insertTime, updateTime )
         VALUES
-            (  #{marketCode}, #{periodCode}, #{year}, #{month}, #{yearWeek}, #{week}, #{startDate}, #{endDate}, #{tradeDays}, #{pricePrevious}, #{priceStart}, #{priceFinal}, #{priceLow}, #{priceHigh}, #{priceAverage}, #{priceStandardDeviation}, #{priceChange}, #{rateChange}, #{volumeTrade}, #{volumeLow}, #{volumeHigh}, #{volumeAverage}, #{volumeStandardDeviation}, #{priceLowDate}, #{priceHighDate}, #{volumeLowDate}, #{volumeHighDate}, #{riseCount}, #{fallCount}, #{evenCount}, now(), now() )
+            (  #{marketCode}, #{periodCode}, #{year}, #{month}, #{yearMonth}, #{yearWeek}, #{week}, #{startDate}, #{endDate}, #{tradeDays}, #{pricePrevious}, #{priceStart}, #{priceFinal}, #{priceLow}, #{priceHigh}, #{priceAverage}, #{priceStandardDeviation}, #{priceChange}, #{rateChange}, #{rateChangeMax}, #{volumeTrade}, #{volumeLow}, #{volumeHigh}, #{volumeAverage}, #{volumeStandardDeviation}, #{priceLowDate}, #{priceHighDate}, #{volumeLowDate}, #{volumeHighDate}, #{riseCount}, #{fallCount}, #{evenCount}, now(), now() )
     </insert>
 
     <insert id="insertsStatIndex" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statIndexId" keyProperty="statIndexId">
         INSERT INTO statIndex
-            (  marketCode, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, volumeTrade, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, riseCount, fallCount, evenCount, insertTime, updateTime )
+            (  marketCode, periodCode, year, month, yearMonth, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, rateChange, rateChangeMax, volumeTrade, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, riseCount, fallCount, evenCount, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            (  #{item.marketCode}, #{item.periodCode}, #{item.year}, #{item.month}, #{item.yearWeek}, #{item.week}, #{item.startDate}, #{item.endDate}, #{item.tradeDays}, #{item.pricePrevious}, #{item.priceStart}, #{item.priceFinal}, #{item.priceLow}, #{item.priceHigh}, #{item.priceAverage}, #{item.priceStandardDeviation}, #{item.priceChange}, #{item.rateChange}, #{item.volumeTrade}, #{item.volumeLow}, #{item.volumeHigh}, #{item.volumeAverage}, #{item.volumeStandardDeviation}, #{item.priceLowDate}, #{item.priceHighDate}, #{item.volumeLowDate}, #{item.volumeHighDate}, #{item.riseCount}, #{item.fallCount}, #{item.evenCount}, now(), now() )
+            (  #{item.marketCode}, #{item.periodCode}, #{item.year}, #{item.month}, #{item.yearMonth}, #{item.yearWeek}, #{item.week}, #{item.startDate}, #{item.endDate}, #{item.tradeDays}, #{item.pricePrevious}, #{item.priceStart}, #{item.priceFinal}, #{item.priceLow}, #{item.priceHigh}, #{item.priceAverage}, #{item.priceStandardDeviation}, #{item.priceChange}, #{item.rateChange}, #{item.rateChangeMax}, #{item.volumeTrade}, #{item.volumeLow}, #{item.volumeHigh}, #{item.volumeAverage}, #{item.volumeStandardDeviation}, #{item.priceLowDate}, #{item.priceHighDate}, #{item.volumeLowDate}, #{item.volumeHighDate}, #{item.riseCount}, #{item.fallCount}, #{item.evenCount}, now(), now() )
         </foreach>
     </insert>
 
@@ -24,6 +24,7 @@
         SET
         <trim prefix="" suffixOverrides=",">
             <if test="periodCode != null">periodCode = #{periodCode},</if>
+            <if test="yearMonth != null">yearMonth = #{yearMonth},</if>
             <if test="week != null">week = #{week},</if>
             <if test="startDate != null">startDate = #{startDate},</if>
             <if test="endDate != null">endDate = #{endDate},</if>
@@ -37,6 +38,7 @@
             <if test="priceStandardDeviation != null">priceStandardDeviation = #{priceStandardDeviation},</if>
             <if test="priceChange != null">priceChange = #{priceChange},</if>
             <if test="rateChange != null">rateChange = #{rateChange},</if>
+            <if test="rateChangeMax != null">rateChangeMax = #{rateChangeMax},</if>
             <if test="volumeTrade != null">volumeTrade = #{volumeTrade},</if>
             <if test="volumeLow != null">volumeLow = #{volumeLow},</if>
             <if test="volumeHigh != null">volumeHigh = #{volumeHigh},</if>
@@ -88,6 +90,7 @@
                 <if test="periodCode != null and periodCode != ''">AND statIndex.periodCode=#{periodCode}</if>
                 <if test="year != null and year != ''">AND statIndex.year=#{year}</if>
                 <if test="month != null and month != ''">AND statIndex.month=#{month}</if>
+                <if test="yearMonth != null and yearMonth != ''">AND statIndex.yearMonth=#{yearMonth}</if>
                 <if test="yearWeek != null and yearWeek != ''">AND statIndex.yearWeek=#{yearWeek}</if>
                 <if test="week != null and week != ''">AND statIndex.week=#{week}</if>
                 <if test="startDate != null and startDate != ''">AND statIndex.startDate=#{startDate}</if>
@@ -102,6 +105,7 @@
                 <if test="priceStandardDeviation != null and priceStandardDeviation != ''">AND statIndex.priceStandardDeviation=#{priceStandardDeviation}</if>
                 <if test="priceChange != null and priceChange != ''">AND statIndex.priceChange=#{priceChange}</if>
                 <if test="rateChange != null and rateChange != ''">AND statIndex.rateChange=#{rateChange}</if>
+                <if test="rateChangeMax != null and rateChangeMax != ''">AND statIndex.rateChangeMax=#{rateChangeMax}</if>
                 <if test="volumeTrade != null and volumeTrade != ''">AND statIndex.volumeTrade=#{volumeTrade}</if>
                 <if test="volumeLow != null and volumeLow != ''">AND statIndex.volumeLow=#{volumeLow}</if>
                 <if test="volumeHigh != null and volumeHigh != ''">AND statIndex.volumeHigh=#{volumeHigh}</if>
@@ -114,7 +118,10 @@
                 <if test="riseCount != null and riseCount != ''">AND statIndex.riseCount=#{riseCount}</if>
                 <if test="fallCount != null and fallCount != ''">AND statIndex.fallCount=#{fallCount}</if>
                 <if test="evenCount != null and evenCount != ''">AND statIndex.evenCount=#{evenCount}</if>
-                <if test="endYear != null and endYear != ''">AND statIndex.year <![CDATA[ <= ]]> #{endYear}</if>
+                <if test="startYearMonth != null and startYearMonth != ''">AND statIndex.yearMonth <![CDATA[ >= ]]> #{startYearMonth}</if>
+                <if test="endYearMonth != null and endYearMonth != ''">AND statIndex.yearMonth <![CDATA[ <= ]]> #{endYearMonth}</if>
+                <if test="startYearWeek != null and startYearWeek != ''">AND statIndex.yearWeek <![CDATA[ >= ]]> #{startYearWeek}</if>
+                <if test="endYearWeek != null and endYearWeek != ''">AND statIndex.yearWeek <![CDATA[ <= ]]> #{endYearWeek}</if>
                 <if test="pagingParam.filter != null and pagingParam.filter != ''">AND statIndex.statNameCode like CONCAT('%',#{pagingParam.filter},'%')</if>
             </trim>
         </where>
@@ -128,6 +135,7 @@
                 <when test="pagingParam.sortIndex eq 'periodCode'">periodCode</when>
                 <when test="pagingParam.sortIndex eq 'year'">year</when>
                 <when test="pagingParam.sortIndex eq 'month'">month</when>
+                <when test="pagingParam.sortIndex eq 'yearMonth'">yearMonth</when>
                 <when test="pagingParam.sortIndex eq 'yearWeek'">yearWeek</when>
                 <when test="pagingParam.sortIndex eq 'week'">week</when>
                 <when test="pagingParam.sortIndex eq 'startDate'">startDate</when>
@@ -142,6 +150,7 @@
                 <when test="pagingParam.sortIndex eq 'priceStandardDeviation'">priceStandardDeviation</when>
                 <when test="pagingParam.sortIndex eq 'priceChange'">priceChange</when>
                 <when test="pagingParam.sortIndex eq 'rateChange'">rateChange</when>
+                <when test="pagingParam.sortIndex eq 'rateChangeMax'">rateChangeMax</when>
                 <when test="pagingParam.sortIndex eq 'volumeTrade'">volumeTrade</when>
                 <when test="pagingParam.sortIndex eq 'volumeLow'">volumeLow</when>
                 <when test="pagingParam.sortIndex eq 'volumeHigh'">volumeHigh</when>

@@ -4,11 +4,12 @@
     let _serverParam = {
         marketCode : '',
         year : '',
+        month : '',
     };
 
     _serverParam.marketCode = '{{serverParam.marketCode}}';
     _serverParam.year = '{{serverParam.year}}';
-
+    _serverParam.month = '{{serverParam.month}}';
 </script>
 
 <!-- Page Sidebar Ends-->
@@ -20,7 +21,7 @@
         <div class="card">
             <div class="card-header">
                 <h2>
-                    <span v-text="_serverParam.year"></span>년</span>월
+                    <span v-text="_serverParam.year"></span>년 <span v-text="_serverParam.month"></span>월
                     <span v-text="statIndex.marketCode == 'kospi' ? '코스피' : '코스닥'"></span>
                 </h2>
                 <span>
@@ -53,7 +54,7 @@
             <div class="col-md-6 des-xl-50 box-col-6">
                 <div class="card">
                     <div class="card-header p-b-0">
-                        <h5>최근 년도</h5>
+                        <h5>최근 13개월</h5>
                         <div class="card-header-right">
 
                         </div>
@@ -379,7 +380,7 @@
 <script src="/lib/local/chartUtil.js"></script>
 <script src="/lib/local/data/index.js"></script>
 <script src="/lib/local/data/stock.js"></script>
-<script src="/js/web/svc/krx/indexes/reportIndexYear.js"></script>
+<script src="/js/web/svc/krx/indexes/reportIndexMonth.js"></script>
 
 
 {{>web/layouts/fullNavFooter}}

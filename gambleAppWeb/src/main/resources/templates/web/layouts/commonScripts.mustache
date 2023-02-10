@@ -19,10 +19,17 @@
 <!-- login js-->
 <!-- Plugin used-->
 
+<!-- dayjs : moment.js 대체품 -->
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/weekOfYear.js"></script>
+<script>dayjs.extend(window.dayjs_plugin_weekOfYear)</script>
 
 <script src="/lib/vue/vue.min.js"></script>
 <script src="/lib/vue/vue-router.js"></script>
 <script src="/lib/vue/axios.min.js"></script>
 
-<script src="/lib/local/util.js"></script>
+<script src="/lib/local/strUtil.js"></script>
+<script src="/lib/local/dateUtil.js"></script>
+<script src="/lib/local/chartUtil.js"></script>
+
 <script src="/lib/local/axiosUtil.js"></script>

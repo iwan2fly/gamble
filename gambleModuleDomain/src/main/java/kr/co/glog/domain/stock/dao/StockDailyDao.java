@@ -284,7 +284,9 @@ public class StockDailyDao {
         if ( stockDaily.getStockCode() == null || stockDaily.getTradeDate() == null ) throw new ParameterMissingException( "종목코드와 날짜는 필수값입니다.");
 
         try {
-            stockDailyMapper.updateStockDaily(stockDaily);
+            if ( stockDailyMapper.updateStockDaily(stockDaily) == 0 ) {
+                stockDailyMapper.insertStockDaily(stockDaily);
+            };
         } catch ( Exception e ) {
             stockDailyMapper.insertStockDaily(stockDaily);
         }

@@ -28,12 +28,14 @@ let obj = {
         },
         getPriceDescList: function() {
             let param = {};
-            param.maretCode = _serverParam.marketCode;
-            param.targetDate = _serverParam.targetDate;
+            param.marketCode = _serverParam.marketCode;
+            param.tradeDate = _serverParam.tradeDate;
+            param.periodCode = 'day';
 
             let callback = function( json ) {
                 if (json.responseCode == RestResponseStatus.OK) {
-                    v.priceDescList = json.object.stockList;
+                    v.priceDescList = json.object.list;
+                    console.log( v.priceDescList );
                 } else {
                     alert(json.responseMessage);
                 }
@@ -43,12 +45,13 @@ let obj = {
         },
         getPriceAscList: function() {
             let param = {};
-            param.maretCode = _serverParam.marketCode;
-            param.targetDate = _serverParam.targetDate;
+            param.marketCode = _serverParam.marketCode;
+            param.tradeDate = _serverParam.tradeDate;
+            param.periodCode = 'day';
 
             let callback = function( json ) {
                 if (json.responseCode == RestResponseStatus.OK) {
-                    v.priceAscList = json.object.stockList;
+                    v.priceAscList = json.object.list;
                 } else {
                     alert(json.responseMessage);
                 }
@@ -58,12 +61,13 @@ let obj = {
         },
         getVolumeDescList: function() {
             let param = {};
-            param.maretCode = _serverParam.marketCode;
-            param.targetDate = _serverParam.targetDate;
+            param.marketCode = _serverParam.marketCode;
+            param.tradeDate = _serverParam.tradeDate;
+            param.periodCode = 'day';
 
             let callback = function( json ) {
                 if (json.responseCode == RestResponseStatus.OK) {
-                    v.priceAscList = json.object.stockList;
+                    v.volumeDescList = json.object.list;
                 } else {
                     alert(json.responseMessage);
                 }

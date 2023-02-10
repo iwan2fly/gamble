@@ -28,12 +28,12 @@ public class IndexDailyController {
 
     // 특정 데이터 리턴
     @GetMapping("/get")
-    public RestResponse get(HttpServletRequest request, HttpServletResponse response, String stockCode, String tradeDate) throws JsonProcessingException {
+    public RestResponse get(HttpServletRequest request, HttpServletResponse response, String marketCode, String tradeDate) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
 
-        IndexDailyResult indexDailyResult = indexDailyDao.getIndexDaily( stockCode, tradeDate );
+        IndexDailyResult indexDailyResult = indexDailyDao.getIndexDaily( marketCode, tradeDate );
 
-        restResponse.putData( "indexDaily", indexDailyResult );
+        restResponse.putData( "result", indexDailyResult );
         return restResponse;
     }
 
@@ -45,7 +45,7 @@ public class IndexDailyController {
 
         ArrayList<IndexDailyResult> indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
 
-        restResponse.putData( "indexDailyList", indexDailyList );
+        restResponse.putData( "list", indexDailyList );
         return restResponse;
     }
 
@@ -56,7 +56,7 @@ public class IndexDailyController {
 
         IndexDaily savedIndexDaily = indexDailyDao.saveIndexDaily( indexDaily );
 
-        restResponse.putData( "indexDaily", savedIndexDaily );
+        restResponse.putData( "result", savedIndexDaily );
         return restResponse;
     }
 

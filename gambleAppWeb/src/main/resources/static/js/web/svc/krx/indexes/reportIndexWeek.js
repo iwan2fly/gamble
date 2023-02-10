@@ -10,7 +10,7 @@ let obj = {
 
     },
     data : {
-        periodCode : 'year',
+        periodCode : 'week',
         statIndex: {},
         statIndexYearlyList: {},
         statIndexMonthlyList: {},
@@ -29,9 +29,14 @@ let obj = {
     },
     methods: {
         init : function () {
+
+            _serverParam.year = _serverParam.yearWeek.substring(0,4);
+            _serverParam.week = _serverParam.yearWeek.substring(4,6);
+
             this.getStatIndex();
             this.getStatIndexDailyList();
-            this.getStatIndexYearlyBeforeYear();
+            this.getStatIndexWeeklyList();
+
             this.getPriceDescList();
             this.getPriceAscList();
             this.getVolumeDescList();
@@ -43,6 +48,7 @@ let obj = {
             let param = {};
             param.marketCode = _serverParam.marketCode;
             param.year = _serverParam.year;
+            param.yearWeek = _serverParam.yearWeek;
 
             let callback = function( json ) {
                 if (json.responseCode == RestResponseStatus.OK) {
@@ -52,22 +58,19 @@ let obj = {
                 }
             }
 
-           _index.getStatIndexYear( param, callback );
+           _index.getStatIndexWeek( param, callback );
         },
-        // 특정년도 일간 지수 목록
+        // 특정주간 일별 지수 목록
         getStatIndexDailyList: function() {
-
             let param = {};
             param.marketCode = _serverParam.marketCode;
-
-            let year = _serverParam.year < 10 ? '0' + _serverParam.year : '' + _serverParam.year;
-            param.startDate = _serverParam.year + "0101";
-            param.endDate = _serverParam.year + "1231";
+            param.startDate = dateUtil.dateToYYYYMMDD( dateUtil.getFirstDateOfWeek( _serverParam.yearWeek ) );
+            param.endDate = dateUtil.dateToYYYYMMDD( dateUtil.getLastDateOfWeek( _serverParam.yearWeek ) );
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
                     v.statIndexDailyList = json.object.list;
-                    _ChartUtil.drawStatIndexChart( v.statIndexDailyList, 'day', 'statIndexChart' );
+                    _chartchart.drawStatIndexChart( 'day', 'statIndexChart' );
                 } else {
                     alert( json.responseMessage );
                 }
@@ -75,23 +78,23 @@ let obj = {
 
             _index.getStatIndexDailyList( param, callback );
         },
-        // 최근 년간 지수 리스트
-        getStatIndexYearlyBeforeYear: function() {
+        // 최근 주간 지수 리스트
+        getStatIndexWeeklyList: function() {
 
             let param = {};
             param.marketCode = _serverParam.marketCode;
-            param.year = _serverParam.year;
+            param.endYearWeek = _serverParam.yearWeek;
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
-                    v.statIndexYearlyList =  json.object.list;
-                    _ChartUtil.drawStatIndexChart( v.statIndexYearlyList, 'year', 'statIndexChartMonthly' );
+                    v.statIndexWeeklyList =  json.object.list;
+                    _ChartUtil.drawStatIndexChart( 'week', 'statIndexChartWeekly' );
                 } else {
                     alert( json.responseMessage );
                 }
             }
 
-            _index.getStatIndexYearlyBeforeYear( param, callback );
+            _index.getStatIndexWeeklyList( param, callback );
         },
 
         // 상승률 상위 주식 리스트
@@ -100,6 +103,7 @@ let obj = {
             param.marketCode = _serverParam.marketCode;
             param.periodCode = this.periodCode;
             param.year = _serverParam.year;
+            param.yearWeek = _serverParam.yearWeek;
             param.sortType = 'desc';
             param.rows = 20;
 
@@ -119,6 +123,7 @@ let obj = {
             param.marketCode = _serverParam.marketCode;
             param.periodCode = this.periodCode;
             param.year = _serverParam.year;
+            param.yearWeek = _serverParam.yearWeek;
             param.sortType = 'asc';
             param.rows = 20;
 
@@ -138,6 +143,7 @@ let obj = {
             param.marketCode = _serverParam.marketCode;
             param.periodCode = this.periodCode;
             param.year = _serverParam.year;
+            param.yearWeek = _serverParam.yearWeek;
             param.sortType = 'desc';
             param.rows = 20;
 
@@ -157,6 +163,7 @@ let obj = {
             param.marketCode = _serverParam.marketCode;
             param.periodCode = this.periodCode;
             param.year = _serverParam.year;
+            param.yearWeek = _serverParam.yearWeek;
             param.sortType = 'desc';
             param.rows = 20;
 

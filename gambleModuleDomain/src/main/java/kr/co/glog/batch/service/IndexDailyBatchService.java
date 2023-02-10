@@ -246,6 +246,7 @@ public class IndexDailyBatchService {
             // 연간
             statIndexService.makeStatIndexYear(MarketCode.kospi, yyyymmdd);
             statIndexService.makeStatIndexYear(MarketCode.kosdaq, yyyymmdd);
+
         } catch ( Exception e ) {
             time = System.currentTimeMillis();
             log.debug( batch + "에러 : " + time);

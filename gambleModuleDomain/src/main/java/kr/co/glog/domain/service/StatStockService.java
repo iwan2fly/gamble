@@ -6,20 +6,20 @@ import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
 import kr.co.glog.domain.stat.stock.dao.StatStockDao;
 import kr.co.glog.domain.stat.stock.entity.StatStock;
-import kr.co.glog.domain.stat.stock.model.StatStockParam;
-import kr.co.glog.domain.stat.stock.model.StatStockResult;
+import kr.co.glog.domain.stat.stock.model.StatIndexParam;
+import kr.co.glog.domain.stat.stock.model.StatIndexResult;
 import kr.co.glog.domain.stat.stock.model.StatStockParam;
 import kr.co.glog.domain.stat.stock.model.StatStockResult;
 import kr.co.glog.domain.stock.MarketCode;
 import kr.co.glog.domain.stock.PeriodCode;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
-import kr.co.glog.domain.stock.model.StockDailyParam;
 import kr.co.glog.domain.stock.model.StockDailyResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 /**
@@ -112,7 +112,7 @@ public class StatStockService {
      * @param year
      * @return
      */
-    public ArrayList<StatStockResult> getStatStockMonthlyList( String stockCode, Integer year ) {
+    public ArrayList<StatStockResult> getStatStockMonthlyListOfYear( String stockCode, Integer year ) {
         StatStockParam statStockParam = new StatStockParam();
         statStockParam.setStockCode( stockCode );
         statStockParam.setYear( year );
@@ -122,17 +122,53 @@ public class StatStockService {
     }
 
     /**
+     * 시작월과 종료월 사이의 월간 데이터 리턴
+     * @param stockCode
+     * @param startYearMonth
+     * @param endYearMonth
+     * @return
+     */
+    public ArrayList<StatStockResult> getStatStockMonthlyList(String stockCode, String startYearMonth, String endYearMonth ) {
+
+        StatStockParam statStockParam = new StatStockParam();
+        statStockParam.setPeriodCode( PeriodCode.month );
+        statStockParam.setStockCode( stockCode );
+        statStockParam.setStartYearMonth( startYearMonth );
+        statStockParam.setEndYearMonth(endYearMonth);
+
+        return statStockDao.getStatStockList( statStockParam );
+    }
+
+    /**
      * 특정 년도의 주간 데이터 리턴
      * @param stockCode
      * @param year
      * @return
      */
-    public ArrayList<StatStockResult> getStatStockWeeklyList( String stockCode, Integer year ) {
+    public ArrayList<StatStockResult> getStatStockWeeklyListOfYear(String stockCode, Integer year ) {
         StatStockParam statStockParam = new StatStockParam();
         statStockParam.setStockCode( stockCode );
         statStockParam.setYear( year );
         statStockParam.setPeriodCode( PeriodCode.week );
         return statStockDao.getStatStockList( statStockParam );
+    }
+
+    public ArrayList<StatStockResult> getStatStockWeeklyList(String stockCode, String endYearWeek, Integer rows ) {
+
+        PagingParam pagingParam = new PagingParam();
+        pagingParam.setRows( rows );
+        pagingParam.setSortIndex( "yearWeek");
+        pagingParam.setSortType("desc");
+
+        StatStockParam statStockParam = new StatStockParam();
+        statStockParam.setPagingParam( pagingParam );
+        statStockParam.setPeriodCode( PeriodCode.week );
+        statStockParam.setStockCode( stockCode );
+        statStockParam.setEndYearWeek(endYearWeek);
+
+        ArrayList<StatStockResult> list = statStockDao.getStatStockList( statStockParam );
+        Collections.reverse( list );
+        return list;
     }
 
 
@@ -263,15 +299,18 @@ public class StatStockService {
         statStock.setPeriodCode( periodCode);
 
         statStock.setMonth( 0 );
-        statStock.setYearWeek( startDate.substring(0, 4) + "00" );
         if ( periodCode.equals( PeriodCode.year ) ) {
             statStock.setYear( Integer.parseInt( startDate.substring(0, 4) ) );
+            statStock.setYearMonth( statStock.getYear() + "00" );
+            statStock.setYearWeek( statStock.getYear() + "00" );
         } else if ( periodCode.equals( PeriodCode.month ) ) {
             statStock.setYear( Integer.parseInt( startDate.substring(0, 4) ) );
             statStock.setMonth( Integer.parseInt( startDate.substring(4, 6) ) );
+            statStock.setYearMonth( startDate.substring(0,6) );
+            statStock.setYearWeek( statStock.getYear() + "00" );
         } else if ( periodCode.equals( PeriodCode.week ) ) {
             statStock.setYear( Integer.parseInt( yearWeek.substring(0, 4) ) );
-            statStock.setMonth( Integer.parseInt( yearWeek.substring(4, 6) ) );
+            statStock.setYearMonth( statStock.getYear()  + "00" );
             statStock.setYearWeek( DateUtil.getYearWeek( startDate ) );
             statStock.setWeek( DateUtil.getWeekOfYear( startDate ) );
         }
@@ -299,8 +338,11 @@ public class StatStockService {
         statStock.setForeignerLow( stockDailyResult.getForeignerLow() );
         statStock.setForeignerAverage(stockDailyResult.getForeignerAverage() );
         statStock.setPricePrevious( stockDailyResult.getPricePrevious() );
+        statStock.setPriceTrade( stockDailyResult.getPriceTrade() );
         statStock.setPriceTotal( stockDailyResult.getPriceTotal() );
         statStock.setPriceTotalPrevious( stockDailyResult.getPriceTotalPrevious() );
+        statStock.setVolumeTotal( stockDailyResult.getVolumeTotal() );
+        statStock.setVolumeTotalPrevious( stockDailyResult.getVolumeTotalPrevious() );
 
         statStock.setPriceStart( stockDailyResult.getPriceStart() );
         statStock.setForeignerStart( stockDailyResult.getForeignerStart() );
@@ -340,13 +382,20 @@ public class StatStockService {
         statStock.setPriceChange( statStock.getPricePrevious()!=null ? statStock.getPriceFinal() - statStock.getPricePrevious() : null );
         // statStock.setRateChange( statStock.getPricePrevious()!=null ? Math.round( 10000 * statStock.getPriceChange() / statStock.getPricePrevious() ) / 100f : null );      // 소수점 2자리까지만 남김
 
-        // 각격 변동으로 변동율을 구하면 증자/감자 등에 대응이 안됨
+        // 가격 변동으로 변동율을 구하면 증자/감자 등에 대응이 안됨
         // 이전 시총 정보가 없으면 그냥 현재 시총으로 설정
+        // 추가상장은 실제로는 안 올라도, 주식수가 늘어서 시총이 늘어남.. ㅠㅠ
         log.debug( "" + statStock.getPriceTotalPrevious() );
         log.debug( "" + statStock.getPriceTotal() );
-        statStock.setRateChange( ( statStock.getPriceTotalPrevious()!=null && statStock.getPriceTotal()!=null ) ? Math.round( 10000 * ( statStock.getPriceTotal() - statStock.getPriceTotalPrevious() ) / statStock.getPriceTotalPrevious() ) / 100f : null );      // 소수점 2자리까지만 남김
 
-        statStockDao.saveStatStock( statStock );
+        // 주식수가 늘어나지 않았으면
+        if ( statStock.getVolumeTotal() <= statStock.getVolumeTotalPrevious() ) {
+            statStock.setRateChange((statStock.getPriceTotalPrevious() != null && statStock.getPriceTotal() != null) ? Math.round(10000 * (statStock.getPriceTotal() - statStock.getPriceTotalPrevious()) / statStock.getPriceTotalPrevious()) / 100f : null);      // 소수점 2자리까지만 남김
+        } else {
+            statStock.setRateChange( (statStock.getPriceFinal() != null && statStock.getPricePrevious() != null) ? Math.round(10000 * (statStock.getPriceFinal() - statStock.getPricePrevious()) / statStock.getPricePrevious()) / 100f : null);
+        }
+
+        statStockDao.updateInsertStatStock( statStock );
    }
 
 

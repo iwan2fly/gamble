@@ -8,6 +8,7 @@ package kr.co.glog.external.daumFinance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.glog.common.exception.ApplicationRuntimeException;
+import kr.co.glog.common.utils.StockUtil;
 import kr.co.glog.domain.service.StockDailyService;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
@@ -42,15 +43,10 @@ public class DaumDailyStockScrapper {
         if ( perPage > 100 ) perPage = 100;     // 페이지당 100개가 한계
 
         Document document	= null;
-        String url	=  "https://finance.daum.net/api/quote/##header####stockCode##/days?symbolCode=A##stockCode##&page=##page##&perPage=##perPage##&pagination=true";
-        url = url.replaceAll( "##stockCode##", stockCode );
+        String url	=  "https://finance.daum.net/api/quote/##stockCode##/days?symbolCode=##stockCode##&page=##page##&perPage=##perPage##&pagination=true";
+        url = url.replaceAll( "##stockCode##", StockUtil.toStockCode7( stockCode ) );
         url = url.replaceAll( "##page##", ""+page );
         url = url.replaceAll( "##perPage##", ""+perPage );
-
-        String header = "A";                    // 일반 주식은 다음에서 A로 시작
-        if ( stockCode.charAt(0) == '5' || stockCode.charAt(0) == '6' || stockCode.charAt(0) == '7' ) header = "Q";         // ETN은 Q로 시작하고 500000번대..
-        url = url.replaceAll( "##header##", ""+header );
-        log.debug( url );
 
         try {
             document = Jsoup.connect(url).header("referer", "https://finance.daum.net/domestic/market_cap").ignoreContentType(true).get();

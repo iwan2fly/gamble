@@ -20,6 +20,7 @@ public class StockDailyResult extends StockDaily {
     Integer   priceStandardDeviation;     // 가격 표준편차
     Integer   pricePrevious;              // 이전가격
     Long      priceTotalPrevious;         // 이전시총
+    Long      priceTrade;                 // 거래대금
 
     Long    volumeLow;                  // 최소거래량
     Long    volumeHigh;                 // 최대거래량

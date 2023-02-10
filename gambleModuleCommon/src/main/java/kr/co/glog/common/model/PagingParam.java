@@ -11,12 +11,12 @@ public class PagingParam extends EntityModel {
 	String sortType		= "";			// 정렬 순서 ASC, DESC
 	String sortIndex	= "";			// 정렬 항목, 
 	
-	int currentPage = 1;
-	int rows = -1;
-	int startIndex = 0;
-	int endIndex = 0;
-	int limit = 0;
-	int totalCount	= 0;				// 왜 totalCount 가 없어요? 그래서 넣었어요
+	Integer currentPage = 1;
+	Integer rows = -1;
+	Integer startIndex = 0;
+	Integer endIndex = 0;
+	Integer limit = 0;
+	Integer totalCount	= 0;				// 왜 totalCount 가 없어요? 그래서 넣었어요
 	
 	public int getStartIndex() {
 		int startIndex = (this.currentPage - 1) * this.rows;

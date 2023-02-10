@@ -5,6 +5,7 @@ import kr.co.glog.common.model.EntityModel;
 import kr.co.glog.external.datagokr.fsc.model.GetStockPriceInfoResult;
 import kr.co.glog.external.daumFinance.model.DaumDailyStock;
 import kr.co.glog.external.daumFinance.model.DaumInvestorStock;
+import kr.co.glog.external.daumFinance.model.DaumQuotes;
 import kr.co.glog.external.naverStock.model.SiseDay;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,6 +36,7 @@ public class StockDaily extends EntityModel {
     Long	volumeTrade;		        // 거래량
     Long    priceTotal;                 // 시가총액
     Long	volumeTotal;		        // 전체주식수
+    Long    volumeTotalPrevious;        // 이전 전체주식수
     Float 	rateChange;			        // 변동비
     Long	volumeOrg;			        // 기관 순매매
     Long	volumeForeigner;	        // 외인 순매매
@@ -75,6 +77,9 @@ public class StockDaily extends EntityModel {
         this.setForeignerHoldRate( (int)( daumInvestorStock.getForeignOwnSharesRate() * 10000) / 100f );
     }
 
+    // {"numOfRows":1,"pageNo":1,"totalCount":757,"items":{"item":[{"basDt":"20230120","srtnCd":"049960","isinCd":"KR7049960008","itmsNm":"쎌바이오텍","
+    //   mrktCtg":"KOSDAQ","clpr":"13800","vs":"400","fltRt":"2.99","mkp":"13300","hipr":"13800","lopr":"13250","trqu":"18981","trPrc":"258389150","lstgStCnt":"9400000","mrktTotAmt":"129720000000"}
+    // 다음날 오전 12시에나 업데이트 됨
     public StockDaily(GetStockPriceInfoResult getStockPriceInfoResult) {
         if ( getStockPriceInfoResult == null ) throw new ParameterMissingException( "getPriceStockInfoResult" );
 
@@ -95,6 +100,31 @@ public class StockDaily extends EntityModel {
         this.setPriceTotal( getStockPriceInfoResult.getMrktTotAmt() );        // 시총
 
         this.setPricePrevious( this.getPriceFinal() - this.getPriceChange() );  // 정일종가 =  오늘종가 - 대비
+    }
+
+    public StockDaily( DaumQuotes daumQuotes ) {
+        if ( daumQuotes == null ) throw new ParameterMissingException( "daumQuotes" );
+
+        this.setTradeDate( daumQuotes.getTradeDate() ) ;                        // 날짜
+        this.setIsin( daumQuotes.getCode() );                                   // ISIN
+        this.setStockCode( daumQuotes.getSymbolCode().substring(1,7) );         // 종목코드(6자리)
+        this.setMarketCode( daumQuotes.getMarket().toLowerCase() );             // 시장코드
+        this.setStockName( daumQuotes.getName() );                              // 종목명
+        this.setPriceStart( daumQuotes.getOpeningPrice() );                     // 시가
+        this.setPriceHigh( daumQuotes.getHighPrice() );                         // 고가
+        this.setPriceLow( daumQuotes.getLowPrice() );                           // 저가
+        this.setPriceFinal( daumQuotes.getTradePrice() );                       // 종가
+        this.setPriceChange( daumQuotes.getChangePrice() );                      // 전일대비
+        if ( daumQuotes.getChange() != null && daumQuotes.getChange().equals("FALL") ) this.setPriceChange( -this.getPriceChange() );
+        this.setRateChange( daumQuotes.getChangeRate() );                       // 등락율
+        this.setVolumeTrade( daumQuotes.getPrevAccTradeVolume() );              // 거래량
+        this.setPriceTrade( daumQuotes.getAccTradePrice() );                    // 거래대금
+        this.setVolumeTotal( daumQuotes.getListedShareCount() );                // 주식수
+        this.setPriceTotal( daumQuotes.getMarketCap() );                        // 시총
+        this.setForeignerStockCount( daumQuotes.getForeignOwnShares() );        // 외국인보유량
+        this.setForeignerHoldRate( daumQuotes.getForeignRatio() );              // 외국인보유율
+
+        this.setPricePrevious( this.getPriceFinal() - this.getPriceChange() );  // 전일종가 =  오늘종가 - 대비
     }
 
     public Integer getPriceYesterday() {

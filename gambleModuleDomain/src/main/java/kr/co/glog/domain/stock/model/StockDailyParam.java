@@ -18,7 +18,7 @@ public class StockDailyParam extends StockDaily {
     Integer dataCount;                      // 자료 건수
     String  startDate;                      // 기간 시작일
     String  endDate;                        // 기간 종료일
-    String  beforeDate;     // 해당 날짜의 전날까지
+    String  beforeDate;                     // 해당 날짜의 전날까지
     Integer priceAverage;                   // 평균가격
     Long    volumeAverage;                  // 평균거래량
     Long    foreignerAverage;               // 평균 외국인 주식수

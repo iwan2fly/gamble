@@ -34,7 +34,7 @@ public class StockController {
 
         StockResult stockResult = stockDao.getStock( stockCode );
 
-        restResponse.putData( "stock", stockResult );
+        restResponse.putData( "result", stockResult );
         return restResponse;
     }
 
@@ -46,7 +46,7 @@ public class StockController {
 
         ArrayList<StockResult> stockList = stockDao.getStockList( stockParam );
 
-        restResponse.putData( "stockList", stockList );
+        restResponse.putData( "list", stockList );
         return restResponse;
     }
 
@@ -57,7 +57,7 @@ public class StockController {
 
         Stock savedStock = stockDao.saveStock( stock );
 
-        restResponse.putData( "stock", savedStock );
+        restResponse.putData( "result", savedStock );
         return restResponse;
     }
 

@@ -1,24 +1,23 @@
-let _chart = {
+let _ChartUtil = {
 	// 주식 일봉/주봉/월봉/연봉 차트 그리기
 	drawStatIndexChart : function( stockDataList, period, dom ) {
-
 		// X축
 		let xAxisData = [];
-		for ( i = 0; i < stockDatList.length; i++ ) {
-			if ( period == 'month' ) xAxisData[i] = stockDatList[i].month;
-			else if ( period == 'week' ) xAxisData[i] = stockDatList[i].yearWeek;
-			else if ( period == 'day' ) xAxisData[i] = yyyymmdd(stockDatList[i].tradeDate);
-			else xAxisData[i] = stockDatList[i].year;
+		for ( i = 0; i < stockDataList.length; i++ ) {
+			if ( period == 'month' ) xAxisData[i] = stockDataList[i].month;
+			else if ( period == 'week' ) xAxisData[i] = stockDataList[i].yearWeek;
+			else if ( period == 'day' ) xAxisData[i] = _DateUtil.yyyymmdd(stockDataList[i].tradeDate.substring(4,6) + '.' + stockDataList[i].tradeDate.substring(6,8) );
+			else xAxisData[i] = stockDataList[i].year;
 		}
 
 		// 데이터
 		let seriesData = [];
-		let min = stockDatList[0].priceLow;
-		let max = stockDatList[0].priceHigh;
-		for ( i = 0; i < stockDatList.length; i++ ) {
-			let dayData = [ stockDatList[i].priceStart, stockDatList[i].priceFinal, stockDatList[i].priceLow, stockDatList[i].priceHigh ];
-			min = min > stockDatList[i].priceLow ? stockDatList[i].priceLow : min;
-			max = max < stockDatList[i].priceHigh ? stockDatList[i].priceHigh : max;
+		let min = stockDataList[0].priceLow;
+		let max = stockDataList[0].priceHigh;
+		for ( i = 0; i < stockDataList.length; i++ ) {
+			let dayData = [ stockDataList[i].priceStart, stockDataList[i].priceFinal, stockDataList[i].priceLow, stockDataList[i].priceHigh ];
+			min = min > stockDataList[i].priceLow ? stockDataList[i].priceLow : min;
+			max = max < stockDataList[i].priceHigh ? stockDataList[i].priceHigh : max;
 			seriesData[i] = dayData;
 		}
 
@@ -61,5 +60,6 @@ let _chart = {
 		};
 
 		option && myChart.setOption(option);
+
 	}
 }

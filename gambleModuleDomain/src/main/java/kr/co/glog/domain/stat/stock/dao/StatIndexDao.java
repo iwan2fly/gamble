@@ -109,7 +109,7 @@ public class StatIndexDao {
         return statIndex;
     }
 
-    public StatIndex saveStatIndex(StatIndex statIndex) {
+    public StatIndex insertUpdateStatIndex(StatIndex statIndex) {
         log.debug( statIndex.toString() );
         if ( statIndex == null ) throw new ParameterMissingException( "StatIndex" );
         if ( statIndex.getMarketCode() == null || statIndex.getPeriodCode() == null ) throw new ParameterMissingException( "시장코드, 주기, 회차는 필수값입니다.");

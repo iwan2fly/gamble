@@ -1,6 +1,8 @@
 package kr.co.glog.domain.service;
 
 
+import kr.co.glog.common.exception.ApplicationRuntimeException;
+import kr.co.glog.common.exception.NetworkCommunicationFailureException;
 import kr.co.glog.common.utils.DateUtil;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
@@ -11,8 +13,10 @@ import kr.co.glog.external.datagokr.fsc.GetStockPriceInfo;
 import kr.co.glog.external.datagokr.fsc.model.GetStockPriceInfoResult;
 import kr.co.glog.external.daumFinance.DaumDailyInvestorScrapper;
 import kr.co.glog.external.daumFinance.DaumDailyStockScrapper;
+import kr.co.glog.external.daumFinance.DaumQuotesScrapper;
 import kr.co.glog.external.daumFinance.model.DaumDailyStock;
 import kr.co.glog.external.daumFinance.model.DaumInvestorStock;
+import kr.co.glog.external.daumFinance.model.DaumQuotes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
@@ -29,11 +33,13 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class StockDailyService {
 
+    private final DaumQuotesScrapper daumQuotesScrapper;
     private final DaumDailyStockScrapper daumDailyStockScrapper;
     private final DaumDailyInvestorScrapper daumDailyInvestorScrapper;
     private final StockDailyDao stockDailyDao;
     private final StockDao stockDao;
     private final GetStockPriceInfo getStockPriceInfo;          // 일별 주식 시세 - 금융위원회
+
 
     /**
      * KRX의 특정 종목의 전체 일별 데이터를 upsert
@@ -239,6 +245,7 @@ public class StockDailyService {
             } catch (Exception e) {
                 e.printStackTrace();
                 readCount++;
+                if ( readCount > 5 ) throw new NetworkCommunicationFailureException();
                 Thread.sleep( 3000 );
             }
         }
@@ -278,9 +285,10 @@ public class StockDailyService {
                     stock.setCurrentPrice( stockDaily.getPriceFinal() );        // 마지막 가격
                     stockDao.updateStock( stock );
                 }
-                stockDailyDao.insertUpdateStockDaily( stockDaily );
+                stockDailyDao.updateInsertStockDaily( stockDaily );
             } catch ( org.springframework.dao.DuplicateKeyException dke ) {
-
+                dke.printStackTrace();
+                throw new ApplicationRuntimeException("왜 키 중복 에러지?");
             }
         }
     }
@@ -325,11 +333,8 @@ public class StockDailyService {
                 */
             }
 
-            try {
-                stockDailyDao.updateStockDaily( stockDaily );
-            } catch ( org.springframework.dao.DuplicateKeyException dke ) {
+            stockDailyDao.updateInsertStockDaily( stockDaily );
 
-            }
         }
 
         // 일간 데이터가 있을 경우, 그 첫 번째 데이터는 가장 최근 데이터임
@@ -344,6 +349,30 @@ public class StockDailyService {
             stockDao.updateStock( stock );
         }
 
+    }
+
+
+    /**
+     * 다음 주식 페이지, 주식 상세 페이지 데이터를 stockDaily 테이블에 upsert
+     * @param stockCode
+     */
+    public void upsertStockDailyFromDaumQuotes( String stockCode ) {
+
+        DaumQuotes daumQuotes = daumQuotesScrapper.get( stockCode );
+        if ( daumQuotes != null ) {
+            StockDaily stockDaily = new StockDaily(daumQuotes);
+            stockDailyDao.updateInsertStockDaily(stockDaily);
+
+            Stock stock = new Stock(stockDaily);
+            stock.setIssueDate(DateUtil.getYyyymmdd(daumQuotes.getListingDate()));
+            stockDao.updateInsert(stock);
+        } else {
+            Stock stock = new Stock();
+            stock.setStockCode( stockCode );
+            stock.setDelistingYn( "Y" );
+            stockDao.updateStock( stock );
+
+        }
     }
 
 }

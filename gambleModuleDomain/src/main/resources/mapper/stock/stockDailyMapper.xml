@@ -13,16 +13,18 @@
     <!-- 주식 특정 기간 동안의 최소, 최대, 거래일수, 평균 -->
     <select id="selectStatStockCommon" parameterType="StockDailyParam" resultType="StockDailyResult" >
         SELECT  stat1.*,
-                lastStock.stockName, lastStock.marketCode,
-                pricePrevious.pricePrevious, pricePrevious.priceTotalPrevious,
-                priceStart.priceStart,
-                priceFinal.priceFinal,
-                CASE WHEN priceFinal.priceTotal is null THEN priceFinal.priceFinal * stock.stockCount ELSE priceFinal.priceTotal END priceTotal,
-                priceLow.priceLowDate,
-                priceHigh.priceHighDate,
+                stock.stockCount volumeTotal,
+                lastStock.stockName, lastStock.marketCode, lastStock.priceFinal, lastStock.priceTotal,
+                firstStock.pricePrevious, firstStock.priceStart,
+                IFNULL(previousStock.priceTotal, firstStock.volumeTotal * firstStock.pricePrevious) priceTotalPrevious,
+                IFNULL(previousStock.volumeTotal, firstStock.volumeTotal) volumeTotalPrevious,
+                priceLow.tradeDate priceLowDate,
+                priceHigh.tradeDate priceHighDate,
+                volumeLow.tradeDate volumeLowDate,
+                volumeHigh.tradeDate volumeHighDate,
                 IFNULL(riseCount, 0) riseCount, IFNULL(evenCount,0) evenCount, IFNULL(fallCount, 0) fallCount
         FROM (
-            SELECT  stockCode, MIN(priceLow) priceLow, MAX(priceHigh) priceHigh, ROUND(SUM(priceFinal)/COUNT(*), 0) priceAverage, COUNT(*) dataCount,
+            SELECT  stockCode, MIN(priceLow) priceLow, MAX(priceHigh) priceHigh, ROUND(SUM(priceFinal)/COUNT(*), 0) priceAverage, SUM(priceTrade) priceTrade, COUNT(*) dataCount,
                     SUM(volumeTrade) volumeTrade, MIN(volumeTrade) volumeLow, MAX(volumeTrade) volumeHigh, ROUND(SUM(volumeTrade)/COUNT(*), 0) volumeAverage,
                     MIN(foreignerStockCount) foreignerLow, MAX(foreignerStockCount) foreignerHigh, ROUND(SUM(foreignerStockCount)/COUNT(*), 0) foreignerAverage,
                     MIN(tradeDate) startDate, MAX(tradeDate) endDate
@@ -35,14 +37,30 @@
             FROM stock
             WHERE   stockCode=#{stockCode}
         ) stock ON stat1.stockCode = stock.stockCode
-        <!-- 마지막 값 : 이름, 시장코드 등 -->
+        <!-- 기간 시작 정보 -->
         LEFT JOIN (
-            SELECT  stockCode, stockName, marketCode
+            SELECT  stockCode, priceStart, pricePrevious, foreignerStockCount, volumeTotal
+            FROM    stockDaily
+            WHERE   stockCode=#{stockCode} AND tradeDate <![CDATA[ >= ]]> #{startDate}
+            ORDER BY tradeDate
+            LIMIT 1
+        ) firstStock ON stat1.stockCode = firstStock.stockCode
+        <!-- 기간 마지막 정보 -->
+        LEFT JOIN (
+            SELECT  stockCode, stockName, marketCode, priceFinal, priceTotal, volumeTotal
             FROM    stockDaily
             WHERE   stockCode=#{stockCode} AND tradeDate <![CDATA[ <= ]]> #{endDate}
             ORDER BY tradeDate desc
             LIMIT 1
         ) lastStock ON stat1.stockCode = lastStock.stockCode
+        <!-- 이전 마지막 정보 -->
+        LEFT JOIN (
+            SELECT stockCode, priceTotal, volumeTotal
+            FROM stockDaily
+            WHERE stockCode=#{stockCode} AND tradeDate <![CDATA[ < ]]> #{startDate}
+            ORDER BY tradeDate DESC
+            LIMIT 1
+        ) previousStock  ON stat1.stockCode = previousStock.stockCode
         <!-- 상승 건수 -->
         LEFT JOIN (
             SELECT stockCode, COUNT(*) riseCount FROM stockDaily WHERE tradeDate BETWEEN #{startDate} AND #{endDate} AND stockCode=#{stockCode} AND rateChange > 0
@@ -55,33 +73,9 @@
         LEFT JOIN (
             SELECT stockCode, COUNT(*) fallCount FROM stockDaily WHERE tradeDate BETWEEN #{startDate} AND #{endDate} AND stockCode=#{stockCode} AND rateChange <![CDATA[ < ]]> 0
         ) fallCount ON stat1.stockCode = fallCount.stockCode
-        <!-- 이전 가격 -->
-        LEFT JOIN (
-            SELECT stockCode, priceFinal pricePrevious, priceTotal priceTotalPrevious
-            FROM stockDaily
-            WHERE stockCode=#{stockCode} AND tradeDate <![CDATA[ < ]]> #{startDate}
-            ORDER BY tradeDate DESC
-            LIMIT 1
-        ) pricePrevious ON stat1.stockCode = pricePrevious.stockCode
-        <!-- 시작가, 외국인 시작 시 보유량 -->
-        LEFT JOIN (
-            SELECT stockCode, priceFinal priceStart, foreignerStockCount foreignerStart
-            FROM stockDaily
-            WHERE stockCode=#{stockCode} AND tradeDate >= #{startDate}
-            ORDER BY tradeDate ASC
-            LIMIT 1
-        ) priceStart ON stat1.stockCode = priceStart.stockCode
-        <!-- 최종가, 외국인 최종 보유량 -->
-        LEFT JOIN (
-            SELECT stockCode, priceFinal, priceTotal
-            FROM stockDaily
-            WHERE stockCode=#{stockCode} AND tradeDate <![CDATA[ <= ]]> #{endDate}
-            ORDER BY tradeDate DESC
-            LIMIT 1
-        ) priceFinal ON stat1.stockCode = priceFinal.stockCode
         <!-- 최저가일자 -->
         LEFT JOIN (
-            SELECT stockCode, tradeDate priceLowDate
+            SELECT stockCode, tradeDate
             FROM stockDaily
             WHERE stockCode=#{stockCode} AND tradeDate BETWEEN #{startDate} AND #{endDate}
             ORDER BY priceLow ASC, tradeDate DESC
@@ -89,7 +83,7 @@
         ) priceLow ON stat1.stockCode = priceLow.stockCode
         <!-- 최고가일자 -->
         LEFT JOIN (
-            SELECT stockCode, tradeDate priceHighDate
+            SELECT stockCode, tradeDate
             FROM stockDaily
             WHERE stockCode=#{stockCode} AND tradeDate BETWEEN #{startDate} AND #{endDate}
             ORDER BY priceHigh DESC, tradeDate DESC
@@ -97,7 +91,7 @@
         ) priceHigh ON stat1.stockCode = priceHigh.stockCode
         <!-- 거래량 최저일자 -->
         LEFT JOIN (
-            SELECT stockCode, tradeDate volumeLowDate
+            SELECT stockCode, tradeDate
             FROM stockDaily
             WHERE stockCode=#{stockCode} AND tradeDate BETWEEN #{startDate} AND #{endDate}
             ORDER BY volumeTrade ASC, tradeDate DESC
@@ -105,7 +99,7 @@
         ) volumeLow ON stat1.stockCode = volumeLow.stockCode
         <!-- 거래량 최고일자 -->
             LEFT JOIN (
-            SELECT stockCode, tradeDate volumeHighDate
+            SELECT stockCode, tradeDate
             FROM stockDaily
             WHERE stockCode=#{stockCode} AND tradeDate BETWEEN  #{startDate} AND #{endDate}
             ORDER BY volumeTrade DESC, tradeDate DESC
@@ -141,17 +135,17 @@
     
     <insert id="insertStockDaily" parameterType="StockDaily" useGeneratedKeys="true" keyProperty="stockDailyId">
         INSERT INTO stockDaily
-            ( isin, stockCode, tradeDate, marketCode, stockName, pricePrevious, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, priceTotal, volumeTotal, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
+            ( isin, stockCode, tradeDate, marketCode, stockName, pricePrevious, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, priceTotal, volumeTotal, volumeTotalPrevious, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
         VALUES
-            ( #{isin}, #{stockCode}, #{tradeDate}, #{marketCode}, #{stockName}, #{pricePrevious}, #{priceFinal}, #{priceChange}, #{priceStart}, #{priceHigh}, #{priceLow}, #{priceTrade}, #{volumeTrade}, #{priceTotal}, #{volumeTotal}, #{rateChange}, #{volumeOrg}, #{volumeForeigner}, #{foreignerStockCount}, #{foreignerHoldRate}, now(), now() )
+            ( #{isin}, #{stockCode}, #{tradeDate}, #{marketCode}, #{stockName}, #{pricePrevious}, #{priceFinal}, #{priceChange}, #{priceStart}, #{priceHigh}, #{priceLow}, #{priceTrade}, #{volumeTrade}, #{priceTotal}, #{volumeTotal}, #{volumeTotalPrevious}, #{rateChange}, #{volumeOrg}, #{volumeForeigner}, #{foreignerStockCount}, #{foreignerHoldRate}, now(), now() )
     </insert>
 
     <insert id="insertsStockDaily" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="stockDailyId" keyProperty="stockDailyId">
         INSERT INTO stock
-            ( isin, stockCode, tradeDate, marketCode, stockName, pricePrevious, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, priceTotal, volumeTotal, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
+            ( isin, stockCode, tradeDate, marketCode, stockName, pricePrevious, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, priceTotal, volumeTotal, volumeTotalPrevious, rateChange, volumeOrg, volumeForeigner, foreignerStockCount, foreignerHoldRate, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            ( #{item.isin}, #{item.stockCode}, #{item.tradeDate}, #{item.marketCode}, #{item.stockName}, #{item.pricePrevious}, #{item.priceFinal}, #{item.priceChange}, #{item.priceStart}, #{item.priceHigh}, #{item.priceLow}, #{item.priceTrade}, #{item.volumeTrade}, #{item.priceTotal}, #{item.volumeTotal},  #{item.rateChange}, #{item.volumeOrg}, #{item.volumeForeigner}, #{item.foreignerStockCount}, #{item.foreignerHoldRate}, now(), now() )
+            ( #{item.isin}, #{item.stockCode}, #{item.tradeDate}, #{item.marketCode}, #{item.stockName}, #{item.pricePrevious}, #{item.priceFinal}, #{item.priceChange}, #{item.priceStart}, #{item.priceHigh}, #{item.priceLow}, #{item.priceTrade}, #{item.volumeTrade}, #{item.priceTotal}, #{item.volumeTotal}, #{item.volumeTotalPrevious},  #{item.rateChange}, #{item.volumeOrg}, #{item.volumeForeigner}, #{item.foreignerStockCount}, #{item.foreignerHoldRate}, now(), now() )
         </foreach>
     </insert>
 
@@ -172,6 +166,7 @@
             <if test="volumeTrade != null">volumeTrade = #{volumeTrade},</if>
             <if test="priceTotal != null">priceTotal = #{priceTotal},</if>
             <if test="volumeTotal != null">volumeTotal = #{volumeTotal},</if>
+            <if test="volumeTotalPrevious != null">volumeTotalPrevious = #{volumeTotalPrevious},</if>
             <if test="rateChange != null">rateChange = #{rateChange},</if>
             <if test="volumeOrg != null">volumeOrg = #{volumeOrg},</if>
             <if test="volumeForeigner != null">volumeForeigner = #{volumeForeigner},</if>
@@ -220,6 +215,8 @@
                 <if test="volumeTrade != null and volumeTrade != ''">AND stockDaily.volumeTrade=#{volumeTrade}</if>
                 <if test="priceTotal != null and priceTotal != ''">AND stockDaily.priceTotal=#{priceTotal}</if>
                 <if test="volumeTotal != null and volumeTotal != ''">AND stockDaily.volumeTotal=#{volumeTotal}</if>
+                <if test="volumeTotalPrevious != null and volumeTotalPrevious != ''">AND stockDaily.volumeTotalPrevious=#{volumeTotalPrevious}</if>
+                <if test="rateChange != null and rateChange != ''">AND stockDaily.rateChange=#{rateChange}</if>
                 <if test="volumeOrg != null and volumeOrg != ''">AND stockDaily.volumeOrg=#{volumeOrg}</if>
                 <if test="volumeForeigner != null and volumeForeigner != ''">AND stockDaily.volumeForeigner=#{volumeForeigner}</if>
                 <if test="foreignerStockCount != null and foreignerStockCount != ''">AND stockDaily.foreignerStockCount=#{foreignerStockCount}</if>
@@ -251,6 +248,8 @@
                 <when test="pagingParam.sortIndex eq 'volumeTrade'">volumeTrade</when>
                 <when test="pagingParam.sortIndex eq 'priceTotal'">priceTotal</when>
                 <when test="pagingParam.sortIndex eq 'volumeTotal'">volumeTotal</when>
+                <when test="pagingParam.sortIndex eq 'volumeTotalPrevious'">volumeTotalPrevious</when>
+                <when test="pagingParam.sortIndex eq 'rateChange'">rateChange</when>
                 <when test="pagingParam.sortIndex eq 'volumeOrg'">volumeOrg</when>
                 <when test="pagingParam.sortIndex eq 'volumeForeigner'">volumeForeigner</when>
                 <when test="pagingParam.sortIndex eq 'foreignerStockCount'">foreignerStockCount</when>

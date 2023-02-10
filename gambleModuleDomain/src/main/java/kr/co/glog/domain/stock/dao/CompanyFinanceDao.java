@@ -19,6 +19,27 @@ public class CompanyFinanceDao {
 
     private final CompanyFinanceMapper companyFinanceMapper;
 
+    // 최근 분기 데이터 목록
+    public ArrayList<CompanyFinanceResult> getRecentQuarterList( String companyCode ) {
+        if ( companyCode == null ) return new ArrayList<CompanyFinanceResult>();
+
+        CompanyFinanceParam companyFinanceParam = new CompanyFinanceParam();
+        companyFinanceParam.setCompanyCode( companyCode );
+        companyFinanceParam.setRecentQuarter("Y");
+        return companyFinanceMapper.selectCompanyFinanceList( companyFinanceParam );
+    }
+
+    // 최근 년도 데이터 목록
+    public ArrayList<CompanyFinanceResult> getRecentYearList( String companyCode ) {
+        if ( companyCode == null ) return new ArrayList<CompanyFinanceResult>();
+
+        CompanyFinanceParam companyFinanceParam = new CompanyFinanceParam();
+        companyFinanceParam.setCompanyCode( companyCode );
+        companyFinanceParam.setRecentYear("Y");
+        return companyFinanceMapper.selectCompanyFinanceList( companyFinanceParam );
+    }
+
+
     public CompanyFinanceResult getCompanyFinance(String companyCode, Integer year, Integer quarter, String subject, String account ) {
         if ( companyCode == null ) throw new ParameterMissingException( "companyCode" );
         if ( year == null ) throw new ParameterMissingException( "year" );

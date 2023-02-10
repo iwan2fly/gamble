@@ -5,17 +5,17 @@
 
     <insert id="insertStatStock" parameterType="StatStock" useGeneratedKeys="true" keyProperty="statStockId">
         INSERT INTO statStock
-            (  stockCode, marketCode, stockName, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, priceTotal, priceTotalPrevious, rateChange, volumeTrade, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerPrevious, foreignerStart, foreignerLow, foreignerHigh, foreignerFinal, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
+            (  stockCode, marketCode, stockName, periodCode, year, month, yearMonth, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, priceTrade, priceTotal, priceTotalPrevious, rateChange, rateChangeMax, volumeTotal, volumeTotalPrevious, volumeTrade, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerPrevious, foreignerStart, foreignerLow, foreignerHigh, foreignerFinal, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
         VALUES
-            (  #{stockCode}, #{marketCode}, #{stockName}, #{periodCode}, #{year}, #{month}, #{yearWeek}, #{week}, #{startDate}, #{endDate}, #{tradeDays}, #{pricePrevious}, #{priceStart}, #{priceFinal}, #{priceLow}, #{priceHigh}, #{priceAverage}, #{priceStandardDeviation}, #{priceChange}, #{priceTotal}, #{priceTotalPrevious}, #{rateChange}, #{volumeTrade}, #{volumeLow}, #{volumeHigh}, #{volumeAverage}, #{volumeStandardDeviation}, #{foreignerPrevious}, #{foreignerStart}, #{foreignerLow}, #{foreignerHigh}, #{foreignerFinal}, #{foreignerAverage}, #{foreignerStandardDeviation}, #{priceLowDate}, #{priceHighDate}, #{volumeLowDate}, #{volumeHighDate}, now(), now() )
+            (  #{stockCode}, #{marketCode}, #{stockName}, #{periodCode}, #{year}, #{month}, #{yearMonth}, #{yearWeek}, #{week}, #{startDate}, #{endDate}, #{tradeDays}, #{pricePrevious}, #{priceStart}, #{priceFinal}, #{priceLow}, #{priceHigh}, #{priceAverage}, #{priceStandardDeviation}, #{priceChange}, #{priceTrade}, #{priceTotal}, #{priceTotalPrevious}, #{rateChange}, #{rateChangeMax}, #{volumeTotal}, #{volumeTotalPrevious}, #{volumeTrade}, #{volumeLow}, #{volumeHigh}, #{volumeAverage}, #{volumeStandardDeviation}, #{foreignerPrevious}, #{foreignerStart}, #{foreignerLow}, #{foreignerHigh}, #{foreignerFinal}, #{foreignerAverage}, #{foreignerStandardDeviation}, #{priceLowDate}, #{priceHighDate}, #{volumeLowDate}, #{volumeHighDate}, now(), now() )
     </insert>
 
     <insert id="insertsStatStock" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statStockId" keyProperty="statStockId">
         INSERT INTO statStock
-            (  stockCode, marketCode, stockName, periodCode, year, month, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, priceTotal, priceTotalPrevious, rateChange, volumeTrade, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerPrevious, foreignerStart, foreignerLow, foreignerHigh, foreignerFinal, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
+            (  stockCode, marketCode, stockName, periodCode, year, month, yearMonth, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, priceTrade, priceTotal, priceTotalPrevious, rateChange, rateChange, volumeTotal, volumeTotalPrevious, volumeTrade, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerPrevious, foreignerStart, foreignerLow, foreignerHigh, foreignerFinal, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            (  #{item.stockCode}, #{item.marketCode}, #{item.stockName}, #{item.periodCode}, #{item.year}, #{item.month}, #{item.yearWeek}, #{item.week}, #{item.startDate}, #{item.endDate}, #{item.tradeDays}, #{item.pricePrevious}, #{item.priceStart}, #{item.priceFinal}, #{item.priceLow}, #{item.priceHigh}, #{item.priceAverage}, #{item.priceStandardDeviation}, #{item.priceChange}, #{item.priceTotal}, #{item.priceTotalPrevious}, #{item.rateChange}, #{item.volumeTrade}, #{item.volumeLow}, #{item.volumeHigh}, #{item.volumeAverage}, #{item.volumeStandardDeviation}, #{item.foreignerPrevious}, #{item.foreignerStart}, #{item.foreignerLow}, #{item.foreignerHigh}, #{item.foreignerFinal}, #{item.foreignerAverage}, #{item.foreignerStandardDeviation}, #{item.priceLowDate}, #{item.priceHighDate}, #{item.volumeLowDate}, #{item.volumeHighDate}, now(), now() )
+            (  #{item.stockCode}, #{item.marketCode}, #{item.stockName}, #{item.periodCode}, #{item.year}, #{item.month}, #{item.yearMonth}, #{item.yearWeek}, #{item.week}, #{item.startDate}, #{item.endDate}, #{item.tradeDays}, #{item.pricePrevious}, #{item.priceStart}, #{item.priceFinal}, #{item.priceLow}, #{item.priceHigh}, #{item.priceAverage}, #{item.priceStandardDeviation}, #{item.priceChange}, #{item.priceTrade}, #{item.priceTotal}, #{item.priceTotalPrevious}, #{item.rateChange}, #{item.rateChangeMax}, #{item.volumeTotal}, #{volumeTotalPrevious}, #{item.volumeTrade}, #{item.volumeLow}, #{item.volumeHigh}, #{item.volumeAverage}, #{item.volumeStandardDeviation}, #{item.foreignerPrevious}, #{item.foreignerStart}, #{item.foreignerLow}, #{item.foreignerHigh}, #{item.foreignerFinal}, #{item.foreignerAverage}, #{item.foreignerStandardDeviation}, #{item.priceLowDate}, #{item.priceHighDate}, #{item.volumeLowDate}, #{item.volumeHighDate}, now(), now() )
         </foreach>
     </insert>
 
@@ -26,6 +26,7 @@
             <if test="marketCode != null">marketCode = #{marketCode},</if>
             <if test="stockName != null">stockName = #{stockName},</if>
             <if test="periodCode != null">periodCode = #{periodCode},</if>
+            <if test="yearMonth != null">yearMonth = #{yearMonth},</if>
             <if test="week != null">week = #{week},</if>
             <if test="startDate != null">startDate = #{startDate},</if>
             <if test="endDate != null">endDate = #{endDate},</if>
@@ -38,9 +39,13 @@
             <if test="priceAverage != null">priceAverage = #{priceAverage},</if>
             <if test="priceStandardDeviation != null">priceStandardDeviation = #{priceStandardDeviation},</if>
             <if test="priceChange != null">priceChange = #{priceChange},</if>
+            <if test="priceTrade != null">priceTrade = #{priceTrade},</if>
             <if test="priceTotal != null">priceTotal = #{priceTotal},</if>
             <if test="priceTotalPrevious != null">priceTotalPrevious = #{priceTotalPrevious},</if>
             <if test="rateChange != null">rateChange = #{rateChange},</if>
+            <if test="rateChangeMax != null">rateChangeMax = #{rateChangeMax},</if>
+            <if test="volumeTotal != null">volumeTotal = #{volumeTotal},</if>
+            <if test="volumeTotalPrevious != null">volumeTotalPrevious = #{volumeTotalPrevious},</if>
             <if test="volumeTrade != null">volumeTrade = #{volumeTrade},</if>
             <if test="volumeLow != null">volumeLow = #{volumeLow},</if>
             <if test="volumeHigh != null">volumeHigh = #{volumeHigh},</if>
@@ -101,6 +106,7 @@
                 <if test="periodCode != null and periodCode != ''">AND statStock.periodCode=#{periodCode}</if>
                 <if test="year != null and year != ''">AND statStock.year=#{year}</if>
                 <if test="month != null and month != ''">AND statStock.month=#{month}</if>
+                <if test="yearMonth != null and yearMonth != ''">AND statStock.yearMonth=#{yearMonth}</if>
                 <if test="yearWeek != null and yearWeek != ''">AND statStock.yearWeek=#{yearWeek}</if>
                 <if test="week != null and week != ''">AND statStock.week=#{week}</if>
                 <if test="startDate != null and startDate != ''">AND statStock.startDate=#{startDate}</if>
@@ -114,9 +120,13 @@
                 <if test="priceAverage != null and priceAverage != ''">AND statStock.priceAverage=#{priceAverage}</if>
                 <if test="priceStandardDeviation != null and priceStandardDeviation != ''">AND statStock.priceStandardDeviation=#{priceStandardDeviation}</if>
                 <if test="priceChange != null and priceChange != ''">AND statStock.priceChange=#{priceChange}</if>
+                <if test="priceTrade != null and priceTrade != ''">AND statStock.priceTrade=#{priceTrade}</if>
                 <if test="priceTotal != null and priceTotal != ''">AND statStock.priceTotal=#{priceTotal}</if>
                 <if test="priceTotalPrevious != null and priceTotalPrevious != ''">AND statStock.priceTotalPrevious=#{priceTotalPrevious}</if>
                 <if test="rateChange != null and rateChange != ''">AND statStock.rateChange=#{rateChange}</if>
+                <if test="rateChangeMax != null and rateChangeMax != ''">AND statStock.rateChangeMax=#{rateChangeMax}</if>
+                <if test="volumeTotal != null and volumeTotal != ''">AND statStock.volumeTotal=#{volumeTotal}</if>
+                <if test="volumeTotalPrevious != null and volumeTotalPrevious != ''">AND statStock.volumeTotalPrevious=#{volumeTotalPrevious}</if>
                 <if test="volumeTrade != null and volumeTrade != ''">AND statStock.volumeTrade=#{volumeTrade}</if>
                 <if test="volumeLow != null and volumeLow != ''">AND statStock.volumeLow=#{volumeLow}</if>
                 <if test="volumeHigh != null and volumeHigh != ''">AND statStock.volumeHigh=#{volumeHigh}</if>
@@ -137,6 +147,10 @@
                 <if test="fallCount != null and fallCount != ''">AND statStock.fallCount=#{fallCount}</if>
                 <if test="evenCount != null and evenCount != ''">AND statStock.evenCount=#{evenCount}</if>
                 <if test="tradeYn != null and tradeYn != ''">AND statStock.volumeTrade > 0</if>
+                <if test="startYearMonth != null and startYearMonth != ''">AND statStock.yearMonth <![CDATA[ >= ]]> #{startYearMonth}</if>
+                <if test="endYearMonth != null and endYearMonth != ''">AND statStock.yearMonth <![CDATA[ <= ]]> #{endYearMonth}</if>
+                <if test="startYearWeek != null and startYearWeek != ''">AND statStock.yearWeek <![CDATA[ >= ]]> #{startYearWeek}</if>
+                <if test="endYearWeek != null and endYearWeek != ''">AND statStock.yearWeek <![CDATA[ <= ]]> #{endYearWeek}</if>
                 <if test="pagingParam.filter != null and pagingParam.filter != ''">AND statStock.statNameCode like CONCAT('%',#{pagingParam.filter},'%')</if>
             </trim>
         </where>
@@ -152,6 +166,7 @@
                 <when test="pagingParam.sortIndex eq 'periodCode'">periodCode</when>
                 <when test="pagingParam.sortIndex eq 'year'">year</when>
                 <when test="pagingParam.sortIndex eq 'month'">month</when>
+                <when test="pagingParam.sortIndex eq 'yearMonth'">yearMonth</when>
                 <when test="pagingParam.sortIndex eq 'yearWeek'">yearWeek</when>
                 <when test="pagingParam.sortIndex eq 'week'">week</when>
                 <when test="pagingParam.sortIndex eq 'startDate'">startDate</when>
@@ -165,9 +180,13 @@
                 <when test="pagingParam.sortIndex eq 'priceAverage'">priceAverage</when>
                 <when test="pagingParam.sortIndex eq 'priceStandardDeviation'">priceStandardDeviation</when>
                 <when test="pagingParam.sortIndex eq 'priceChange'">priceChange</when>
+                <when test="pagingParam.sortIndex eq 'priceTrade'">priceTrade</when>
                 <when test="pagingParam.sortIndex eq 'priceTotal'">priceTotal</when>
                 <when test="pagingParam.sortIndex eq 'priceTotalPrevious'">priceTotalPrevious</when>
                 <when test="pagingParam.sortIndex eq 'rateChange'">rateChange</when>
+                <when test="pagingParam.sortIndex eq 'rateChangeMax'">rateChangeMax</when>
+                <when test="pagingParam.sortIndex eq 'volumeTotal'">volumeTotal</when>
+                <when test="pagingParam.sortIndex eq 'volumeTotalPrevious'">volumeTotalPrevious</when>
                 <when test="pagingParam.sortIndex eq 'volumeTrade'">volumeTrade</when>
                 <when test="pagingParam.sortIndex eq 'volumeLow'">volumeLow</when>
                 <when test="pagingParam.sortIndex eq 'volumeHigh'">volumeHigh</when>

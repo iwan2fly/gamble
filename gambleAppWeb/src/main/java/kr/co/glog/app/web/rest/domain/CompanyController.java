@@ -30,8 +30,8 @@ public class CompanyController {
         RestResponse restResponse = new RestResponse();
 
         CompanyResult companyResult = companyDao.getCompany( companyCode );
-
-        restResponse.putData( "company", companyResult );
+        restResponse.putData( "result", companyResult );
+        log.debug( restResponse.toString() );
         return restResponse;
     }
 
@@ -43,7 +43,7 @@ public class CompanyController {
 
         ArrayList<CompanyResult> companyList = companyDao.getCompanyList( companyParam );
 
-        restResponse.putData( "companyList", companyList );
+        restResponse.putData( "list", companyList );
         return restResponse;
     }
 

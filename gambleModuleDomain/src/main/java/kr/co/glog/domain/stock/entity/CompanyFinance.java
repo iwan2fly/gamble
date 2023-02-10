@@ -12,10 +12,12 @@ import org.apache.ibatis.type.Alias;
 @Alias("CompanyFinance")
 public class CompanyFinance extends EntityModel {
     String  companyCode;            // dart corp_code
-    Integer  year;                  // 년도
-    Integer  quarter;               // 분기
+    String  stockCode;              // 주식코드
+    String  yearQuarter;            // 년도분기
+    Integer year;                  // 년도
+    Integer quarter;               // 분기
     String  subject;                // 분류
     String  account;                // 항목
-    Long  amount;                   // 금액
-    Integer  sortOrder;             // 정렬순서
+    Long    amount;                   // 금액
+    Integer sortOrder;             // 정렬순서
 }

@@ -109,7 +109,7 @@ public class StatStockDao {
         return statStock;
     }
 
-    public StatStock saveStatStock(StatStock statStock) {
+    public StatStock insertUpdateStatStock(StatStock statStock) {
         log.debug( statStock.toString() );
         if ( statStock == null ) throw new ParameterMissingException( "StatStock" );
         if ( statStock.getStockCode() == null || statStock.getPeriodCode() == null ) throw new ParameterMissingException( "주식코드, 주기, 회차는 필수값입니다.");
@@ -118,6 +118,23 @@ public class StatStockDao {
             statStockMapper.insertStatStock(statStock);
         } catch ( org.springframework.dao.DuplicateKeyException dke ) {
             statStockMapper.updateStatStock(statStock);
+        }
+
+        return statStock;
+    }
+
+    public StatStock updateInsertStatStock(StatStock statStock) {
+        log.debug( statStock.toString() );
+        if ( statStock == null ) throw new ParameterMissingException( "StatStock" );
+        if ( statStock.getStockCode() == null || statStock.getPeriodCode() == null ) throw new ParameterMissingException( "주식코드, 주기, 회차는 필수값입니다.");
+
+        try {
+            if ( statStockMapper.updateStatStock(statStock) == 0 ) {
+                statStockMapper.insertStatStock(statStock);
+            }
+
+        } catch ( Exception e ) {
+            statStockMapper.insertStatStock(statStock);
         }
 
         return statStock;

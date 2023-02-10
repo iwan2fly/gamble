@@ -1,6 +1,7 @@
 package kr.co.glog.app.web.rest.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.model.RestResponse;
 import kr.co.glog.domain.service.StockDailyService;
 import kr.co.glog.domain.stock.dao.StockDailyDao;
@@ -33,19 +34,21 @@ public class StockDailyController {
 
         StockDailyResult stockDailyResult = stockDailyDao.getStockDaily( stockCode, tradeDate );
 
-        restResponse.putData( "stockDaily", stockDailyResult );
+        restResponse.putData( "result", stockDailyResult );
         return restResponse;
     }
 
 
     // 목록 데이터 리턴
     @GetMapping("/getList")
-    public RestResponse getList(HttpServletRequest request, HttpServletResponse response, StockDailyParam stockDailyParam ) throws JsonProcessingException {
+    public RestResponse getList(HttpServletRequest request, HttpServletResponse response, StockDailyParam stockDailyParam, PagingParam pagingParam ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
 
+        stockDailyParam.setPagingParam( pagingParam );
+        log.debug( pagingParam.toString() );
         ArrayList<StockDailyResult> stockDailyList = stockDailyDao.getStockDailyList( stockDailyParam );
 
-        restResponse.putData( "stockDailyList", stockDailyList );
+        restResponse.putData( "list", stockDailyList );
         return restResponse;
     }
 
@@ -56,7 +59,7 @@ public class StockDailyController {
 
         StockDaily savedStockDaily = stockDailyDao.insertUpdateStockDaily( stockDaily );
 
-        restResponse.putData( "stockDaily", savedStockDaily );
+        restResponse.putData( "result", savedStockDaily );
         return restResponse;
     }
 

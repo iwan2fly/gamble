@@ -17,6 +17,7 @@ public class StatIndex extends EntityModel {
     String  periodCode;                         // 주기코드
     Integer year;		                        // 년도
     Integer month;                              // 월
+    String  yearMonth;                          // 년월
     String  yearWeek;                           // 년주차
     Integer week;                               // 주차
     String  startDate;                          // 주기의 시작일자
@@ -30,7 +31,9 @@ public class StatIndex extends EntityModel {
     Float   priceAverage;                       // 평균가
     Float   priceStandardDeviation;             // 가격 표준편차
     Float   priceChange;                        // 변동금액
+    Float   pirceChangeMax;                     // 지수 최고 최저 차이
     Float   rateChange;                         // 변동률
+    Float   rateChangeMax;                      // 최저최고 사이 비율
     Long    volumeTrade;                        // 거래량
     Long    volumeLow;                          // 최저거래량
     Long    volumeHigh;                         // 최고거래량

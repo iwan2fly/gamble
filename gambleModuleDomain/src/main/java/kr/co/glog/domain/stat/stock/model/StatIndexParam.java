@@ -15,6 +15,11 @@ public class StatIndexParam extends StatIndex {
 
     PagingParam pagingParam = new PagingParam();
 
+    Integer startYear;
     Integer endYear;
+    String  startYearMonth;
+    String  endYearMonth;
+    String  startYearWeek;
+    String  endYearWeek;
 
 }

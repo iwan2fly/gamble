@@ -245,6 +245,11 @@ public class DateUtil {
 		SimpleDateFormat sdf = new SimpleDateFormat("HHmmss");
 		return sdf.format(new Date());
 	}
+	public static String getCurrentDateTime() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return sdf.format(new Date());
+	}
+
 	
 	/**
 	 * 

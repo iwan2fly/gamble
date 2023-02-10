@@ -150,7 +150,7 @@ public class IndexDailyDao {
     }
 
 
-    public ArrayList<IndexDailyResult> getIndexDailyList(IndexDailyParam indexDailyParam ) {
+    public ArrayList<IndexDailyResult>  getIndexDailyList(IndexDailyParam indexDailyParam ) {
         if ( indexDailyParam == null ) throw new ParameterMissingException( "indexDailyParam" );
 
         return indexDailyMapper.selectIndexDailyList( indexDailyParam );
