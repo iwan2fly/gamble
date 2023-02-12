@@ -1,7 +1,9 @@
 # 스프링부트 서버 설정
 server:
   port: 8888
-  servlet.session.timeout: 1800   # 세션 타임아웃 : 초
+  servlet:
+    session:
+      timeout: 1800
 
 
 # 스프링 설정
@@ -20,6 +22,13 @@ spring:
   jackson:
     default-property-inclusion: non_null
 
+  session:
+    store-type: redis
+  redis:
+    host: localhost
+    port: 6379
+
+
 # JWT 설정
 jwt:
   header: Authorization
@@ -32,6 +41,10 @@ jwt:
 caching:
   ttl: 300000   # 캐싱의 Time to live
 
+# logging
+logging:
+  level:
+    io.lettuce.core: info
 ---
 # 개발환경 프로파일
 spring:

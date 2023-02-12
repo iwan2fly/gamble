@@ -119,9 +119,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().permitAll()
                 .expressionHandler(webExpressionHandler())
                 .and()
-                .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAt(loginCheckFilter, BasicAuthenticationFilter.class)
-                .exceptionHandling(handler -> handler.authenticationEntryPoint(authenticationEntryPoint))
+                //.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
+                //.addFilterAt(loginCheckFilter, BasicAuthenticationFilter.class)
+                //.exceptionHandling(handler -> handler.authenticationEntryPoint(authenticationEntryPoint))
                 //.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣는다
         ;

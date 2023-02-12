@@ -1,17 +1,22 @@
 package kr.co.glog.app.web.rest.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.glog.app.web.auth.config.JwtTokenProvider;
 import kr.co.glog.common.model.RestResponse;
 import kr.co.glog.domain.member.entity.Member;
 import kr.co.glog.domain.member.model.MemberResult;
 import kr.co.glog.domain.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.Collections;
 
 @Slf4j
@@ -20,9 +25,35 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class AuthController {
 
+    @Value("${server.servlet.session.timeout}")
+    private int sessionTimeout;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberService memberService;
+    private final ObjectMapper objectMapper;
 
+    @SneakyThrows
+    @PostMapping("/redis/login")
+    public Member login(@RequestBody Member member, HttpSession session) {
+        Member authMember = memberService.loginMember(member.getEmail(), member.getPwd());
+        log.debug("### authMember: {}", authMember);
+
+        session.setAttribute(authMember.getEmail(), objectMapper.writeValueAsString(authMember));
+        session.setMaxInactiveInterval(sessionTimeout);
+        return authMember;
+    }
+
+    @SneakyThrows
+    @GetMapping("/member")
+    public MemberResult getUser(@RequestParam String email, HttpSession session) {
+        Object sessionAttribute = session.getAttribute(email);
+        if (sessionAttribute == null) throw new AccountExpiredException("세션 만료");
+
+        String authMemberJsonString = (String) sessionAttribute;
+        log.debug("### authMemberJsonString: {}", authMemberJsonString);
+
+        MemberResult authMember = objectMapper.readValue(authMemberJsonString, MemberResult.class);
+        return authMember;
+    }
 
     // 회원가입
     @PostMapping("/register")

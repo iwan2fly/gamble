@@ -17,19 +17,18 @@ import java.util.Arrays;
 @EnableScheduling
 public class WebApplication extends SpringBootServletInitializer {
 
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(WebApplication.class);
-	}
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(WebApplication.class);
+    }
 
-	public static void main(String[] args) {
-		ApplicationContext applicationContext = SpringApplication.run(WebApplication.class, args);
-		String [] beanNames = applicationContext.getBeanDefinitionNames();
-		Arrays.sort( beanNames );
+    public static void main(String[] args) {
+        ApplicationContext applicationContext = SpringApplication.run(WebApplication.class, args);
+        String[] beanNames = applicationContext.getBeanDefinitionNames();
+        Arrays.sort(beanNames);
 
-		for ( String beanName : beanNames ) {
-			log.debug( beanName );
-		}
-	}
-
+        for (String beanName : beanNames) {
+            log.debug(beanName);
+        }
+    }
 }
