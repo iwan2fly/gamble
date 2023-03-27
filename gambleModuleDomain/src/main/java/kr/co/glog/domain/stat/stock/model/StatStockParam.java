@@ -21,4 +21,8 @@ public class StatStockParam extends StatStock {
     String  endYearMonth;
     String  startYearWeek;
     String  endYearWeek;
+    String  startYearOrder;
+    String  endYearOrder;
+
+    Integer rangeSize;          // 구간범위
 }

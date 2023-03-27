@@ -32,16 +32,16 @@ public class StatIndexDao {
     }
 
     // 유니크 SELECT
-    public StatIndexResult getStatIndex( String marketCode, String periodCode, String yearWeek ) {
+    public StatIndexResult getStatIndex( String marketCode, String periodCode, String yearOrder ) {
         if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( periodCode == null ) throw new ParameterMissingException( "periodCode" );
-        if ( yearWeek == null ) throw new ParameterMissingException( "yearWeek" );
+        if ( yearOrder == null ) throw new ParameterMissingException( "yearOrder" );
 
         StatIndexResult statIndexResult = null;
         StatIndexParam statIndexParam = new StatIndexParam();
         statIndexParam.setMarketCode( marketCode );
         statIndexParam.setPeriodCode( periodCode );
-        statIndexParam.setYearWeek( yearWeek );
+        statIndexParam.setYearOrder( yearOrder );
         ArrayList<StatIndexResult> statIndexList = statIndexMapper.selectStatIndexList( statIndexParam );
         if ( statIndexList != null && statIndexList.size() > 0 ) statIndexResult = statIndexList.get(0);
         return statIndexResult;
@@ -57,7 +57,7 @@ public class StatIndexDao {
     public int insertStatIndex ( StatIndex statIndex ) {
 
         if ( statIndex == null ) throw new ParameterMissingException( "StatIndex" );
-        if ( statIndex.getMarketCode() == null || statIndex.getPeriodCode() == null || statIndex.getYearWeek() == null) throw new ParameterMissingException( "시장코드, 주기, 회차는 필수값입니다.");
+        if ( statIndex.getMarketCode() == null || statIndex.getPeriodCode() == null || statIndex.getYearOrder() == null) throw new ParameterMissingException( "시장코드, 주기, 회차는 필수값입니다.");
 
         return statIndexMapper.insertStatIndex(statIndex);
     }
@@ -104,7 +104,7 @@ public class StatIndexDao {
 
     public StatIndex updateStatIndex( StatIndex statIndex ) {
         if ( statIndex == null ) throw new ParameterMissingException( "StatIndex" );
-        if ( statIndex.getMarketCode() == null || statIndex.getPeriodCode() == null || statIndex.getYearWeek() == null) throw new ParameterMissingException( "시장코드, 주기, 회차는 필수값입니다.");
+        if ( statIndex.getMarketCode() == null || statIndex.getPeriodCode() == null || statIndex.getYearOrder() == null) throw new ParameterMissingException( "시장코드, 주기, 회차는 필수값입니다.");
         statIndexMapper.updateStatIndex(statIndex);
         return statIndex;
     }

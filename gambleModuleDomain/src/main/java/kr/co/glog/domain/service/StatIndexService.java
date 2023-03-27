@@ -5,13 +5,17 @@ import kr.co.glog.common.exception.ParameterMissingException;
 import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
 import kr.co.glog.domain.stat.stock.dao.StatIndexDao;
+import kr.co.glog.domain.stat.stock.dao.StatStockDao;
 import kr.co.glog.domain.stat.stock.entity.StatIndex;
 import kr.co.glog.domain.stat.stock.model.StatIndexParam;
 import kr.co.glog.domain.stat.stock.model.StatIndexResult;
+import kr.co.glog.domain.stat.stock.model.StatStockResult;
 import kr.co.glog.domain.stock.MarketCode;
 import kr.co.glog.domain.stock.PeriodCode;
 import kr.co.glog.domain.stock.dao.IndexDailyDao;
+import kr.co.glog.domain.stock.entity.IndexDaily;
 import kr.co.glog.domain.stock.model.IndexDailyResult;
+import kr.co.glog.domain.stock.model.StockDailyResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +35,8 @@ public class StatIndexService {
 
     private final StatIndexDao statIndexDao;
     private final IndexDailyDao indexDailyDao;
+    private final StatStockDao statStockDao;
+
 
 
     /**
@@ -44,7 +50,7 @@ public class StatIndexService {
         statIndexParam.setMarketCode( marketCode );
         statIndexParam.setPeriodCode( PeriodCode.year );
         statIndexParam.setYear( year );
-        statIndexParam.setYearWeek( year + "00" );
+        statIndexParam.setYearOrder( year + "00" );
         ArrayList<StatIndexResult> statIndexList = statIndexDao.getStatIndexList( statIndexParam );
 
         StatIndexResult statIndexResult = null;
@@ -60,12 +66,15 @@ public class StatIndexService {
      * @return
      */
     public StatIndexResult getStatIndexMonth(String marketCode, Integer year, Integer month ) {
+        String yearOrder = month < 10 ? year + "0" + month : "" + year + month;
+        return getStatIndexMonth( marketCode, yearOrder );
+    }
+
+    public StatIndexResult getStatIndexMonth(String marketCode, String yearOrder ) {
         StatIndexParam statIndexParam = new StatIndexParam();
         statIndexParam.setMarketCode( marketCode );
         statIndexParam.setPeriodCode( PeriodCode.month );
-        statIndexParam.setYear( year );
-        statIndexParam.setMonth( month );
-        statIndexParam.setYearWeek( year + "00" );
+        statIndexParam.setYearOrder( yearOrder );
         ArrayList<StatIndexResult> statIndexList = statIndexDao.getStatIndexList( statIndexParam );
 
         StatIndexResult statIndexResult = null;
@@ -76,15 +85,15 @@ public class StatIndexService {
     /**
      * 특정 주차 통계
      * @param marketCode
-     * @param yearWeek
+     * @param yearOrder
      * @return
      */
-    public StatIndexResult getStatIndexWeek(String marketCode, String yearWeek ) {
+    public StatIndexResult getStatIndexWeek(String marketCode, String yearOrder ) {
         StatIndexParam statIndexParam = new StatIndexParam();
         statIndexParam.setMarketCode( marketCode );
         statIndexParam.setPeriodCode( PeriodCode.week );
-        statIndexParam.setYear( Integer.parseInt( yearWeek.substring(0,4) ) );
-        statIndexParam.setYearWeek( yearWeek );
+        statIndexParam.setYear( Integer.parseInt( yearOrder.substring(0,4) ) );
+        statIndexParam.setYearOrder( yearOrder );
         ArrayList<StatIndexResult> statIndexList =  statIndexDao.getStatIndexList( statIndexParam );
 
         StatIndexResult statIndexResult = null;
@@ -117,7 +126,7 @@ public class StatIndexService {
         statIndexParam.setMarketCode( marketCode );
         statIndexParam.setYear( year );
         statIndexParam.setPeriodCode( PeriodCode.month );
-        statIndexParam.setYearWeek( year + "00" );
+        statIndexParam.setYearOrder( year + "00" );
         return statIndexDao.getStatIndexList( statIndexParam );
     }
 
@@ -156,7 +165,7 @@ public class StatIndexService {
 
         PagingParam pagingParam = new PagingParam();
         pagingParam.setRows(53);
-        pagingParam.setSortIndex( "yearWeek");
+        pagingParam.setSortIndex( "yearOrder");
         pagingParam.setSortType("desc");
 
         StatIndexParam statIndexParam = new StatIndexParam();
@@ -247,11 +256,11 @@ public class StatIndexService {
         if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( yyyymmdd == null ) throw new ParameterMissingException( "yyyymmdd" );
 
-        String yearWeek = DateUtil.getYearWeek( yyyymmdd );
+        String yearOrder = DateUtil.getYearWeek( yyyymmdd );
         String startDate = DateUtil.getFirstDateOfWeek( yyyymmdd );
         String endDate = DateUtil.getLastDateOfWeek( yyyymmdd );
 
-        makeStatIndexCommon( marketCode, PeriodCode.week, startDate, endDate, yearWeek );
+        makeStatIndexCommon( marketCode, PeriodCode.week, startDate, endDate, yearOrder );
     }
 
 
@@ -264,7 +273,7 @@ public class StatIndexService {
   //      makeStatIndexCommon( marketCode, periodCode, startDate, endDate, null );
    // }
 
-    public void makeStatIndexCommon(String marketCode, String periodCode, String startDate, String endDate, String yearWeek ) {
+    public void makeStatIndexCommon(String marketCode, String periodCode, String startDate, String endDate, String yearOrder ) {
 
         if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
@@ -273,24 +282,21 @@ public class StatIndexService {
         StatIndex statIndex = new StatIndex();
         statIndex.setMarketCode( marketCode );
         statIndex.setPeriodCode( periodCode);
-        statIndex.setWeek( yearWeek == null ? null : Integer.parseInt(yearWeek.substring(4,6) ) );
+        statIndex.setWeek( yearOrder == null ? null : Integer.parseInt(yearOrder.substring(4,6) ) );
 
         statIndex.setMonth( 0 );
 
         if ( periodCode.equals( PeriodCode.year ) ) {
             statIndex.setYear( Integer.parseInt( startDate.substring(0, 4) ) );
-            statIndex.setYearMonth( statIndex.getYear() + "00" );
-            statIndex.setYearWeek( statIndex.getYear() + "00" );
+            statIndex.setYearOrder( statIndex.getYear() + "00" );
         } else if ( periodCode.equals( PeriodCode.month ) ) {
             statIndex.setYear( Integer.parseInt( startDate.substring(0, 4) ) );
             statIndex.setMonth( Integer.parseInt( startDate.substring(4, 6) ) );
-            statIndex.setYearMonth( startDate.substring(0,6) );
-            statIndex.setYearWeek( statIndex.getYear() + "00" );
+            statIndex.setYearOrder( startDate.substring(0,6) );
         } else if ( periodCode.equals( PeriodCode.week ) ) {
-            statIndex.setYear( Integer.parseInt( yearWeek.substring(0, 4) ) );
+            statIndex.setYear( Integer.parseInt( yearOrder.substring(0, 4) ) );
             statIndex.setMonth( DateUtil.getWeekOfYear( startDate ) );
-            statIndex.setYearMonth( DateUtil.getYearWeek( startDate ) );
-            statIndex.setYearWeek( DateUtil.getYearWeek( startDate ) );
+            statIndex.setYearOrder( DateUtil.getYearWeek( startDate ) );
             statIndex.setWeek( DateUtil.getWeekOfYear( startDate ) );
         }
 
@@ -351,7 +357,34 @@ public class StatIndexService {
    }
 
 
+    /**
+     *  특정 주기의 상승/보합/하락 주식 수 업데이트
+     * @param marketCode
+     * @param periodCode
+     * @param yearOrder
+     */
+    public void updateRiseFallCountFromStockIndex( String marketCode, String periodCode, String yearOrder ) {
 
+        if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
+        if ( periodCode == null ) throw new ParameterMissingException( "periodCode" );
+        if ( yearOrder == null ) throw new ParameterMissingException( "yearOrder" );
+
+        ArrayList<StatStockResult> statStockList = statStockDao.getRiseFallStockCountList( marketCode, periodCode, yearOrder, yearOrder );
+        if ( statStockList != null && statStockList.size() == 1 ) {
+            StatStockResult statStockResult = statStockList.get(0);
+
+            StatIndex statIndex = new StatIndex();
+            statIndex.setMarketCode( marketCode );
+            statIndex.setPeriodCode( periodCode );
+            statIndex.setYearOrder( yearOrder );
+            statIndex.setRiseStockCount( statStockResult.getRiseStockCount() );
+            statIndex.setEvenStockCount( statStockResult.getEvenStockCount() );
+            statIndex.setFallStockCount( statStockResult.getFallStockCount() );
+
+            statIndexDao.updateStatIndex( statIndex );
+        }
+
+    }
 }
 
 

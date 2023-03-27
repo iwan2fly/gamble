@@ -23,6 +23,9 @@ public class IndexDaily extends EntityModel {
     Long    priceTrade;                 // 거래대금
     Long	volumeTrade;		        // 거래량
     Float 	rateChange;			        // 변동비
+    Integer riseStockCount;             // 오른주식수
+    Integer evenStockCount;             // 보합주식수
+    Integer fallStockCount;             // 내린주식수
 
     public Float getPriceYesterday() {
         return getPriceFinal() - getPriceChange();

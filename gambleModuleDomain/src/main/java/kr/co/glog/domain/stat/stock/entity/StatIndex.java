@@ -17,8 +17,7 @@ public class StatIndex extends EntityModel {
     String  periodCode;                         // 주기코드
     Integer year;		                        // 년도
     Integer month;                              // 월
-    String  yearMonth;                          // 년월
-    String  yearWeek;                           // 년주차
+    String  yearOrder;                          // 년도의 월순서, 주순서
     Integer week;                               // 주차
     String  startDate;                          // 주기의 시작일자
     String  endDate;                            // 주기의 종료일자
@@ -43,7 +42,10 @@ public class StatIndex extends EntityModel {
     String  priceHighDate;                      // 최고가날짜
     String  volumeLowDate;                      // 최저거래량 날짜
     String  volumeHighDate;                     // 최고거래량 날짜
-    Integer riseCount;                          // 상승건수
-    Integer fallCount;                          // 하락건수
-    Integer evenCount;                          // 보합건수
+    Integer riseCount;                          // 상승회수
+    Integer fallCount;                          // 하락회수
+    Integer evenCount;                          // 보합회수
+    Integer riseStockCount;                          // 상승주식수
+    Integer fallStockCount;                          // 하락주식수
+    Integer evenStockCount;                          // 보합주식수
 }

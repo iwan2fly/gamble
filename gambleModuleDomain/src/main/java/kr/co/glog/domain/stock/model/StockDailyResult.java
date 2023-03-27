@@ -43,6 +43,10 @@ public class StockDailyResult extends StockDaily {
     Integer evenCount;                          // 보합회수
     Integer fallCount;                          // 하락회수
 
+    Integer riseStockCount;                          // 상승주식수
+    Integer evenStockCount;                          // 보합주식수
+    Integer fallStockCount;                          // 하락주식수
+
     String  startDate;              // 시작일자
     String  endDate;                // 종료일자
 

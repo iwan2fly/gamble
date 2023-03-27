@@ -4,8 +4,15 @@
 
     <!-- DART 데이터를 companyFinance 데이터로 복사하기 -->
     <insert id="insertFromDart" parameterType="companyFinance">
-        INSERT INTO companyFinance ( companyCode, stockCode, year, quarter, subject, account, amount, sortOrder, insertTime, updateTime)
-        SELECT  companyCode, stockCode, year,
+        INSERT INTO companyFinance ( companyCode, stockCode, yearQuarter, year, quarter, subject, account, amount, sortOrder, insertTime, updateTime)
+        SELECT  companyCode, stockCode,
+                CASE
+                    WHEN reportCode = '11013' THEN CONCAT( YEAR, '1' )
+                    WHEN reportCode = '11012' THEN CONCAT( YEAR, '2' )
+                    WHEN reportCode = '11014' THEN CONCAT( YEAR, '3' )
+                    WHEN reportCode = '11011' THEN CONCAT( YEAR, '5' )
+                END quarter,
+                year,
                 CASE
                     WHEN reportCode = '11013' THEN 1
                     WHEN reportCode = '11012' THEN 2
@@ -27,7 +34,12 @@
     <!-- 1,2,3 분기와 연도 전체 데이터로 4분기 데이터 만들기 -->
     <insert id="makeQuarter4" parameterType="companyFinance">
         INSERT INTO companyFinance ( companyCode, stockCode, yearQuarter, year, quarter, subject, account, amount, sortOrder, insertTime, updateTime)
-        SELECT total.companyCode, total.stockCode, concat( total.year, 4 ), total.year, 4, total.subject, total.account, totalAmount - q123Amount q4Amount, total.sortORder, NOW(), NOW()
+        SELECT total.companyCode, total.stockCode, concat( total.year, 4 ), total.year, 4, total.subject, total.account,
+               CASE
+                   WHEN total.account IN ( '매출액', '영업이익', '당기순이익', '법인세차감전 순이익' ) THEN totalAmount - q123Amount
+                   ELSE totalAmount
+               END q4Amount,
+               total.sortORder, NOW(), NOW()
         FROM (
                  SELECT companyCode, stockCode,YEAR, SUBJECT, ACCOUNT, sortOrder, amount totalAmount
                  FROM	companyFinance
@@ -93,7 +105,7 @@
                 <if test="subject != null and subject != ''">AND companyFinance.subject=#{subject}</if>
                 <if test="account != null and account != ''">AND companyFinance.account=#{account}</if>
                 <if test="amount != null and amount != ''">AND companyFinance.amount=#{amount}</if>
-                <if test="recentQuarter != null and recentQuarter != ''">AND companyFinance.yearQuarter=( SELECT MAX(yearQuarter) FROM companyFinance )</if>
+                <if test="recentQuarter != null and recentQuarter != ''">AND companyFinance.yearQuarter=( SELECT MAX(yearQuarter) FROM companyFinance WHERE companyCode=#{companyCode} AND quarter!=5)</if>
                 <if test="recentYear != null and recentYear != ''">AND companyFinance.year=( SELECT MAX(year) FROM companyFinance WHERE companyCode=#{companyCode} AND quarter=5 ) AND quarter=5</if>
                 <if test="pagingParam.filter != null and pagingParam.filter != ''">AND companyFinance.companyCode like CONCAT('%',#{pagingParam.filter},'%')</if>
             </trim>

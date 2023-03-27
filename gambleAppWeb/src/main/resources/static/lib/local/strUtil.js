@@ -1,9 +1,14 @@
 
 let _StrUtil = {
+	isEmpty: function( value ) {
+		if ( typeof value == "undefined" || value == null || value == "" ) return true;
+		else return false ;
+	},
 	// 3자리마다 ,
 	toCurrency: function(value) {
+		if ( this.isEmpty( value ) ) return value;
 		// if(isNaN(value)) return value;
-		if('-' == value || '' == value) return value;
+		if ('-' == value || '' == value) return value;
 
 		try {
 			let number;

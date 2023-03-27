@@ -10,6 +10,8 @@
                 priceFinal.priceFinal,
                 priceLow.priceLowDate,
                 priceHigh.priceHighDate,
+                volumeLow.volumeLowDate,
+                volumeHigh.volumeHighDate,
                 IFNULL(riseCount, 0) riseCount, IFNULL(evenCount,0) evenCount, IFNULL(fallCount, 0) fallCount
         FROM (
             SELECT  marketCode, MIN(priceLow) priceLow, MAX(priceHigh) priceHigh, ROUND(SUM(priceFinal)/COUNT(*),2) priceAverage, COUNT(*) dataCount,
@@ -114,17 +116,17 @@
 
     <insert id="insertIndexDaily" parameterType="IndexDaily" useGeneratedKeys="true" keyProperty="indexDailyId">
         INSERT INTO indexDaily
-            ( marketCode, tradeDate, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, rateChange, insertTime, updateTime )
+            ( marketCode, tradeDate, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, rateChange, riseStockCount, evenStockCount, fallStockCount, insertTime, updateTime )
         VALUES
-            ( #{marketCode}, #{tradeDate}, #{priceFinal}, #{priceChange}, #{priceStart}, #{priceHigh}, #{priceLow}, #{priceTrade}, #{volumeTrade}, #{rateChange}, now(), now() )
+            ( #{marketCode}, #{tradeDate}, #{priceFinal}, #{priceChange}, #{priceStart}, #{priceHigh}, #{priceLow}, #{priceTrade}, #{volumeTrade}, #{rateChange}, #{riseStockCount}, #{evenStockCount}, #{fallStockCount}, now(), now() )
     </insert>
 
     <insert id="insertsIndexDaily" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="indexDailyId" keyProperty="indexDailyId">
         INSERT INTO stock
-            ( marketCode, tradeDate, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, rateChange, insertTime, updateTime )
+            ( marketCode, tradeDate, priceFinal, priceChange, priceStart, priceHigh, priceLow, priceTrade, volumeTrade, rateChange, riseStockCount, evenStockCount, fallStockCount, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            ( #{item.marketCode}, #{item.tradeDate}, #{item.priceFinal}, #{item.priceChange}, #{item.priceStart}, #{item.priceHigh}, #{item.priceLow}, #{item.priceTrade}, #{item.volumeTrade}, #{item.rateChange}, now(), now() )
+            ( #{item.marketCode}, #{item.tradeDate}, #{item.priceFinal}, #{item.priceChange}, #{item.priceStart}, #{item.priceHigh}, #{item.priceLow}, #{item.priceTrade}, #{item.volumeTrade}, #{item.rateChange}, #{item.riseStockCount}, #{item.evenStockCount}, #{item.fallStockCount},  now(), now() )
         </foreach>
     </insert>
 
@@ -140,6 +142,9 @@
             <if test="priceTrade != null">priceTrade = #{priceTrade},</if>
             <if test="volumeTrade != null">volumeTrade = #{volumeTrade},</if>
             <if test="rateChange != null">rateChange = #{rateChange},</if>
+            <if test="riseStockCount != null">riseStockCount = #{riseStockCount},</if>
+            <if test="evenStockCount != null">evenStockCount = #{evenStockCount},</if>
+            <if test="fallStockCount != null">fallStockCount = #{fallStockCount},</if>
             updateTime = now()
         </trim>
         WHERE indexDaily.marketCode=#{marketCode}
@@ -178,6 +183,9 @@
                 <if test="priceTrade != null and priceTrade != ''">AND indexDaily.priceTrade=#{priceTrade}</if>
                 <if test="volumeTrade != null and volumeTrade != ''">AND indexDaily.volumeTrade=#{volumeTrade}</if>
                 <if test="rateChange != null and rateChange != ''">AND indexDaily.rateChange=#{rateChange}</if>
+                <if test="riseStockCount != null and riseStockCount != ''">AND indexDaily.riseStockCount=#{riseStockCount}</if>
+                <if test="evenStockCount != null and evenStockCount != ''">AND indexDaily.evenStockCount=#{evenStockCount}</if>
+                <if test="fallStockCount != null and fallStockCount != ''">AND indexDaily.fallStockCount=#{fallStockCount}</if>
                 <if test="startDate != null and startDate != ''">AND indexDaily.tradeDate <![CDATA[ >= ]]> #{startDate}</if>
                 <if test="endDate != null and endDate != ''">AND indexDaily.tradeDate <![CDATA[ <= ]]> #{endDate}</if>
                 <if test="beforeDate != null and beforeDate != ''">AND indexDaily.tradeDate <![CDATA[ < ]]> #{beforeDate}</if>
@@ -199,6 +207,9 @@
                 <when test="pagingParam.sortIndex eq 'priceTrade'">priceTrade</when>
                 <when test="pagingParam.sortIndex eq 'volumeTrade'">volumeTrade</when>
                 <when test="pagingParam.sortIndex eq 'rateChange'">rateChange</when>
+                <when test="pagingParam.sortIndex eq 'riseStockCount'">riseStockCount</when>
+                <when test="pagingParam.sortIndex eq 'evenStockCount'">evenStockCount</when>
+                <when test="pagingParam.sortIndex eq 'fallStockCount'">falltockCount</when>
                 <otherwise>indexDailyId</otherwise>
             </choose>
             <choose>

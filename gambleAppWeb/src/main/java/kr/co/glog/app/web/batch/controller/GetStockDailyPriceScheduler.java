@@ -195,55 +195,6 @@ public class GetStockDailyPriceScheduler {
 
 
 
-
-
-
-
-    /**
-     * DART의 고유번호 파일 다운로드 받아서, 있는 건 업데이트하고, 없는 건 등록
-     * @throws InterruptedException
-     */
-//    @Scheduled(cron = "0 11 14 07 * * ")
-    public void updateCorpCode() throws InterruptedException {
-
-        log.info( "corpCodeApi START" );
-        try {
-            dartCorpCodeApi.updateCorpCode();
-        } catch ( Exception e ) {
-            e.printStackTrace();
-        }
-        log.info( "coprCodeApi END" );
-
-    }
-
-    /**
-     *  DART 의 고유번호로 기업개황 가져와서 있는 건 업데이트하고, 없는 건 등록
-     * @throws InterruptedException
-     */
-  //  @Scheduled(cron = "0 16 14 04 * * ")
-    public void updateCompany() throws InterruptedException {
-
-        log.info( "corpCodeApi START" );
-        try {
-            CompanyParam CompanyParam = new CompanyParam();
-            CompanyParam.setHasStockCode( true );
-            ArrayList<CompanyResult> CompanyList = companyDao.getCompanyList( CompanyParam );
-            int index=0;
-
-            for ( CompanyResult dartCorpResult : CompanyList ) {
-                index++;
-                log.debug( index + " :" + dartCorpResult.toString() );
-                dartCompanyApi.updateCompany(dartCorpResult.getCompanyCode());
-                Thread.sleep( 100 );        // DART 의 경우 1분에 1000회 이상 호출할경우 24시간 IP 차단 방지
-            }
-
-        } catch ( Exception e ) {
-            e.printStackTrace();
-        }
-        log.info( "coprCodeApi END" );
-
-    }
-
     /**
      *  한국예탁결제원_주식정보서비스 : 시장별 단축코드 전체 조회
      * @throws InterruptedException
@@ -267,7 +218,7 @@ public class GetStockDailyPriceScheduler {
      *  DART 의 고유번호로 전체 재무정보 가져와서 있는 건 업데이트하고, 없는 건 등록
      * @throws InterruptedException
      */
-    //@Scheduled(cron = "0 6 11 17 * * ")
+    @Scheduled(cron = "0 59 20 15 * * ")
     public void updateCompanyFinancialInfoReport() throws InterruptedException {
 
          /*
@@ -280,34 +231,26 @@ public class GetStockDailyPriceScheduler {
         log.info( "dartFinancialApi START" );
         String result = "SUCCESS";
         String year = "2022";
-        String reportCode = "11012";
+        String reportCode = "11011";
 
 
         try {
             CompanyParam CompanyParam = new CompanyParam();
             CompanyParam.setHasStockCode( true );
-            ArrayList<CompanyResult> companyList = companyDao.getCompanyList( CompanyParam );
+            ArrayList<StockResult> stockList = stockDao.getCompanyIdList();
 
-            for ( int i = companyList.size()-1; i >= 0; i-- ) {
-                CompanyResult companyResult = companyList.get(i);
+            for ( int i = stockList.size()-1; i >= 0; i-- ) {
+                StockResult stockResult = stockList.get(i);
 
                 // 이미 한개라도 재무정보가 들어가 있으면 패스
                 DartCompanyFinancialInfoParam companyFinancialInfoParam = new DartCompanyFinancialInfoParam();
-                companyFinancialInfoParam.setCompanyCode(companyResult.getCompanyCode());
+                companyFinancialInfoParam.setCompanyCode(stockResult.getCompanyCode());
                 companyFinancialInfoParam.setYear(year);
                 companyFinancialInfoParam.setReportCode(reportCode);
                 ArrayList<DartCompanyFinancialInfoResult> financialList = dartCompanyFinancialInfoDao.getCompanyFinancialInfoList(companyFinancialInfoParam);
                 if (financialList != null && financialList.size() > 0) continue;
 
-                log.debug(companyResult.getCompanyCode() + " : " + companyResult.getCompanyName() + " : " + companyResult.getStockCode());
-                if (companyResult.getStockCode() == null || companyResult.getStockCode().trim().equals("")) {
-                    log.debug("NO StockCode");
-                    continue;
-                }
-
-                dartFinancialApi.updateCompanyFinancialInfo(companyResult.getCompanyCode(), year, reportCode);
-
-
+                dartFinancialApi.updateCompanyFinancialInfo(stockResult.getCompanyCode(), year, reportCode);
                 Thread.sleep( 100 );
             }
 
@@ -327,184 +270,8 @@ public class GetStockDailyPriceScheduler {
     }
 
 
-    /**
-     *  DART 의 고유번호로 특정회사 재무정보 가져와서 있는 건 업데이트하고, 없는 건 등록
-     * @throws InterruptedException
-     */
-    @Scheduled(cron = "0 11 9 3 * * ")
-    public void updateCompanyFinancialInfo() throws InterruptedException {
-
-         /*
-                1분기보고서 : 11013
-                반기보고서 : 11012
-                3분기보고서 : 11014
-                사업보고서 : 11011
-        */
-
-        log.info( "dartFinancialApi START" );
-        String result = "SUCCESS";
-        String year = "2022";
-        String reportCode = "11014";
-
-        try {
-            CompanyParam CompanyParam = new CompanyParam();
-            CompanyParam.setHasStockCode( true );
-            ArrayList<CompanyResult> companyList = companyDao.getCompanyList( CompanyParam );
-
-            for ( int i = companyList.size()-1; i >= 0; i-- ) {
-                CompanyResult companyResult = companyList.get(i);
-                dartFinancialApi.updateCompanyFinancialInfo(companyResult.getCompanyCode(), year, reportCode);
-                Thread.sleep(100);
-            }
-        } catch ( Exception e ) {
-            e.printStackTrace();
-            result = "FAIL";
-        }
-
-        log.info( "" );
-        log.info( "===========================================================================" );
-        log.info( "dartFinancialApi END " + result );
-        log.info( "===========================================================================" );
-        log.info( "" );
-    }
-
-
-    /**
-     *  낮 12시 배치
-     *  금융위원회 자료로 지수/종목 정보 업데이트
-     * @throws InterruptedException
-     */
-     @Scheduled(cron = "0 30 11 * * * ")
-    public void at12() throws InterruptedException {
-
-        // 금융위원회 자료로 코스피 지수 업서트
-        indexDailyBatchService.upsertFromKrxData10( MarketCode.kospi );
-
-        // 금융위원회 자료로 코스닥 지수 업서트
-        indexDailyBatchService.upsertFromKrxData10( MarketCode.kosdaq );
-
-        // 금융위원회 정보로 지수를 업데이트 했으니, 지수통계도 없데이트
-        indexDailyBatchService.makeStatIndexToday();
 
 
 
-        // 금융위원회 자료로 코스피 코스닥 전 종목 조회 후 stock 테이블에 등록
-        stockDailyBatchService.upsertFromKrxData10();
 
-        // 금융위원회 자료로 코스피 코스닥 전 종목 업데이트 했으니, 종목별 통계도 업데이트
-        stockDailyBatchService.makeStatStockToday();
-    }
-
-
-    /**
-     * 오후 3시 35분 배치
-     * 다음 주식 정보로 당일 지수 / 종목 정보 업서트
-     * @throws InterruptedException
-     */
-    @Scheduled(cron = "0 32 15 * * *")
-    public void at1535() throws InterruptedException {
-
-        // 다음 데이터로 지수 UPSERT
-        indexDailyBatchService.upsertDailyIndexDataBatchFromDaum();
-
-        // 다음 데이터 정보로 지수를 업데이트 했으니, 지수통계도 없데이트
-        indexDailyBatchService.makeStatIndexToday();
-
-
-        // 다음 데이터로 종목 UPSERT
-        stockDailyBatchService.upsertDailyStockDataBatchFromDaumDaily();
-
-        // 다음 데이터로 자료로 코스피 코스닥 전 종목 업데이트 했으니, 종목별 통계도 업데이트
-        stockDailyBatchService.makeStatStockToday();
-    }
-
-    /**
-     * 오후 20시 배치
-     *  주식 종목에 대해서 외인 / 기관 거래정보 업서트
-     * @throws InterruptedException
-     */
-    // 20시 배치 : 외인/기관 거래정보 업서트
-    @Scheduled(cron = "0 0 20 * * *")
-    public void at20() throws InterruptedException {
-
-        // 다음 외인 / 기관 거래 정보
-        stockDailyBatchService.upsertDailyStockDataBatchFromDaumInvestor();
-
-        // 다음 외인 / 기관 정보로 주식을 업데이트 했으니, 주식 동계도 없데이트
-        stockDailyBatchService.makeStatStockToday();
-    }
-
-
-
-    @Scheduled(cron = "0 46 19 3 * * ")
-    public void test() throws InterruptedException {
-
-        // 금융위원회 정보로 지수를 업데이트 했으니, 지수통계도 없데이트
-        indexDailyBatchService.makeStatIndexToday();
-
-        // 다음 데이터로 자료로 코스피 코스닥 전 종목 업데이트 했으니, 종목별 통계도 업데이트
-       // stockDailyBatchService.makeStatStockToday();
-
-    //    stockDailyBatchService.upsertFromKrxDataMonthOf( "202301" );
-
-   //     statStockService.makeStatStockYear( "2023" );
-    //    statStockService.makeStatStockMonth( "202301" );
-/*
-        int date = 20230102;
-        while ( date < 20230127 ) {
-            String dateStr = "" + date;
-            statStockService.makeStatStockWeek( dateStr );
-
-            dateStr = dateUtil.addDate( dateStr, "D", "yyyyMMdd", 7 );
-            date = Integer.parseInt( dateStr );
-        }
-
- */
-/*
-        for ( int i = 1; i < 2; i++ ) {
-            String month = i < 9 ? "0"+ i : ""+i;
-            stockDailyBatchService.upsertFromKrxDataMonthOf( 2021 + month );
-        }
-
-        for ( int i = 1; i <= 12; i++ ) {
-            String month = i < 9 ? "0"+ i : ""+i;
-            stockDailyBatchService.upsertFromKrxDataMonthOf( 2020 + month );
-        }
-*/
-        // 다음 데이터로 종목 UPSERT
-//        stockDailyBatchService.upsertDailyStockDataBatchFromDaumDaily();
-  //    stockDailyService.upsertStockDailyFromDaumDaily( "000020" );
-
-    //    stockDailyBatchService.upsertDailyStockDataBatchFromDaumDaily();
- //      stockDailyBatchService.makeStatStockToday();
-
-
-      //    stockDailyService.upsertDailyStockFromKrx( "049960" );
-       // stockDailyService.upsertDailyDateFromKrx( "20230117" );
-        // stockDailyService.insertDailyStockAllFromDaumInvestor( "049960" );
-
-        /*
-        statStockService.makeStatStockYear( "2020" );
-        statStockService.makeStatStockYear( "2021" );
-        statStockService.makeStatStockYear( "2022" );
-
-        // 월간waw
-        for ( int year = 2020; year <= 2022; year++ ) {
-            for (int i = 1; i <= 12; i++) {
-                String month = i < 10 ? "0" + i : "" + i;
-                statStockService.makeStatStockMonth( "" + year + month );
-            }
-        }
-
-
-        int date = 20230101;
-        while ( date < 20230113 ) {
-            String dateStr = "" + date;
-            statStockService.makeStatStockWeek( dateStr );
-
-            dateStr = dateUtil.addDate( dateStr, "D", "yyyyMMdd", 7 );
-            date = Integer.parseInt( dateStr );
-        }
-*/
-    }
 }

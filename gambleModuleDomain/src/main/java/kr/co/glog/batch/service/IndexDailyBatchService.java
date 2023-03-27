@@ -4,7 +4,9 @@ import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
 import kr.co.glog.domain.service.IndexDailyService;
 import kr.co.glog.domain.service.StatIndexService;
+import kr.co.glog.domain.service.StatStockService;
 import kr.co.glog.domain.stock.MarketCode;
+import kr.co.glog.domain.stock.PeriodCode;
 import kr.co.glog.domain.stock.dao.IndexDailyDao;
 import kr.co.glog.domain.stock.entity.IndexDaily;
 import kr.co.glog.domain.stock.model.IndexDailyParam;
@@ -28,7 +30,6 @@ public class IndexDailyBatchService {
     private final IndexDailyService indexDailyService;
     private final IndexDailyDao indexDailyDao;
     private final StatIndexService statIndexService;
-
 
 
     public void upsertFromKrxDataByDate( String yyyymmdd, String marketCode ) {
@@ -133,7 +134,7 @@ public class IndexDailyBatchService {
         try {
             String indexName = marketCode.equals( MarketCode.kospi ) ? "코스피" : "코스닥";
             String endDate = DateUtil.getToday();
-            String beginDate = DateUtil.addDate( endDate, "D", "yyyyMMdd", -10 );
+            String beginDate = DateUtil.addDate( endDate, "D", "yyyyMMdd", -34 );
 
             time = System.currentTimeMillis();
             log.debug( batch + "데이터 가져오기 : " + time);
@@ -206,22 +207,6 @@ public class IndexDailyBatchService {
      *  오늘의 연간/월간/주간 지수통계 upsert
      */
     public void makeStatIndexToday() {
-
-        // 데이터가 등록되어있는 가장 최근 날짜로 설정
-        /*
-        PagingParam pagingParam = new PagingParam();
-        pagingParam.setRows(1);
-        pagingParam.setSortIndex("tradeDate");
-        pagingParam.setSortType("desc");
-
-        IndexDailyParam indexDailyParam = new IndexDailyParam();
-        indexDailyParam.setMarketCode( MarketCode.kospi );
-        indexDailyParam.setBeforeDate( DateUtil.getToday() );
-        indexDailyParam.setPagingParam( pagingParam );
-
-        ArrayList<IndexDailyResult> indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
-        makeStatIndex( indexDailyList.get(0).getTradeDate() );
-        */
         makeStatIndex( DateUtil.getToday() );
     }
 
@@ -257,4 +242,50 @@ public class IndexDailyBatchService {
 
         }
     }
+
+
+    /**
+     * 오늘 상승/보합/하락 종목 수 업데이트
+     */
+    public void updateStockCountStatToday() {
+        updateStockCountStat( DateUtil.getToday() );
+    }
+
+    /**
+     * 특정 일자의 상승/보합/하락 종목 수 업데이트
+     * @param yyyymmdd
+     * @return
+     */
+    public void updateStockCountStat( String yyyymmdd ) {
+        String batch = "[BATCH] 상승/보합/하락 종목 수 update - ";
+        long time = System.currentTimeMillis();
+        log.debug( batch + "시작 : " + time);
+
+        try {
+            // 일간
+            indexDailyService.updateRiseFallCountFromStockDaily(MarketCode.kospi, yyyymmdd);
+            indexDailyService.updateRiseFallCountFromStockDaily(MarketCode.kosdaq, yyyymmdd);
+
+            String yearOrder = yyyymmdd.substring(0,4) + "00";
+            statIndexService.updateRiseFallCountFromStockIndex( MarketCode.kospi, PeriodCode.year, yearOrder );
+            statIndexService.updateRiseFallCountFromStockIndex( MarketCode.kosdaq, PeriodCode.year, yearOrder );
+
+            yearOrder = yyyymmdd.substring(0,6);
+            statIndexService.updateRiseFallCountFromStockIndex( MarketCode.kospi, PeriodCode.month, yearOrder );
+            statIndexService.updateRiseFallCountFromStockIndex( MarketCode.kosdaq, PeriodCode.month, yearOrder );
+
+            yearOrder = DateUtil.getYearWeek( yyyymmdd );
+            statIndexService.updateRiseFallCountFromStockIndex( MarketCode.kospi, PeriodCode.week, yearOrder );
+            statIndexService.updateRiseFallCountFromStockIndex( MarketCode.kosdaq, PeriodCode.week, yearOrder );
+        } catch ( Exception e ) {
+            time = System.currentTimeMillis();
+            log.debug( batch + "에러 : " + time);
+            e.printStackTrace();
+        } finally {
+            time = System.currentTimeMillis();
+            log.debug( batch + "종료 : " + time);
+        }
+
+    }
 }
+

@@ -20,6 +20,7 @@ let obj = {
         priceAscList: {},
         priceTotalDescList: {},
         volumeDescList: {},
+        changeSpreadList: {},
     },
     watch : {
 
@@ -31,11 +32,12 @@ let obj = {
         init : function () {
             this.getStatIndex();
             this.getStatIndexDailyList();
-            this.getStatIndexYearlyBeforeYear();
+            this.getStatIndexYearlyList();
             this.getPriceDescList();
             this.getPriceAscList();
             this.getVolumeDescList();
             this.getPriceTotalDescList();
+            this.getChangeSpreadList();
         },
         // 지수 통계 : 년간 / 월간 / 주간
         getStatIndex: function() {
@@ -75,8 +77,8 @@ let obj = {
 
             _index.getStatIndexDailyList( param, callback );
         },
-        // 최근 년간 지수 리스트
-        getStatIndexYearlyBeforeYear: function() {
+        // 년간 지수 리스트
+        getStatIndexYearlyList: function() {
 
             let param = {};
             param.marketCode = _serverParam.marketCode;
@@ -91,7 +93,7 @@ let obj = {
                 }
             }
 
-            _index.getStatIndexYearlyBeforeYear( param, callback );
+            _index.getStatIndexYearlyList( param, callback );
         },
 
         // 상승률 상위 주식 리스트
@@ -170,5 +172,22 @@ let obj = {
 
             _stock.getPriceTotalDescList( param, callback );
         },
+        // 변동 스프레드 리스트
+        getChangeSpreadList: function() {
+            let param = {}
+            param.marketCode = _serverParam.marketCode;
+            param.yearOrder = _serverParam.year + '00';
+
+            let callback = function( json ) {
+                if ( json.responseCode == RestResponseStatus.OK ) {
+                    v.changeSpreadList = json.object.list;
+                    _ChartUtil.drawBarChart( v.changeSpreadList, 'changeSpreadChart' );
+                } else {
+                    alert( json.responseMessage );
+                }
+            }
+
+            _stock.getChangeSpreadListYear( param, callback );
+        }
     }
 }

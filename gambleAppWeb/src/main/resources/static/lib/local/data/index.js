@@ -41,10 +41,6 @@ let _index = {
     },
 
 
-    // 특정 년도 이전 지수 통계 목록
-    getStatIndexYearlyBeforeYear: function( param, callback ) {
-        _get( '/rest/domain/krx/statIndex/yearlyListOfYear', param, callback );
-    },
 
     // 특정 년도 월간 지수 통계 목록
     getStatIndexMonthlyListOfYear: function( param, callback ) {

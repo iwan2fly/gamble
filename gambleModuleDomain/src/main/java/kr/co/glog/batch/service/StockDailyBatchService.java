@@ -1,9 +1,10 @@
 package kr.co.glog.batch.service;
 
 import kr.co.glog.common.exception.ApplicationRuntimeException;
-import kr.co.glog.common.exception.NetworkCommunicationFailureException;
 import kr.co.glog.common.model.PagingParam;
 import kr.co.glog.common.utils.DateUtil;
+import kr.co.glog.domain.service.DailyRankStockService;
+import kr.co.glog.domain.service.PeriodRankStockService;
 import kr.co.glog.domain.service.StatStockService;
 import kr.co.glog.domain.service.StockDailyService;
 import kr.co.glog.domain.stock.MarketCode;
@@ -32,6 +33,8 @@ public class StockDailyBatchService {
     private final StockDailyDao stockDailyDao;
     private final StatStockService statStockService;
     private final IndexDailyDao indexDailyDao;
+    private final DailyRankStockService dailyRankStockService;
+    private final PeriodRankStockService periodRankStockService;
 
 
     /**
@@ -388,15 +391,49 @@ public class StockDailyBatchService {
 
             int count = 0;
             for (StockDailyResult stockDailyResult : stockDailyList) {
-
                 count++;
-                log.debug( batch + " [" + count + " / " + stockDailyList.size() + "] " + stockDailyResult.getStockCode() + " 시작" );
+
+                log.debug(batch + " [" + count + " / " + stockDailyList.size() + "] " + stockDailyResult.getStockCode() + " 시작");
 
                 // 연간
                 statStockService.makeStatStockYear(stockDailyResult.getStockCode(), yyyymmdd.substring(0, 4));
 
                 // 월간
                 statStockService.makeStatStockMonth(stockDailyResult.getStockCode(), yyyymmdd.substring(0, 6));
+
+                // 주간
+                statStockService.makeStatStockWeek(stockDailyResult.getStockCode(), yyyymmdd);
+
+                log.debug(batch + " [" + count + " / " + stockDailyList.size() + "] " + stockDailyResult.getStockCode() + " 종료");
+            }
+        } catch ( Exception e ) {
+            time = System.currentTimeMillis();
+            log.debug( batch + "에러 : " + time);
+            e.printStackTrace();
+        } finally {
+            time = System.currentTimeMillis();
+            log.debug(batch + "종료 : " + time);
+        }
+
+    }
+
+    public void makeStatStockWeek( String yyyymmdd ) {
+        String batch = "[BATCH] 주간 지수통계 upsert - ";
+        long time = System.currentTimeMillis();
+        log.debug( batch + "시작 : " + time);
+
+        try {
+            String startDate = DateUtil.getFirstDateOfWeek(yyyymmdd);
+            String endDate = DateUtil.getLastDateOfWeek(yyyymmdd);
+            ArrayList<StockDailyResult> stockDailyList = stockDailyDao.getStockListBetween( MarketCode.kospi, startDate, endDate );
+            ArrayList<StockDailyResult> kosdaqList = stockDailyDao.getStockListBetween( MarketCode.kosdaq, startDate, endDate );
+            stockDailyList.addAll( kosdaqList );
+
+            int count = 0;
+            for (StockDailyResult stockDailyResult : stockDailyList) {
+
+                count++;
+                log.debug( batch + " [" + count + " / " + stockDailyList.size() + "] " + stockDailyResult.getStockCode() + " 시작" );
 
                 // 주간
                 statStockService.makeStatStockWeek(stockDailyResult.getStockCode(), yyyymmdd);
@@ -411,7 +448,121 @@ public class StockDailyBatchService {
             time = System.currentTimeMillis();
             log.debug(batch + "종료 : " + time);
         }
+    }
 
+    public void makeStatStockMonth( String yyyymmdd ) {
+        String batch = "[BATCH] 월간 지수통계 upsert - ";
+        long time = System.currentTimeMillis();
+        log.debug( batch + "시작 : " + time);
+
+        try {
+            String startDate = DateUtil.getFirstDateOfWeek(yyyymmdd);
+            String endDate = DateUtil.getLastDateOfWeek(yyyymmdd);
+            ArrayList<StockDailyResult> stockDailyList = stockDailyDao.getStockListBetween( MarketCode.kospi, startDate, endDate );
+            ArrayList<StockDailyResult> kosdaqList = stockDailyDao.getStockListBetween( MarketCode.kosdaq, startDate, endDate );
+            stockDailyList.addAll( kosdaqList );
+
+            int count = 0;
+            for (StockDailyResult stockDailyResult : stockDailyList) {
+
+                count++;
+                log.debug( batch + " [" + count + " / " + stockDailyList.size() + "] " + stockDailyResult.getStockCode() + " 시작" );
+
+                // 주간
+                statStockService.makeStatStockMonth(stockDailyResult.getStockCode(), yyyymmdd.substring(0,6));
+
+                log.debug( batch + " [" + count + " / " + stockDailyList.size() + "] " + stockDailyResult.getStockCode() + " 종료" );
+            }
+        } catch ( Exception e ) {
+            time = System.currentTimeMillis();
+            log.debug( batch + "에러 : " + time);
+            e.printStackTrace();
+        } finally {
+            time = System.currentTimeMillis();
+            log.debug(batch + "종료 : " + time);
+        }
+    }
+
+
+
+    /**
+     *  오늘의 주식 순위 upsert
+     */
+    public void makeDailyRankStockToday() {
+
+        // 데이터가 등록되어있는 가장 최근 날짜로 설정
+        PagingParam pagingParam = new PagingParam();
+        pagingParam.setRows(1);
+        pagingParam.setSortIndex("tradeDate");
+        pagingParam.setSortType("desc");
+
+        IndexDailyParam indexDailyParam = new IndexDailyParam();
+        indexDailyParam.setMarketCode( MarketCode.kospi );
+        indexDailyParam.setEndDate( DateUtil.getToday() );
+        indexDailyParam.setPagingParam( pagingParam );
+
+        ArrayList<IndexDailyResult> indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
+        makeDailyRankStock( indexDailyList.get(0).getTradeDate() );
+    }
+
+    public void makeDailyRankStock( String yyyymmdd ) {
+        String batch = "[BATCH] 주식 순위 upsert - ";
+        long time = System.currentTimeMillis();
+        log.debug( batch + "시작 : " + time);
+
+        try {
+            dailyRankStockService.makeDailyRank( MarketCode.kospi, yyyymmdd );
+            dailyRankStockService.makeDailyRank( MarketCode.kosdaq, yyyymmdd );
+        } catch ( Exception e ) {
+            time = System.currentTimeMillis();
+            log.debug( batch + "에러 : " + time);
+            e.printStackTrace();
+        } finally {
+            time = System.currentTimeMillis();
+            log.debug(batch + "종료 : " + time);
+        }
+    }
+
+
+    /**
+     *  오늘의 주식 통계 순위 upsert
+     */
+    public void makePeriodRankStockToday() {
+
+        // 데이터가 등록되어있는 가장 최근 날짜로 설정
+        PagingParam pagingParam = new PagingParam();
+        pagingParam.setRows(1);
+        pagingParam.setSortIndex("tradeDate");
+        pagingParam.setSortType("desc");
+
+        IndexDailyParam indexDailyParam = new IndexDailyParam();
+        indexDailyParam.setMarketCode( MarketCode.kospi );
+        indexDailyParam.setEndDate( DateUtil.getToday() );
+        indexDailyParam.setPagingParam( pagingParam );
+
+        ArrayList<IndexDailyResult> indexDailyList = indexDailyDao.getIndexDailyList( indexDailyParam );
+        makePeriodRankStock( indexDailyList.get(0).getTradeDate() );
+    }
+
+    public void makePeriodRankStock(String yyyymmdd ) {
+        String batch = "[BATCH] 주식 통계 순위 upsert - ";
+        long time = System.currentTimeMillis();
+        log.debug( batch + "시작 : " + time);
+
+        try {
+            periodRankStockService.makePeriodRankYear( yyyymmdd.substring(0,4) );
+            periodRankStockService.makePeriodRankMonth( yyyymmdd.substring(0,6) );
+            periodRankStockService.makePeriodRankWeek( DateUtil.getYearWeek( yyyymmdd ) );
+        } catch ( Exception e ) {
+            time = System.currentTimeMillis();
+            log.debug( batch + "에러 : " + time);
+            e.printStackTrace();
+        } finally {
+            time = System.currentTimeMillis();
+            log.debug(batch + "종료 : " + time);
+        }
     }
 
 }
+
+

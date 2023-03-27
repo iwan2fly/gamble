@@ -2,6 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.glog.domain.stock.mapper.StockMapper">
 
+    <select id="selectCompanyIdList" resultType="StockResult">
+        SELECT DISTINCT(companyCode) FROM stock WHERE companyCode IS NOT NULL
+    </select>
+
+    <update id="updateCompanyCodeFromCompany">
+        UPDATE stock, company
+        SET		stock.companyCode = company.companyCode
+        WHERE CONCAT( left(stock.stockCode,5), '0') = company.stockCode
+    </update>
     <insert id="insertStock" parameterType="Stock" keyProperty="stockCode">
         INSERT INTO stock
             ( stockCode, companyCode, isin, stockName, delistingYn, suspendYn, lastTradeDate, currentPrice, stockTypeCode, marketCode, stockCount, issueDate, facePrice, foreignersStockLimit, foreignersStockCount, foreignersHoldRate, insertTime, updateTime )

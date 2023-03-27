@@ -21,6 +21,15 @@ public class StockDao {
 
     private final StockMapper stockMapper;
 
+    public ArrayList<StockResult> getCompanyIdList() {
+        return stockMapper.selectCompanyIdList();
+    }
+
+    // company 테이블의 companyId를 stock 테이블의 companyId로 복사
+    public int updateCompanyCodeFromCompany() {
+        return stockMapper.updateCompanyCodeFromCompany();
+    }
+
     public StockResult getStock( String stockCode ) {
         if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
 

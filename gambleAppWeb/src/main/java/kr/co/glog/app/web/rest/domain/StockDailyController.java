@@ -27,6 +27,16 @@ public class StockDailyController {
     private final StockDailyDao stockDailyDao;
 
 
+    public RestResponse getRiseFallStockCountList(HttpServletRequest request, HttpServletResponse response, String marketCode, String startDate, String endDate) throws JsonProcessingException {
+        RestResponse restResponse = new RestResponse();
+
+        ArrayList<StockDailyResult> list = stockDailyDao.getRiseFallStockCountList( marketCode, startDate, endDate );
+
+        restResponse.putData( "list", list );
+        return restResponse;
+    }
+
+
     // 특정 데이터 리턴
     @GetMapping("/get")
     public RestResponse get(HttpServletRequest request, HttpServletResponse response, String stockCode, String tradeDate) throws JsonProcessingException {

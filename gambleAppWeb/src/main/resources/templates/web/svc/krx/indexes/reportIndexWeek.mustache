@@ -3,12 +3,11 @@
 <script>
     let _serverParam = {
         marketCode : '',
-        year: '',
-        yearWeek : '',
+        yearOrder : '',
     };
 
     _serverParam.marketCode = '{{serverParam.marketCode}}';
-    _serverParam.yearWeek = '{{serverParam.yearWeek}}';
+    _serverParam.yearOrder = '{{serverParam.yearOrder}}';
 </script>
 
 <!-- Page Sidebar Ends-->
@@ -24,7 +23,7 @@
                     <span v-text="statIndex.marketCode == 'kospi' ? '코스피' : '코스닥'"></span>
                 </h2>
                 <span>
-                    <span v-text="yyyymmdd(statIndex.startDate)"></span> ~ <span v-text="yyyymmdd(statIndex.endDate)"></span>
+                    <span v-text="_DateUtil.yyyymmdd(statIndex.startDate)"></span> ~ <span v-text="_DateUtil.yyyymmdd(statIndex.endDate)"></span>
                     <span>(<span class="text-info" v-text="statIndex.tradeDays + '거래일'"></span>)</span>
                     <span>상승 : <span class="text-danger" v-text="statIndex.riseCount + '일'"></span>, </span>
                     <span>하락 : <span class="text-primary" v-text="statIndex.fallCount + '일'"></span></span>
@@ -39,7 +38,7 @@
             <div class="col-md-6 des-xl-50 box-col-6">
                 <div class="card">
                     <div class="card-header p-b-0">
-                        <h5><span v-text="_serverParam.year"></span>년 <span v-text="_serverParam.month"></span>월</h5>
+                        <h5>주간 일봉</h5>
                         <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
                         </div>
                     </div>
@@ -75,7 +74,7 @@
                     <div class="card-header p-b-0">
                         <h5>시가</h5>
                         <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
-                            <code v-text="yyyymmdd(statIndex.startDate)"></code>
+                            <code v-text="_DateUtil.yyyymmdd(statIndex.startDate)"></code>
                         </div>
                     </div>
                     <div :class="(statIndex.priceStart - statIndex.pricePrevious) > 0 ? 'text-danger' : (statIndex.priceStart - statIndex.pricePrevious) < 0 ? 'text-primary' : ''" class="card-body p-b-0 align-self-end">
@@ -93,7 +92,7 @@
                     <div class="card-header p-b-0">
                         <h5>고가</h5>
                         <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
-                            <code v-text="yyyymmdd(statIndex.priceHighDate)"></code>
+                            <code v-text="_DateUtil.yyyymmdd(statIndex.priceHighDate)"></code>
                         </div>
                     </div>
                     <div :class="(statIndex.priceHigh - statIndex.pricePrevious) > 0 ? 'text-danger' : (statIndex.priceHigh - statIndex.pricePrevious) < 0 ? 'text-primary' : ''" class="card-body p-b-0 align-self-end">
@@ -111,7 +110,7 @@
                     <div class="card-header p-b-0">
                         <h5>저가</h5>
                         <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
-                            <code v-text="yyyymmdd(statIndex.priceLowDate)"></code>
+                            <code v-text="_DateUtil.yyyymmdd(statIndex.priceLowDate)"></code>
                         </div>
                     </div>
                     <div :class="(statIndex.priceLow - statIndex.pricePrevious) > 0 ? 'text-danger' : (statIndex.priceLow - statIndex.pricePrevious) < 0 ? 'text-primary' : ''" class="card-body p-b-0 align-self-end">
@@ -129,7 +128,7 @@
                     <div class="card-header p-b-0">
                         <h5>종가</h5>
                         <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
-                            <code v-text="yyyymmdd(statIndex.endDate)"></code>
+                            <code v-text="_DateUtil.yyyymmdd(statIndex.endDate, '.')"></code>
                         </div>
                     </div>
                     <div :class="statIndex.priceChange > 0 ? 'text-danger' : statIndex.priceChange < 0 ? 'text-primary' : ''" class="card-body p-b-0 align-self-end">
@@ -156,7 +155,7 @@
                         </div>
                     </div>
                     <div class="card-body p-b-0 align-self-end">
-                        <h3 v-text="toCurrency( parseInt( statIndex.volumeTrade / 1000000 ) )"></h3>
+                        <h3 v-text="_StrUtil.toCurrency( parseInt( statIndex.volumeTrade / 1000000 ) )"></h3>
                     </div>
                     <div class="card-body p-t-0 align-self-end">
                         <code>(단위 : 백만)</code>
@@ -169,11 +168,11 @@
                     <div class="card-header p-b-0">
                         <h5>최고거래량</h5>
                         <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
-                            <code v-text="yyyymmdd(statIndex.volumeHighDate)"></code>
+                            <code v-text="_DateUtil.yyyymmdd(statIndex.volumeHighDate)"></code>
                         </div>
                     </div>
                     <div class="card-body p-b-0 align-self-end">
-                        <h3 v-text="toCurrency( parseInt( statIndex.volumeHigh / 1000000 ) )"></h3>
+                        <h3 v-text="_StrUtil.toCurrency( parseInt( statIndex.volumeHigh / 1000000 ) )"></h3>
                     </div>
                     <div class="card-body p-t-0 align-self-end">
                         <code>(단위 : 백만)</code>
@@ -186,11 +185,11 @@
                     <div class="card-header p-b-0">
                         <h5>최저거래량</h5>
                         <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
-                            <code v-text="yyyymmdd(statIndex.volumeLowDate)"></code>
+                            <code v-text="_DateUtil.yyyymmdd(statIndex.volumeLowDate)"></code>
                         </div>
                     </div>
                     <div class="card-body p-b-0 align-self-end">
-                        <h3 v-text="toCurrency( parseInt( statIndex.volumeLow / 1000000 ) )"></h3>
+                        <h3 v-text="_StrUtil.toCurrency( parseInt( statIndex.volumeLow / 1000000 ) )"></h3>
                     </div>
                     <div class="card-body p-t-0 align-self-end">
                         <code>(단위 : 백만)</code>
@@ -207,7 +206,7 @@
                         </div>
                     </div>
                     <div class="card-body p-b-0 align-self-end">
-                        <h3 v-text="toCurrency( parseInt( statIndex.volumeAverage / 1000000 ) )"></h3>
+                        <h3 v-text="_StrUtil.toCurrency( parseInt( statIndex.volumeAverage / 1000000 ) )"></h3>
                     </div>
                     <div class="card-body p-t-0 align-self-end">
                         <code>(단위 : 백만)</code>
@@ -216,6 +215,99 @@
             </div>
         </div>
     </div>
+
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8 col-12 des-xl-50 box-col-6">
+                <div class="row">
+                    <div class="col-sm-12 col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>주간 변동비율 그래프</h5>
+                                <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
+                                    <code>변동비 단위 %</code>
+                                </div>
+                            </div>
+                            <div class="card-body p-t-0">
+                                <div id="changeSpreadChart" style="height:400px">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 col-12">
+                        <div class="card">
+                            <div class="card-header p-b-0">
+                                <h5>상승</h5>
+                                <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
+                                    <code>전체 <span v-text="_StrUtil.toCurrency( totalStockCount )"></span> 종목</code>
+                                </div>
+                            </div>
+                            <div class="card-body p-b-0 align-self-end text-danger">
+                                <h3 v-text="_StrUtil.toCurrency( parseInt( statIndex.riseStockCount ) ) + ' (' + _StrUtil.toCurrency( ( 100 * statIndex.riseStockCount / totalStockCount ).toFixed(2) ) + '%)'"></h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="card">
+                            <div class="card-header p-b-0">
+                                <h5>보합</h5>
+                                <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
+                                    <code>전체 <span v-text="_StrUtil.toCurrency( totalStockCount )"></span> 종목</code>
+                                </div>
+                            </div>
+                            <div class="card-body p-b-0 align-self-end">
+                                <h3 v-text="_StrUtil.toCurrency( parseInt( statIndex.evenStockCount ) ) + ' (' + _StrUtil.toCurrency( ( 100 * statIndex.evenStockCount / totalStockCount ).toFixed(2) ) + '%)'"></h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <div class="card">
+                            <div class="card-header p-b-0">
+                                <h5>하락</h5>
+                                <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
+                                    <code>전체 <span v-text="_StrUtil.toCurrency( totalStockCount )"></span> 종목</code>
+                                </div>
+                            </div>
+                            <div class="card-body p-b-0 align-self-end text-primary">
+                                <h3 v-text="_StrUtil.toCurrency( parseInt( statIndex.fallStockCount ) ) + ' (' + _StrUtil.toCurrency( ( 100 * statIndex.fallStockCount / totalStockCount ).toFixed(2) ) + '%)'"></h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-4 col-12 des-xl-50 box-col-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>주간 변동비율 표</h5>
+                        <div class="card-header-right" style="position:absolute; top:30px;  right:30px">
+                            <code>전체 <span v-text="_StrUtil.toCurrency( totalStockCount )"></span> 종목</code>
+                        </div>
+                    </div>
+                    <div class="card-body p-t-0">
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                            <tr>
+                                <th scope="col">변동비율</th>
+                                <th scope="col">종목수</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="(item,index) in changeSpreadListReverse">
+                                <td v-text="item.rateChangeMin + '% ~ ' + item.rateChangeMax + '%'"></td>
+                                <td v-text="item.stockCount"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="container-fluid">
         <div class="row">
@@ -230,7 +322,7 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered table-sm">
                             <thead>
                             <tr>
                                 <th scope="col">종목명</th>
@@ -244,12 +336,12 @@
                             <tr v-for="item in priceDescList">
                                 <th scope="row"><span v-text="item.stockName"></span><code v-text="item.stockCode"></code></th>
                                 <td class="text-end">
-                                    <div v-text="toCurrency(item.priceFinal)"></div>
-                                    <div><code :class="item.priceChange > 0 ? 'text-danger' : item.priceChange < 0 ? 'text-primary' : ''" v-text="((item.priceChange>0) ? '+' : '') + toCurrency(item.priceChange)"></code></div>
+                                    <div v-text="_StrUtil.toCurrency(item.priceFinal)"></div>
+                                    <div><code :class="item.priceChange > 0 ? 'text-danger' : item.priceChange < 0 ? 'text-primary' : ''" v-text="((item.priceChange>0) ? '+' : '') + _StrUtil.toCurrency(item.priceChange)"></code></div>
                                 </td>
                                 <td v-text="item.rateChange + '%'" class="text-end f-w-700"></td>
-                                <td v-text="toCurrency( parseInt( item.priceTotal / 100000000 ) )" class="text-end"></td>
-                                <td v-text="toCurrency( parseInt( item.volumeTrade / 1000 ) )"class="text-end"></td>
+                                <td v-text="_StrUtil.toCurrency( parseInt( item.priceTotal / 100000000 ) )" class="text-end"></td>
+                                <td v-text="_StrUtil.toCurrency( parseInt( item.volumeTrade / 1000 ) )"class="text-end"></td>
                             </tr>
                             </tbody>
                         </table>
@@ -268,7 +360,7 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered table-sm">
                             <thead>
                             <tr>
                                 <th scope="col">종목명</th>
@@ -282,12 +374,12 @@
                             <tr v-for="item in priceAscList">
                                 <th scope="row"><span v-text="item.stockName"></span><code v-text="item.stockCode"></code></th>
                                 <td class="text-end">
-                                    <div v-text="toCurrency(item.priceFinal)"></div>
-                                    <div><code :class="item.priceChange > 0 ? 'text-danger' : item.priceChange < 0 ? 'text-primary' : ''" v-text="((item.priceChange>0) ? '+' : '') + toCurrency(item.priceChange)"></code></div>
+                                    <div v-text="_StrUtil.toCurrency(item.priceFinal)"></div>
+                                    <div><code :class="item.priceChange > 0 ? 'text-danger' : item.priceChange < 0 ? 'text-primary' : ''" v-text="((item.priceChange>0) ? '+' : '') + _StrUtil.toCurrency(item.priceChange)"></code></div>
                                 </td>
                                 <td v-text="item.rateChange + '%'" class="text-end f-w-700"></td>
-                                <td v-text="toCurrency( parseInt( item.priceTotal / 100000000 ) )" class="text-end"></td>
-                                <td v-text="toCurrency( parseInt( item.volumeTrade / 1000 ) )"class="text-end"></td>
+                                <td v-text="_StrUtil.toCurrency( parseInt( item.priceTotal / 100000000 ) )" class="text-end"></td>
+                                <td v-text="_StrUtil.toCurrency( parseInt( item.volumeTrade / 1000 ) )"class="text-end"></td>
                             </tr>
                             </tbody>
                         </table>
@@ -308,7 +400,7 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered table-sm">
                             <thead>
                             <tr>
                                 <th scope="col">종목명</th>
@@ -322,12 +414,12 @@
                             <tr v-for="item in priceTotalDescList">
                                 <th scope="row"><span v-text="item.stockName"></span><code v-text="item.stockCode"></code></th>
                                 <td class="text-end">
-                                    <div v-text="toCurrency(item.priceFinal)"></div>
-                                    <div><code :class="item.priceChange > 0 ? 'text-danger' : item.priceChange < 0 ? 'text-primary' : ''" v-text="((item.priceChange>0) ? '+' : '') + toCurrency(item.priceChange)"></code></div>
+                                    <div v-text="_StrUtil.toCurrency(item.priceFinal)"></div>
+                                    <div><code :class="item.priceChange > 0 ? 'text-danger' : item.priceChange < 0 ? 'text-primary' : ''" v-text="((item.priceChange>0) ? '+' : '') + _StrUtil.toCurrency(item.priceChange)"></code></div>
                                 </td>
                                 <td v-text="item.rateChange + '%'" class="text-end"></td>
-                                <td v-text="toCurrency( parseInt( item.priceTotal / 100000000 ) )" class="text-end f-w-700"></td>
-                                <td v-text="toCurrency( parseInt( item.volumeTrade / 1000 ) )"class="text-end"></td>
+                                <td v-text="_StrUtil.toCurrency( parseInt( item.priceTotal / 100000000 ) )" class="text-end f-w-700"></td>
+                                <td v-text="_StrUtil.toCurrency( parseInt( item.volumeTrade / 1000 ) )"class="text-end"></td>
                             </tr>
                             </tbody>
                         </table>
@@ -345,7 +437,7 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered table-sm">
                             <thead>
                             <tr>
                                 <th scope="col">종목명</th>
@@ -359,12 +451,12 @@
                             <tr v-for="item in volumeDescList">
                                 <th scope="row"><span v-text="item.stockName"></span><code v-text="item.stockCode"></code></th>
                                 <td class="text-end">
-                                    <div v-text="toCurrency(item.priceFinal)"></div>
-                                    <div><code :class="item.priceChange > 0 ? 'text-danger' : item.priceChange < 0 ? 'text-primary' : ''" v-text="((item.priceChange>0) ? '+' : '') + toCurrency(item.priceChange)"></code></div>
+                                    <div v-text="_StrUtil.toCurrency(item.priceFinal)"></div>
+                                    <div><code :class="item.priceChange > 0 ? 'text-danger' : item.priceChange < 0 ? 'text-primary' : ''" v-text="((item.priceChange>0) ? '+' : '') + _StrUtil.toCurrency(item.priceChange)"></code></div>
                                 </td>
                                 <td v-text="item.rateChange + '%'" class="text-end"></td>
-                                <td v-text="toCurrency( parseInt( item.priceTotal / 100000000 ) )" class="text-end"></td>
-                                <td v-text="toCurrency( parseInt( item.volumeTrade / 1000 ) )" class="text-end f-w-700"></td>
+                                <td v-text="_StrUtil.toCurrency( parseInt( item.priceTotal / 100000000 ) )" class="text-end"></td>
+                                <td v-text="_StrUtil.toCurrency( parseInt( item.volumeTrade / 1000 ) )" class="text-end f-w-700"></td>
                             </tr>
                             </tbody>
                         </table>
@@ -376,7 +468,7 @@
 
 </div>
 
-<script src="/lib/local/chartUtil.js"></script>
+
 <script src="/lib/local/data/index.js"></script>
 <script src="/lib/local/data/stock.js"></script>
 <script src="/js/web/svc/krx/indexes/reportIndexWeek.js"></script>

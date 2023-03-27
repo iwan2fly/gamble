@@ -4,8 +4,10 @@ package kr.co.glog.domain.service;
 import kr.co.glog.common.exception.NetworkCommunicationFailureException;
 import kr.co.glog.common.exception.ParameterMissingException;
 import kr.co.glog.domain.stock.dao.IndexDailyDao;
+import kr.co.glog.domain.stock.dao.StockDailyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.entity.IndexDaily;
+import kr.co.glog.domain.stock.model.StockDailyResult;
 import kr.co.glog.external.datagokr.fsc.model.GetMarketIndexInfoResult;
 import kr.co.glog.external.daumFinance.DaumDailyIndexScrapper;
 import kr.co.glog.external.daumFinance.DaumIndexScrapper;
@@ -32,6 +34,7 @@ public class IndexDailyService {
     private final StockDao stockDao;
     private final DaumDailyIndexScrapper daumDailyIndexScrapper;
     private final DaumIndexScrapper daumIndexScrapper;
+    private final StockDailyDao stockDailyDao;
 
 
     /**
@@ -107,7 +110,7 @@ public class IndexDailyService {
      * 다음 주식의 전체 일별 지수 데이터를 IndexDaily 테이블에 인서트
      * @param marketCode
      */
-    public void insertDailyIndexAllFromDaum(String marketCode  ) {
+    public void insertDailyIndexAllFromDaum( String marketCode  ) {
 
         int perPage = 100;
 
@@ -239,4 +242,28 @@ public class IndexDailyService {
         return indexDaily;
     }
 
+    /**
+     *  특정 시장, 특정 날짜의 상승/보합/하락 주식 수를 업데이트
+     * @param marketCode
+     * @param tradeDate
+     */
+    public void updateRiseFallCountFromStockDaily( String marketCode, String tradeDate ) {
+
+        if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
+        if ( tradeDate == null ) throw new ParameterMissingException( "tradeDate" );
+
+        ArrayList<StockDailyResult> stockDailyList = stockDailyDao.getRiseFallStockCountList( marketCode, tradeDate, tradeDate );
+        if ( stockDailyList != null && stockDailyList.size() == 1 ) {
+            StockDailyResult stockDailyResult = stockDailyList.get(0);
+
+            IndexDaily indexDaily = new IndexDaily();
+            indexDaily.setMarketCode( marketCode );
+            indexDaily.setTradeDate( tradeDate );
+            indexDaily.setRiseStockCount( stockDailyResult.getRiseStockCount() );
+            indexDaily.setEvenStockCount( stockDailyResult.getEvenStockCount() );
+            indexDaily.setFallStockCount( stockDailyResult.getFallStockCount() );
+
+            indexDailyDao.updateIndexDaily( indexDaily );
+        }
+    }
 }

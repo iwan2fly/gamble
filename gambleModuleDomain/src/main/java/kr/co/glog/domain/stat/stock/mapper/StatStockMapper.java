@@ -9,6 +9,9 @@ import java.util.ArrayList;
 
 @Mapper
 public interface StatStockMapper {
+
+    public ArrayList<StatStockResult> selectRateChangeSpreadList( StatStockParam statStockParam );          // 변동 구간별 주식 수
+    public ArrayList<StatStockResult> selectRiseFallStockCountList( StatStockParam statStockParam );        // 상승/보합/하락 주식 수
     public int insertStatStock( StatStock statStock );									    // 등록
     public int insertsStatStock( ArrayList<StatStock> statStockList );		                // 대량등록
     public int updateStatStock( StatStock statStock );									    // 수정

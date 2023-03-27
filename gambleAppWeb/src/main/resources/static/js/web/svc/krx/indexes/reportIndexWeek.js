@@ -11,6 +11,7 @@ let obj = {
     },
     data : {
         periodCode : 'week',
+        totalStockCount: 0,
         statIndex: {},
         statIndexYearlyList: {},
         statIndexMonthlyList: {},
@@ -20,27 +21,28 @@ let obj = {
         priceAscList: {},
         priceTotalDescList: {},
         volumeDescList: {},
+        changeSpreadList: {},
+        changeSpreadListReverse: {},
     },
     watch : {
 
     },
     computed: {
-
     },
     methods: {
         init : function () {
 
-            _serverParam.year = _serverParam.yearWeek.substring(0,4);
-            _serverParam.week = _serverParam.yearWeek.substring(4,6);
+            _serverParam.year = _serverParam.yearOrder.substring(0,4);
+            _serverParam.week = _serverParam.yearOrder.substring(4,6);
 
             this.getStatIndex();
             this.getStatIndexDailyList();
             this.getStatIndexWeeklyList();
-
             this.getPriceDescList();
             this.getPriceAscList();
             this.getVolumeDescList();
             this.getPriceTotalDescList();
+            this.getChangeSpreadList();
         },
         // 지수 통계 : 년간 / 월간 / 주간
         getStatIndex: function() {
@@ -48,11 +50,12 @@ let obj = {
             let param = {};
             param.marketCode = _serverParam.marketCode;
             param.year = _serverParam.year;
-            param.yearWeek = _serverParam.yearWeek;
+            param.yearOrder = _serverParam.yearOrder;
 
             let callback = function( json ) {
                 if (json.responseCode == RestResponseStatus.OK) {
                     v.statIndex = json.object.result;
+                    v.totalStockCount = v.statIndex.riseStockCount + v.statIndex.evenStockCount + v.statIndex.fallStockCount;
                 } else {
                     alert(json.responseMessage);
                 }
@@ -64,13 +67,13 @@ let obj = {
         getStatIndexDailyList: function() {
             let param = {};
             param.marketCode = _serverParam.marketCode;
-            param.startDate = dateUtil.dateToYYYYMMDD( dateUtil.getFirstDateOfWeek( _serverParam.yearWeek ) );
-            param.endDate = dateUtil.dateToYYYYMMDD( dateUtil.getLastDateOfWeek( _serverParam.yearWeek ) );
+            param.startDate = _DateUtil.dateToYYYYMMDD( _DateUtil.getFirstDateOfWeek( _serverParam.yearOrder ) );
+            param.endDate = _DateUtil.dateToYYYYMMDD( _DateUtil.getLastDateOfWeek( _serverParam.yearOrder ) );
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
                     v.statIndexDailyList = json.object.list;
-                    _chartchart.drawStatIndexChart( 'day', 'statIndexChart' );
+                    _ChartUtil.drawStatIndexChart( v.statIndexDailyList, 'day', 'statIndexChart' );
                 } else {
                     alert( json.responseMessage );
                 }
@@ -83,12 +86,12 @@ let obj = {
 
             let param = {};
             param.marketCode = _serverParam.marketCode;
-            param.endYearWeek = _serverParam.yearWeek;
+            param.endYearWeek = _serverParam.yearOrder;
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
                     v.statIndexWeeklyList =  json.object.list;
-                    _ChartUtil.drawStatIndexChart( 'week', 'statIndexChartWeekly' );
+                    _ChartUtil.drawStatIndexChart( v.statIndexWeeklyList, 'week', 'statIndexChartWeekly' );
                 } else {
                     alert( json.responseMessage );
                 }
@@ -103,7 +106,7 @@ let obj = {
             param.marketCode = _serverParam.marketCode;
             param.periodCode = this.periodCode;
             param.year = _serverParam.year;
-            param.yearWeek = _serverParam.yearWeek;
+            param.yearOrder = _serverParam.yearOrder;
             param.sortType = 'desc';
             param.rows = 20;
 
@@ -123,7 +126,7 @@ let obj = {
             param.marketCode = _serverParam.marketCode;
             param.periodCode = this.periodCode;
             param.year = _serverParam.year;
-            param.yearWeek = _serverParam.yearWeek;
+            param.yearOrder = _serverParam.yearOrder;
             param.sortType = 'asc';
             param.rows = 20;
 
@@ -143,7 +146,7 @@ let obj = {
             param.marketCode = _serverParam.marketCode;
             param.periodCode = this.periodCode;
             param.year = _serverParam.year;
-            param.yearWeek = _serverParam.yearWeek;
+            param.yearOrder = _serverParam.yearOrder;
             param.sortType = 'desc';
             param.rows = 20;
 
@@ -163,7 +166,7 @@ let obj = {
             param.marketCode = _serverParam.marketCode;
             param.periodCode = this.periodCode;
             param.year = _serverParam.year;
-            param.yearWeek = _serverParam.yearWeek;
+            param.yearOrder = _serverParam.yearOrder;
             param.sortType = 'desc';
             param.rows = 20;
 
@@ -177,5 +180,23 @@ let obj = {
 
             _stock.getPriceTotalDescList( param, callback );
         },
+        // 변동 스프레드 리스트
+        getChangeSpreadList: function() {
+            let param = {};
+            param.marketCode = _serverParam.marketCode;
+            param.yearOrder = _serverParam.yearOrder;
+
+            let callback = function( json ) {
+                if ( json.responseCode == RestResponseStatus.OK ) {
+                    v.changeSpreadList = json.object.list;
+                    v.changeSpreadListReverse = [...v.changeSpreadList].reverse();
+                    _ChartUtil.drawBarChart( v.changeSpreadList, 'changeSpreadChart' );
+                } else {
+                    alert( json.responseMessage );
+                }
+            }
+
+            _stock.getChangeSpreadListWeek( param, callback );
+        }
     }
 }

@@ -50,9 +50,9 @@ public class StatStockController {
 
     // 특정 주간 데이터 리턴
     @GetMapping("/weekly")
-    public RestResponse weekly(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, String yearWeek ) throws JsonProcessingException {
+    public RestResponse weekly(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, String yearOrder ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
-        StatStockResult statStockResult = statStockService.getStatStockWeek( marketCode, yearWeek );
+        StatStockResult statStockResult = statStockService.getStatStockWeek( marketCode, yearOrder );
         restResponse.putData( "result", statStockResult );
         return restResponse;
     }
@@ -107,7 +107,7 @@ public class StatStockController {
 
     // 특정년도 주식 가격변동률 목록 리턴
     @GetMapping("/rateOfChangePriceList")
-    public RestResponse rateOfChangePriceList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year, Integer month, String yearWeek, PagingParam pagingParam ) throws JsonProcessingException {
+    public RestResponse rateOfChangePriceList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year, Integer month, String yearOrder, PagingParam pagingParam ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
 
         if ( pagingParam.getRows() == null || pagingParam.getRows() > 100 ) pagingParam.setRows(10);
@@ -118,7 +118,7 @@ public class StatStockController {
         statStockParam.setPeriodCode( periodCode );
         statStockParam.setYear( year );
         statStockParam.setMonth( month );
-        statStockParam.setYearWeek( yearWeek );
+        statStockParam.setYearOrder( yearOrder );
 
         statStockParam.setPagingParam( pagingParam );
 
@@ -129,7 +129,7 @@ public class StatStockController {
 
     // 특정년도 주식 거래량 목록 리턴
     @GetMapping("/volumeTradeList")
-    public RestResponse volumeTradeList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year, Integer month, String yearWeek, PagingParam pagingParam ) throws JsonProcessingException {
+    public RestResponse volumeTradeList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year, Integer month, String yearOrder, PagingParam pagingParam ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
 
         if ( pagingParam.getRows() == null || pagingParam.getRows() > 100 ) pagingParam.setRows(10);
@@ -140,7 +140,7 @@ public class StatStockController {
         statStockParam.setPeriodCode( periodCode );
         statStockParam.setYear( year );
         statStockParam.setMonth( month );
-        statStockParam.setYearWeek( yearWeek );
+        statStockParam.setYearOrder( yearOrder );
         statStockParam.setTradeYn( "Y" );
 
         statStockParam.setPagingParam( pagingParam );
@@ -152,7 +152,7 @@ public class StatStockController {
 
     // 특정년도 주식 거래대금 목록 리턴
     @GetMapping("/priceTotalList")
-    public RestResponse priceTotalList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year, Integer month, String yearWeek, PagingParam pagingParam ) throws JsonProcessingException {
+    public RestResponse priceTotalList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, Integer year, Integer month, String yearOrder, PagingParam pagingParam ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
 
         if ( pagingParam.getRows() == null || pagingParam.getRows() > 100 ) pagingParam.setRows(10);
@@ -163,13 +163,24 @@ public class StatStockController {
         statStockParam.setPeriodCode( periodCode );
         statStockParam.setYear( year );
         statStockParam.setMonth( month );
-        statStockParam.setYearWeek( yearWeek );
+        statStockParam.setYearOrder( yearOrder );
         statStockParam.setTradeYn( "Y" );
 
         statStockParam.setPagingParam( pagingParam );
 
         ArrayList<StatStockResult> statStockList = statStockDao.getStatStockList( statStockParam );
         restResponse.putData( "list", statStockList );
+        return restResponse;
+    }
+
+    // 특정기간의 주식 상승/하락 스프레드 목록 리턴
+    @GetMapping("/changeSpreadList")
+    public RestResponse changeSpreadList(HttpServletRequest request, HttpServletResponse response, String marketCode, String periodCode, String yearOrder, Integer rangeSize, PagingParam pagingParam ) throws JsonProcessingException {
+
+        RestResponse restResponse = new RestResponse();
+
+        ArrayList<StatStockResult> statStockList = statStockDao.getRateChangeSpreadList(marketCode, periodCode, yearOrder, rangeSize);
+        restResponse.putData("list", statStockList);
         return restResponse;
     }
 }

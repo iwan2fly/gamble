@@ -12,7 +12,7 @@ import java.util.ArrayList;
 @Mapper
 public interface StockDailyMapper {
 
-
+    public ArrayList<StockDailyResult> selectRiseFallStockCountList( StockDailyParam stockDailyParam);    // 특정기간 상승/보합/하락 종목 수 목록
     public ArrayList<StockDailyResult> selectStockListBetween(StockDailyParam stockDailyParam);		// 특정 기간 거래된 주식 목록
 
     public StockDailyResult selectStatStockCommon(StockDailyParam indexDailyParam  );		        // 주식 평균

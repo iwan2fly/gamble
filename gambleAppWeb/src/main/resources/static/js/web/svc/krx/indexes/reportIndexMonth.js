@@ -11,6 +11,8 @@ let obj = {
     },
     data : {
         periodCode : 'month',
+        year : _serverParam.yearOrder.substring(0,4),
+        month : _serverParam.yearOrder.substring(4,6),
         statIndex: {},
         statIndexYearlyList: {},
         statIndexMonthlyList: {},
@@ -20,6 +22,7 @@ let obj = {
         priceAscList: {},
         priceTotalDescList: {},
         volumeDescList: {},
+        changeSpreadList: {},
     },
     watch : {
 
@@ -37,14 +40,14 @@ let obj = {
             this.getPriceAscList();
             this.getVolumeDescList();
             this.getPriceTotalDescList();
+            this.getChangeSpreadList();
         },
         // 지수 통계 : 년간 / 월간 / 주간
         getStatIndex: function() {
 
             let param = {};
             param.marketCode = _serverParam.marketCode;
-            param.year = _serverParam.year;
-            param.month = _serverParam.month;
+            param.yearOrder = _serverParam.yearOrder;
 
             let callback = function( json ) {
                 if (json.responseCode == RestResponseStatus.OK) {
@@ -61,10 +64,8 @@ let obj = {
 
             let param = {};
             param.marketCode = _serverParam.marketCode;
-
-            let month = _serverParam.month < 10 ? '0' + _serverParam.month : '' + _serverParam.month;
-            param.startDate = _serverParam.year + month + "01";
-            param.endDate = _serverParam.year + month + "31";
+            param.startDate = _serverParam.yearOrder + "01";
+            param.endDate = _serverParam.yearOrder + "31";
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
@@ -82,10 +83,8 @@ let obj = {
 
             let param = {};
             param.marketCode = _serverParam.marketCode;
-
-            let month = _serverParam.month < 10 ? '0' + _serverParam.month : '' + _serverParam.month;
-            param.startYearMonth = ( _serverParam.year - 1 ) + month;
-            param.endYearMonth = _serverParam.year + month;
+            param.startYearMonth = ( this.year - 1 ) + this.month;
+            param.endYearMonth = _serverParam.yearMonth;
 
             let callback = function( json ) {
                 if ( json.responseCode == RestResponseStatus.OK ) {
@@ -104,8 +103,7 @@ let obj = {
             let param = {};
             param.marketCode = _serverParam.marketCode;
             param.periodCode = this.periodCode;
-            param.year = _serverParam.year;
-            param.month = _serverParam.month;
+            param.yearOrder = _serverParam.yearOrder;
             param.sortType = 'desc';
             param.rows = 20;
 
@@ -124,8 +122,7 @@ let obj = {
             let param = {};
             param.marketCode = _serverParam.marketCode;
             param.periodCode = this.periodCode;
-            param.year = _serverParam.year;
-            param.month = _serverParam.month;
+            param.yearOrder = _serverParam.yearOrder;
             param.sortType = 'asc';
             param.rows = 20;
 
@@ -144,8 +141,7 @@ let obj = {
             let param = {};
             param.marketCode = _serverParam.marketCode;
             param.periodCode = this.periodCode;
-            param.year = _serverParam.year;
-            param.month = _serverParam.month;
+            param.yearOrder = _serverParam.yearOrder;
             param.sortType = 'desc';
             param.rows = 20;
 
@@ -164,8 +160,7 @@ let obj = {
             let param = {};
             param.marketCode = _serverParam.marketCode;
             param.periodCode = this.periodCode;
-            param.year = _serverParam.year;
-            param.month = _serverParam.month;
+            param.yearOrder = _serverParam.yearOrder;
             param.sortType = 'desc';
             param.rows = 20;
 
@@ -179,5 +174,22 @@ let obj = {
 
             _stock.getPriceTotalDescList( param, callback );
         },
+        // 변동 스프레드 리스트
+        getChangeSpreadList: function() {
+            let param = {}
+            param.marketCode = _serverParam.marketCode;
+            param.yearOrder = _serverParam.yearOrder;
+
+            let callback = function( json ) {
+                if ( json.responseCode == RestResponseStatus.OK ) {
+                    v.changeSpreadList = json.object.list;
+                    _ChartUtil.drawBarChart( v.changeSpreadList, 'changeSpreadChart' );
+                } else {
+                    alert( json.responseMessage );
+                }
+            }
+
+            _stock.getChangeSpreadListMonth( param, callback );
+        }
     }
 }

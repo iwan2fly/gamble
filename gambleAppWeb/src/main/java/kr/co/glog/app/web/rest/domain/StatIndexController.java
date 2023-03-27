@@ -35,18 +35,18 @@ public class StatIndexController {
 
     // 특정월 지수 데이터 리턴
     @GetMapping("/month")
-    public RestResponse month(HttpServletRequest request, HttpServletResponse response, String marketCode, Integer year, Integer month ) throws JsonProcessingException {
+    public RestResponse month(HttpServletRequest request, HttpServletResponse response, String marketCode, String yearOrder) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
-        StatIndexResult statIndexResult = statIndexService.getStatIndexMonth( marketCode, year, month );
+        StatIndexResult statIndexResult = statIndexService.getStatIndexMonth( marketCode, yearOrder );
         restResponse.putData( "result", statIndexResult );
         return restResponse;
     }
 
     // 특정주 지수 데이터 리턴
     @GetMapping("/week")
-    public RestResponse week(HttpServletRequest request, HttpServletResponse response, String marketCode, String yearWeek ) throws JsonProcessingException {
+    public RestResponse week(HttpServletRequest request, HttpServletResponse response, String marketCode, String yearOrder ) throws JsonProcessingException {
         RestResponse restResponse = new RestResponse();
-        StatIndexResult statIndexResult = statIndexService.getStatIndexWeek( marketCode, yearWeek );
+        StatIndexResult statIndexResult = statIndexService.getStatIndexWeek( marketCode, yearOrder );
         restResponse.putData( "result", statIndexResult );
         return restResponse;
     }

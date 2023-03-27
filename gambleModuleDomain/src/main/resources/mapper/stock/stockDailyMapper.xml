@@ -2,6 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.glog.domain.stock.mapper.StockDailyMapper">
 
+    <!-- 특정주식/특정기간 변동비율 별 수자 -->
+    <select id="selectRateChangeSpreadList" parameterType="StatStockParam" resultType="StatStockResult">
+        SELECT CAST(rateChange/#{rangeSize} AS SIGNED integer) rangeSize, min(rateChange) rateChangeMin, MAX(rateChange) rateChangeMax, COUNT(*) stockCount FROM statStock WHERE stockCode=#{stockCode} AND tradeDate BETWEEN #{startDate} AND #{endDAte}
+        GROUP BY CAST(rateChange/#{rangeSize} AS SIGNED INTEGER) ORDER BY 1
+    </select>
+
+    <!-- 특정일 오른주식, 내린주식, 보합주식 숫자 -->
+    <select id="selectRiseFallStockCountList" parameterType="StockDailyParam" resultType="StockDailyResult">
+        SELECT total.tradeDate, totalStockCount, riseStockCount, evenStockCount, fallStockCount
+        FROM
+            (
+                SELECT tradeDate, COUNT(*) totalStockCount FROM stockDaily WHERE marketCode=#{marketCode} AND tradeDate BETWEEN #{startDate} AND #{endDate} GROUP BY tradeDate
+            ) total
+            LEFT JOIN
+            (
+                SELECT tradeDate, COUNT(*) riseStockCount FROM stockDaily WHERE marketCode=#{marketCode} AND tradeDate BETWEEN #{startDate} AND #{endDate} AND priceChange > 0 GROUP BY tradeDate
+            ) rise ON total.tradeDate = rise.tradeDate
+            LEFT JOIN (
+                SELECT tradeDate, COUNT(*) evenStockCount FROM stockDaily WHERE marketCode=#{marketCode} AND tradeDate BETWEEN #{startDate} AND #{endDate} AND priceChange = 0 GROUP BY tradeDate
+            ) even ON total.tradeDate = even.tradeDate
+            LEFT JOIN (
+                SELECT tradeDate, COUNT(*) fallStockCount FROM stockDaily WHERE marketCode=#{marketCode} AND tradeDate BETWEEN #{startDate} AND #{endDate} AND priceChange <![CDATA[ < ]]>  0 GROUP BY tradeDate
+            ) fall ON total.tradeDate = fall.tradeDate
+    </select>
+
     <!-- 특정 기간동안 거래된 주식 목록 -->
     <select id="selectStockListBetween" parameterType="StockDailyParam" resultType="StockDailyResult" >
         SELECT 	stockCode
@@ -15,7 +40,8 @@
         SELECT  stat1.*,
                 stock.stockCount volumeTotal,
                 lastStock.stockName, lastStock.marketCode, lastStock.priceFinal, lastStock.priceTotal,
-                firstStock.pricePrevious, firstStock.priceStart,
+                IFNULL( previousStock.priceFinal, firstStock.pricePrevious ) pricePrevious,
+                firstStock.priceStart,
                 IFNULL(previousStock.priceTotal, firstStock.volumeTotal * firstStock.pricePrevious) priceTotalPrevious,
                 IFNULL(previousStock.volumeTotal, firstStock.volumeTotal) volumeTotalPrevious,
                 priceLow.tradeDate priceLowDate,
@@ -55,7 +81,7 @@
         ) lastStock ON stat1.stockCode = lastStock.stockCode
         <!-- 이전 마지막 정보 -->
         LEFT JOIN (
-            SELECT stockCode, priceTotal, volumeTotal
+            SELECT stockCode, priceFinal, priceTotal, volumeTotal
             FROM stockDaily
             WHERE stockCode=#{stockCode} AND tradeDate <![CDATA[ < ]]> #{startDate}
             ORDER BY tradeDate DESC

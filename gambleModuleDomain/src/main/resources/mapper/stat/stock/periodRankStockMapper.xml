@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.glog.domain.stat.stock.mapper.PeriodRankStockMapper">
+
+
+    <insert id="insertPeriodRankFromStatStock" parameterType="DailyRankStockParam">
+        INSERT INTO periodRankStock ( stockCode, marketCode, periodCode, year, month, week, yearOrder, rankCode, ranking, rankingValue, insertTime, updateTime )
+        SELECT stockCode, marketCode, periodCode, year, month, week, yearOrder, #{rankCode}, RANK() OVER( ORDER BY ${rankCode} DESC ), ${rankCode}, now(), now() FROM statStock WHERE marketCode=#{marketCode} AND periodCode=#{periodCode} AND yearOrder=#{yearOrder}
+    </insert>
+
+    <insert id="insertPeriodRankStock" parameterType="PeriodRankStock">
+        INSERT INTO periodRankStock
+            (  stockCode, marketCode, periodCode, year, month, week, yearOrder, rankCode, ranking, rankingValue, insertTime, updateTime )
+        VALUES
+            (  #{stockCode}, #{marketCode}, #{periodCode}, #{year}, #{month}, #{week}, #{yearOrder}, #{rankCode}, #{ranking}, #{rankingValue}, now(), now() )
+    </insert>
+
+    <insert id="insertsPeriodRankStock" parameterType="java.util.ArrayList">
+        INSERT INTO periodRankStock
+            (  stockCode, marketCode, periodCode, year, month, week, yearOrder, rankCode, ranking, rankingValue, insertTime, updateTime )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," open="" close="">
+            (  #{item.stockCode}, #{item.marketCode}, #{item.periodCode}, #{item.year}, #item.{month}, #{item.week}, #{item.yearOrder}, #{item.rankCode}, #{item.rankingValue}, #{ranking} now(), now() )
+        </foreach>
+    </insert>
+
+    <update id="updatePeriodRankStock" parameterType="PeriodRankStock">
+        UPDATE 	periodRankStock
+        SET
+        <trim prefix="" suffixOverrides=",">
+            <if test="marketCode != null">marketCode = #{marketCode},</if>
+            <if test="year != null">year = #{year},</if>
+            <if test="month != null">month = #{month},</if>
+            <if test="week != null">week = #{week},</if>
+            <if test="rankCode != null">rankCode = #{rankCode},</if>
+            <if test="ranking != null">ranking = #{ranking</if>
+            <if test="rankingValue != null">rankingValue = #{rankingValue</if>
+            updateTime = now()
+        </trim>
+        WHERE   stockCode = #{stockCode}
+        AND     periodCode = #{periodCode}
+        AND     yearOrder = #{yearOrder}
+        AND     rankCode = #{rankCode}
+    </update>
+
+    <delete id="deletePeriodRankStock" parameterType="PeriodRankStock">
+        DELETE FROM periodRankStock
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="marketCode != null and marketCode != ''">AND periodRankStock.marketCode=#{marketCode}</if>
+                <if test="periodCode != null and periodCode != ''">AND periodRankStock.periodCode=#{periodCode}</if>
+                <if test="rankCode != null and rankCode != ''">AND periodRankStock.rankCode=#{rankCode}</if>
+                <if test="yearOrder != null and yearOrder != ''">AND periodRankStock.yearOrder=#{yearOrder}</if>
+            </trim>
+        </where>
+    </delete>
+
+    <select id="selectPeriodRankStockList" parameterType="PeriodRankStockParam" resultType="PeriodRankStockResult" >
+        SELECT 	periodRankStock.*
+        FROM 	periodRankStock
+        <include refid="wherePeriodRankStock" ></include>
+        <include refid="orderPeriodRankStock" ></include>
+    </select>
+
+    <select id="selectPeriodRankStockListCount" parameterType="PeriodRankStockParam" resultType="java.lang.Integer">
+        SELECT 	COUNT(*)
+        FROM   	periodRankStock
+        <include refid="wherePeriodRankStock" ></include>
+    </select>
+
+    <sql id="wherePeriodRankStock">
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="stockCode != null and stockCode != ''">AND periodRankStock.stockCode=#{stockCode}</if>
+                <if test="marketCode != null and marketCode != ''">AND periodRankStock.marketCode=#{marketCode}</if>
+                <if test="periodCode != null and periodCode != ''">AND periodRankStock.periodCode=#{periodCode}</if>
+                <if test="year != null and year != ''">AND periodRankStock.year=#{year}</if>
+                <if test="month != null and month != ''">AND periodRankStock.month=#{month}</if>
+                <if test="week != null and week != ''">AND periodRankStock.week=#{week}</if>
+                <if test="yearOrder != null and yearOrder != ''">AND periodRankStock.yearOrder=#{yearOrder}</if>
+                <if test="rankCode != null and rankCode != ''">AND periodRankStock.rankCode=#{rankCode}</if>
+                <if test="ranking != null and ranking != ''">AND periodRankStock.ranking=#{ranking}</if>
+                <if test="rankingValue != null and rankingValue != ''">AND periodRankStock.rankingValue=#{rankingValue}</if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="orderPeriodRankStock">
+        <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
+            <choose>
+                <when test="pagingParam.sortIndex eq 'stockCode'">stockCode</when>
+                <when test="pagingParam.sortIndex eq 'marketCode'">marketCode</when>
+                <when test="pagingParam.sortIndex eq 'periodCode'">periodCode</when>
+                <when test="pagingParam.sortIndex eq 'year'">year</when>
+                <when test="pagingParam.sortIndex eq 'month'">month</when>
+                <when test="pagingParam.sortIndex eq 'week'">week</when>
+                <when test="pagingParam.sortIndex eq 'yearOrder'">yearOrder</when>
+                <when test="pagingParam.sortIndex eq 'rankCode'">rankCode</when>
+                <when test="pagingParam.sortIndex eq 'ranking'">ranking</when>
+                <when test="pagingParam.sortIndex eq 'rankingValue'">rankingValue</when>
+                <otherwise>periodRankStockId</otherwise>
+            </choose>
+            <choose>
+                <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
+                <otherwise>ASC</otherwise>
+            </choose>
+        </if>
+        <if test="pagingParam.rows gt 0">
+            LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}
+        </if>
+    </sql>
+    
+</mapper>

@@ -59,34 +59,6 @@ public class DataSourceConfig {
 
     }
 
-    /*
-    @Bean(name = "transactionManager")
-    public PlatformTransactionManager transactionManager(@Qualifier("dataSource") DataSource dataSource) {
 
-        return new DataSourceTransactionManager(dataSource);
-
-    }
-
-
-    @Bean(name = "sqlSessionFactory")
-    public SqlSessionFactory sqlSessionFactory(@Qualifier("dataSource") DataSource dataSource, ApplicationContext applicationContext) throws Exception {
-
-        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(dataSource);
-        sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath:mapper/*.xml"));
-
-        return sqlSessionFactoryBean.getObject();
-
-    }
-
-
-    @Bean(name = "sqlSessionTemplate")
-    public SqlSessionTemplate sqlSessionTemplate(@Qualifier("sqlSessionFactory") SqlSessionFactory sqlSessionFactory) throws Exception {
-
-        return new SqlSessionTemplate(sqlSessionFactory);
-
-    }
-
-     */
 
 }

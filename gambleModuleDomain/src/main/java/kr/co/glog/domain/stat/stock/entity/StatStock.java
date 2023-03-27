@@ -19,8 +19,7 @@ public class StatStock extends EntityModel {
     String  periodCode;                         // 주기코드
     Integer year;		                        // 년도
     Integer month;                              // 월
-    String  yearMonth;                          // 년월
-    String  yearWeek;                           // 년주차
+    String  yearOrder;                          // 년도의 월순서, 주순서
     Integer week;                               // 주차
     String  startDate;                          // 주기의 시작일자
     String  endDate;                            // 주기의 종료일자
@@ -60,4 +59,7 @@ public class StatStock extends EntityModel {
     Integer riseCount;                          // 상승회수
     Integer evenCount;                          // 보합회수
     Integer fallCount;                          // 하락회수
+    Integer riseStockCount;                      // 상승회수
+    Integer evenStockCount;                      // 보합회수
+    Integer fallStockCount;                      // 하락회수
 }

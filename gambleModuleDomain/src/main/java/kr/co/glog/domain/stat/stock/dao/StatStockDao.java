@@ -19,6 +19,36 @@ public class StatStockDao {
 
     private final StatStockMapper statStockMapper;
 
+    // 변동 구간별 주식 수
+    public ArrayList<StatStockResult> getRateChangeSpreadList( String marketCode, String periodCode, String yearOrder, Integer rangeSize ) {
+        if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
+        if ( periodCode == null ) throw new ParameterMissingException( "periodCode" );
+        if ( yearOrder == null ) throw new ParameterMissingException( "yearOrder" );
+        if ( rangeSize == null ) throw new ParameterMissingException( "rangeSize" );
+
+        StatStockParam statStockParam = new StatStockParam();
+        statStockParam.setMarketCode( marketCode );
+        statStockParam.setPeriodCode( periodCode );
+        statStockParam.setYearOrder( yearOrder );
+        statStockParam.setRangeSize( rangeSize );
+        return statStockMapper.selectRateChangeSpreadList( statStockParam );
+    }
+
+    public ArrayList<StatStockResult> getRiseFallStockCountList( String marketCode, String periodCode, String startYearOrder, String endYearOrder ) {
+        if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
+        if ( periodCode == null ) throw new ParameterMissingException( "periodCode" );
+        if ( startYearOrder == null ) throw new ParameterMissingException( "startYearOrder" );
+        if ( endYearOrder == null ) throw new ParameterMissingException( "endYearOrder" );
+
+        StatStockParam statStockParam = new StatStockParam();
+        statStockParam.setMarketCode( marketCode );
+        statStockParam.setPeriodCode( periodCode );
+        statStockParam.setStartYearOrder( startYearOrder );
+        statStockParam.setEndYearOrder( endYearOrder );
+        return statStockMapper.selectRiseFallStockCountList( statStockParam );
+    }
+
+
     // 키 SELECT
     public StatStockResult getStatStock(Long statStockId ) {
         if ( statStockId == null ) throw new ParameterMissingException( "statStockId" );
@@ -32,16 +62,16 @@ public class StatStockDao {
     }
 
     // 유니크 SELECT
-    public StatStockResult getStatStock( String stockCode, String periodCode, String yearWeek ) {
+    public StatStockResult getStatStock( String stockCode, String periodCode, String yearOrder ) {
         if ( stockCode == null ) throw new ParameterMissingException( "stockCode" );
         if ( periodCode == null ) throw new ParameterMissingException( "periodCode" );
-        if ( yearWeek == null ) throw new ParameterMissingException( "yearWeek" );
+        if ( yearOrder == null ) throw new ParameterMissingException( "yearOrder" );
 
         StatStockResult statStockResult = null;
         StatStockParam statStockParam = new StatStockParam();
         statStockParam.setStockCode( stockCode );
         statStockParam.setPeriodCode( periodCode );
-        statStockParam.setYearWeek( yearWeek );
+        statStockParam.setYearOrder( yearOrder );
         ArrayList<StatStockResult> statStockList = statStockMapper.selectStatStockList( statStockParam );
         if ( statStockList != null && statStockList.size() > 0 ) statStockResult = statStockList.get(0);
         return statStockResult;
@@ -57,7 +87,7 @@ public class StatStockDao {
     public int insertStatStock ( StatStock statStock ) {
 
         if ( statStock == null ) throw new ParameterMissingException( "StatStock" );
-        if ( statStock.getStockCode() == null || statStock.getPeriodCode() == null || statStock.getYearWeek() == null) throw new ParameterMissingException( "주식코드, 주기, 회차는 필수값입니다.");
+        if ( statStock.getStockCode() == null || statStock.getPeriodCode() == null || statStock.getYearOrder() == null) throw new ParameterMissingException( "주식코드, 주기, 회차는 필수값입니다.");
 
         return statStockMapper.insertStatStock(statStock);
     }
@@ -104,7 +134,7 @@ public class StatStockDao {
 
     public StatStock updateStatStock( StatStock statStock ) {
         if ( statStock == null ) throw new ParameterMissingException( "StatStock" );
-        if ( statStock.getStockCode() == null || statStock.getPeriodCode() == null || statStock.getYearWeek() == null) throw new ParameterMissingException( "주식코드, 주기, 회차는 필수값입니다.");
+        if ( statStock.getStockCode() == null || statStock.getPeriodCode() == null || statStock.getYearOrder() == null) throw new ParameterMissingException( "주식코드, 주기, 회차는 필수값입니다.");
         statStockMapper.updateStatStock(statStock);
         return statStock;
     }

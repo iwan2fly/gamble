@@ -9,6 +9,9 @@ import java.util.ArrayList;
 
 @Mapper
 public interface StockMapper {
+
+    public ArrayList<StockResult> selectCompanyIdList();                        // 회사코드가 있는 녀석들 리턴
+    public int updateCompanyCodeFromCompany();                                      // company 테이블의 companyId를 stock 의 companyId 에 업데이트
     public int insertStock( Stock stock );									    // 등록
     public int insertsStock( ArrayList<Stock> stockList );		                // 대량등록
     public int updateStock( Stock stock );									    // 수정

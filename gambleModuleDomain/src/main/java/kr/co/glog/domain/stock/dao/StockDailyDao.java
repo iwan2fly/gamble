@@ -19,6 +19,18 @@ public class StockDailyDao {
 
     private final StockDailyMapper stockDailyMapper;
 
+    public ArrayList<StockDailyResult> getRiseFallStockCountList( String marketCode, String startDate, String endDate  ) {
+        if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
+        if ( startDate == null ) throw new ParameterMissingException( "startDate" );
+        if ( endDate == null ) throw new ParameterMissingException( "endDate" );
+
+        StockDailyParam stockDailyParam = new StockDailyParam();
+        stockDailyParam.setStartDate( startDate );
+        stockDailyParam.setEndDate( endDate );
+        stockDailyParam.setMarketCode( marketCode );
+        return stockDailyMapper.selectRiseFallStockCountList( stockDailyParam );
+    }
+
     /**
      * 특정 기간동안 거래되었던 주식 목록
      * @param startDate
@@ -26,6 +38,7 @@ public class StockDailyDao {
      * @return
      */
     public ArrayList<StockDailyResult> getStockListBetween ( String marketCode, String startDate, String endDate ) {
+        if ( marketCode == null ) throw new ParameterMissingException( "marketCode" );
         if ( startDate == null ) throw new ParameterMissingException( "startDate" );
         if ( endDate == null ) throw new ParameterMissingException( "endDate" );
 

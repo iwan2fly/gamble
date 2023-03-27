@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.glog.domain.stat.stock.mapper.DailyRankStockMapper">
+
+
+    <insert id="insertDailyRankFromStockDaily" parameterType="DailyRankStockParam">
+        INSERT INTO dailyRankStock ( stockCode, marketCode, tradeDate, rankCode, ranking, rankingValue, insertTime, updateTime )
+        SELECT stockCode, marketCode, tradeDate, #{rankCode}, RANK() OVER( ORDER BY ${rankCode} DESC ), ${rankCode}, now(), now() FROM stockDaily WHERE marketCode=#{marketCode} and tradeDate=#{tradeDate}
+    </insert>
+    
+    <insert id="insertDailyRankStock" parameterType="DailyRankStock">
+        INSERT INTO dailyRankStock
+            (  stockCode, marketCode, tradeDate, rankCode, ranking, value, insertTime, updateTime )
+        VALUES
+            (  #{stockCode}, #{marketCode}, #{tradeDate}, #{rankCode}, #{ranking}, #{rankingValue}, now(), now() )
+    </insert>
+
+    <insert id="insertsDailyRankStock" parameterType="java.util.ArrayList">
+        INSERT INTO dailyRankStock
+            (  stockCode, marketCode, tradeDate, rankCode, ranking, value, insertTime, updateTime )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," open="" close="">
+            (  #{item.stockCode}, #{item.marketCode}, #{item.tradeDate}, #{item.rankCode}, #{item.ranking}, #{item.rankingValue} now(), now() )
+        </foreach>
+    </insert>
+
+    <update id="updateDailyRankStock" parameterType="DailyRankStock">
+        UPDATE 	dailyRankStock
+        SET
+        <trim prefix="" suffixOverrides=",">
+            <if test="marketCode != null">marketCode = #{marketCode},</if>
+            <if test="rankCode != null">rankCode = #{rankCode},</if>
+            <if test="ranking != null">ranking = #{ranking},</if>
+            <if test="rankingValue != null">rankingValue = #{rankingValue},</if>
+            updateTime = now()
+        </trim>
+        WHERE   stockCode = #{stockCode}
+        AND     tradeDate = #{tradeDate}
+        AND     rankCode = #{rankCode}
+    </update>
+
+    <delete id="deleteDailyRankStock" parameterType="DailyRankStock">
+        DELETE FROM dailyRankStock
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="marketCode != null and marketCode != ''">AND dailyRankStock.marketCode=#{marketCode}</if>
+                <if test="tradeDate != null and tradeDate != ''">AND dailyRankStock.tradeDate=#{tradeDate}</if>
+                <if test="rankCode != null and rankCode != ''">AND dailyRankStock.rankCode=#{rankCode}</if>
+            </trim>
+        </where>
+    </delete>
+
+    <select id="selectDailyRankStockList" parameterType="DailyRankStockParam" resultType="DailyRankStockResult" >
+        SELECT 	dailyRankStock.*
+        FROM 	dailyRankStock
+        <include refid="whereDailyRankStock" ></include>
+        <include refid="orderDailyRankStock" ></include>
+    </select>
+
+    <select id="selectDailyRankStockListCount" parameterType="DailyRankStockParam" resultType="java.lang.Integer">
+        SELECT 	COUNT(*)
+        FROM   	dailyRankStock
+        <include refid="whereDailyRankStock" ></include>
+    </select>
+
+    <sql id="whereDailyRankStock">
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="stockCode != null and stockCode != ''">AND dailyRankStock.stockCode=#{stockCode}</if>
+                <if test="marketCode != null and marketCode != ''">AND dailyRankStock.marketCode=#{marketCode}</if>
+                <if test="tradeDate != null and tradeDate != ''">AND dailyRankStock.tradeDate=#{tradeDate}</if>
+                <if test="rankCode != null and rankCode != ''">AND dailyRankStock.rankCode=#{rankCode}</if>
+                <if test="ranking != null and ranking != ''">AND dailyRankStock.ranking=#{ranking}</if>
+                <if test="rankingValue != null and rankingValue != ''">AND dailyRankStock.rankingValue=#{rankingValue}</if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="orderDailyRankStock">
+        <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
+            <choose>
+                <when test="pagingParam.sortIndex eq 'stockCode'">stockCode</when>
+                <when test="pagingParam.sortIndex eq 'marketCode'">marketCode</when>
+                <when test="pagingParam.sortIndex eq 'tradeDate'">tradeDate</when>
+                <when test="pagingParam.sortIndex eq 'rankCode'">rankCode</when>
+                <when test="pagingParam.sortIndex eq 'ranking'">ranking</when>
+                <when test="pagingParam.sortIndex eq 'rankingValue'">rankingValue</when>
+                <otherwise>dailyRankStockId</otherwise>
+            </choose>
+            <choose>
+                <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
+                <otherwise>ASC</otherwise>
+            </choose>
+        </if>
+        <if test="pagingParam.rows gt 0">
+            LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}
+        </if>
+    </sql>
+    
+</mapper>

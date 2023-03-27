@@ -2,20 +2,44 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.glog.domain.stat.stock.mapper.StatStockMapper">
 
+    <!-- 특정시장/특정기간 동안의 변동비율 별 수자 -->
+    <select id="selectRateChangeSpreadList" parameterType="StatStockParam" resultType="StatStockResult">
+        SELECT CAST(rateChange/#{rangeSize} AS SIGNED integer) rangeSize, min(rateChange) rateChangeMin, MAX(rateChange) rateChangeMax, COUNT(*) stockCount FROM statStock WHERE marketCode=#{marketCode} and periodCode=#{periodCode} AND yearOrder=#{yearOrder}
+        GROUP BY CAST(rateChange/#{rangeSize} AS SIGNED INTEGER) ORDER BY 1
+    </select>
+
+    <!-- 특정일 오른주식, 내린주식, 보합주식 숫자 -->
+    <select id="selectRiseFallStockCountList" parameterType="StatStockParam" resultType="StatStockResult">
+        SELECT total.yearOrder, totalStockCount, riseStockCount, evenStockCount, fallStockCount
+        FROM
+            (
+                SELECT yearOrder, COUNT(*) totalStockCount FROM statStock WHERE marketCode=#{marketCode} AND periodCode=#{periodCode} AND yearOrder BETWEEN #{startYearOrder} AND #{endYearOrder} GROUP BY yearOrder
+            ) total
+            LEFT JOIN
+            (
+                SELECT yearOrder, COUNT(*) riseStockCount FROM statStock WHERE marketCode=#{marketCode} AND periodCode=#{periodCode} AND yearOrder BETWEEN #{startYearOrder} AND #{endYearOrder} AND priceChange > 0 GROUP BY yearOrder
+            ) rise ON total.yearOrder = rise.yearOrder
+            LEFT JOIN (
+                SELECT yearOrder, COUNT(*) evenStockCount FROM statStock WHERE marketCode=#{marketCode} AND periodCode=#{periodCode} AND yearOrder BETWEEN #{startYearOrder} AND #{endYearOrder} AND priceChange = 0 GROUP BY yearOrder
+            ) even ON total.yearOrder = even.yearOrder
+            LEFT JOIN (
+                SELECT yearOrder, COUNT(*) fallStockCount FROM statStock WHERE marketCode=#{marketCode} AND periodCode=#{periodCode} AND yearOrder BETWEEN #{startYearOrder} AND #{endYearOrder} AND priceChange <![CDATA[ < ]]> 0 GROUP BY yearOrder
+            ) fall ON total.yearOrder = fall.yearOrder
+    </select>
 
     <insert id="insertStatStock" parameterType="StatStock" useGeneratedKeys="true" keyProperty="statStockId">
         INSERT INTO statStock
-            (  stockCode, marketCode, stockName, periodCode, year, month, yearMonth, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, priceTrade, priceTotal, priceTotalPrevious, rateChange, rateChangeMax, volumeTotal, volumeTotalPrevious, volumeTrade, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerPrevious, foreignerStart, foreignerLow, foreignerHigh, foreignerFinal, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
+            (  stockCode, marketCode, stockName, periodCode, year, yearOrder, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, priceTrade, priceTotal, priceTotalPrevious, rateChange, rateChangeMax, volumeTotal, volumeTotalPrevious, volumeTrade, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerPrevious, foreignerStart, foreignerLow, foreignerHigh, foreignerFinal, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
         VALUES
-            (  #{stockCode}, #{marketCode}, #{stockName}, #{periodCode}, #{year}, #{month}, #{yearMonth}, #{yearWeek}, #{week}, #{startDate}, #{endDate}, #{tradeDays}, #{pricePrevious}, #{priceStart}, #{priceFinal}, #{priceLow}, #{priceHigh}, #{priceAverage}, #{priceStandardDeviation}, #{priceChange}, #{priceTrade}, #{priceTotal}, #{priceTotalPrevious}, #{rateChange}, #{rateChangeMax}, #{volumeTotal}, #{volumeTotalPrevious}, #{volumeTrade}, #{volumeLow}, #{volumeHigh}, #{volumeAverage}, #{volumeStandardDeviation}, #{foreignerPrevious}, #{foreignerStart}, #{foreignerLow}, #{foreignerHigh}, #{foreignerFinal}, #{foreignerAverage}, #{foreignerStandardDeviation}, #{priceLowDate}, #{priceHighDate}, #{volumeLowDate}, #{volumeHighDate}, now(), now() )
+            (  #{stockCode}, #{marketCode}, #{stockName}, #{periodCode}, #{year}, #{yearOrder}, #{startDate}, #{endDate}, #{tradeDays}, #{pricePrevious}, #{priceStart}, #{priceFinal}, #{priceLow}, #{priceHigh}, #{priceAverage}, #{priceStandardDeviation}, #{priceChange}, #{priceTrade}, #{priceTotal}, #{priceTotalPrevious}, #{rateChange}, #{rateChangeMax}, #{volumeTotal}, #{volumeTotalPrevious}, #{volumeTrade}, #{volumeLow}, #{volumeHigh}, #{volumeAverage}, #{volumeStandardDeviation}, #{foreignerPrevious}, #{foreignerStart}, #{foreignerLow}, #{foreignerHigh}, #{foreignerFinal}, #{foreignerAverage}, #{foreignerStandardDeviation}, #{priceLowDate}, #{priceHighDate}, #{volumeLowDate}, #{volumeHighDate}, now(), now() )
     </insert>
 
     <insert id="insertsStatStock" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="statStockId" keyProperty="statStockId">
         INSERT INTO statStock
-            (  stockCode, marketCode, stockName, periodCode, year, month, yearMonth, yearWeek, week, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, priceTrade, priceTotal, priceTotalPrevious, rateChange, rateChange, volumeTotal, volumeTotalPrevious, volumeTrade, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerPrevious, foreignerStart, foreignerLow, foreignerHigh, foreignerFinal, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
+            (  stockCode, marketCode, stockName, periodCode, year, yearOrder, startDate, endDate, tradeDays, pricePrevious, priceStart, priceFinal, priceLow, priceHigh, priceAverage, priceStandardDeviation, priceChange, priceTrade, priceTotal, priceTotalPrevious, rateChange, rateChange, volumeTotal, volumeTotalPrevious, volumeTrade, volumeLow, volumeHigh, volumeAverage, volumeStandardDeviation, foreignerPrevious, foreignerStart, foreignerLow, foreignerHigh, foreignerFinal, foreignerAverage, foreignerStandardDeviation, priceLowDate, priceHighDate, volumeLowDate, volumeHighDate, insertTime, updateTime )
         VALUES
         <foreach collection="list" item="item" index="index" separator="," open="" close="">
-            (  #{item.stockCode}, #{item.marketCode}, #{item.stockName}, #{item.periodCode}, #{item.year}, #{item.month}, #{item.yearMonth}, #{item.yearWeek}, #{item.week}, #{item.startDate}, #{item.endDate}, #{item.tradeDays}, #{item.pricePrevious}, #{item.priceStart}, #{item.priceFinal}, #{item.priceLow}, #{item.priceHigh}, #{item.priceAverage}, #{item.priceStandardDeviation}, #{item.priceChange}, #{item.priceTrade}, #{item.priceTotal}, #{item.priceTotalPrevious}, #{item.rateChange}, #{item.rateChangeMax}, #{item.volumeTotal}, #{volumeTotalPrevious}, #{item.volumeTrade}, #{item.volumeLow}, #{item.volumeHigh}, #{item.volumeAverage}, #{item.volumeStandardDeviation}, #{item.foreignerPrevious}, #{item.foreignerStart}, #{item.foreignerLow}, #{item.foreignerHigh}, #{item.foreignerFinal}, #{item.foreignerAverage}, #{item.foreignerStandardDeviation}, #{item.priceLowDate}, #{item.priceHighDate}, #{item.volumeLowDate}, #{item.volumeHighDate}, now(), now() )
+            (  #{item.stockCode}, #{item.marketCode}, #{item.stockName}, #{item.periodCode}, #{item.year}, #{item.yearOrder}, #{item.startDate}, #{item.endDate}, #{item.tradeDays}, #{item.pricePrevious}, #{item.priceStart}, #{item.priceFinal}, #{item.priceLow}, #{item.priceHigh}, #{item.priceAverage}, #{item.priceStandardDeviation}, #{item.priceChange}, #{item.priceTrade}, #{item.priceTotal}, #{item.priceTotalPrevious}, #{item.rateChange}, #{item.rateChangeMax}, #{item.volumeTotal}, #{volumeTotalPrevious}, #{item.volumeTrade}, #{item.volumeLow}, #{item.volumeHigh}, #{item.volumeAverage}, #{item.volumeStandardDeviation}, #{item.foreignerPrevious}, #{item.foreignerStart}, #{item.foreignerLow}, #{item.foreignerHigh}, #{item.foreignerFinal}, #{item.foreignerAverage}, #{item.foreignerStandardDeviation}, #{item.priceLowDate}, #{item.priceHighDate}, #{item.volumeLowDate}, #{item.volumeHighDate}, now(), now() )
         </foreach>
     </insert>
 
@@ -25,9 +49,6 @@
         <trim prefix="" suffixOverrides=",">
             <if test="marketCode != null">marketCode = #{marketCode},</if>
             <if test="stockName != null">stockName = #{stockName},</if>
-            <if test="periodCode != null">periodCode = #{periodCode},</if>
-            <if test="yearMonth != null">yearMonth = #{yearMonth},</if>
-            <if test="week != null">week = #{week},</if>
             <if test="startDate != null">startDate = #{startDate},</if>
             <if test="endDate != null">endDate = #{endDate},</if>
             <if test="tradeDays != null">tradeDays = #{tradeDays},</if>
@@ -65,15 +86,18 @@
             <if test="riseCount != null">riseCount = #{riseCount},</if>
             <if test="fallCount != null">fallCount = #{fallCount},</if>
             <if test="evenCount != null">evenCount = #{evenCount},</if>
+            <if test="riseStockCount != null">riseStockCount = #{riseStockCount},</if>
+            <if test="fallStockCount != null">fallStockCount = #{fallStockCount},</if>
+            <if test="evenStockCount != null">evenStockCount = #{evenStockCount},</if>
             updateTime = now()
         </trim>
         <choose>
             <when test="statStockId != null and statStockId != ''">WHERE statStock.statStockId=#{statStockId}</when>
             <otherwise>
             WHERE   stockCode = #{stockCode}
+            AND     periodCode = #{periodCode}
             AND     year = #{year}
-            AND     month = #{month}
-            AND     yearWeek = #{yearWeek}
+            AND     yearOrder = #{yearOrder}
             </otherwise>
         </choose>
     </update>
@@ -105,9 +129,7 @@
                 <if test="marketCode != null and marketCode != ''">AND statStock.marketCode=#{marketCode}</if>
                 <if test="periodCode != null and periodCode != ''">AND statStock.periodCode=#{periodCode}</if>
                 <if test="year != null and year != ''">AND statStock.year=#{year}</if>
-                <if test="month != null and month != ''">AND statStock.month=#{month}</if>
-                <if test="yearMonth != null and yearMonth != ''">AND statStock.yearMonth=#{yearMonth}</if>
-                <if test="yearWeek != null and yearWeek != ''">AND statStock.yearWeek=#{yearWeek}</if>
+                <if test="yearOrder != null and yearOrder != ''">AND statStock.yearOrder=#{yearOrder}</if>
                 <if test="week != null and week != ''">AND statStock.week=#{week}</if>
                 <if test="startDate != null and startDate != ''">AND statStock.startDate=#{startDate}</if>
                 <if test="endDate != null and endDate != ''">AND statStock.endDate=#{endDate}</if>
@@ -147,10 +169,10 @@
                 <if test="fallCount != null and fallCount != ''">AND statStock.fallCount=#{fallCount}</if>
                 <if test="evenCount != null and evenCount != ''">AND statStock.evenCount=#{evenCount}</if>
                 <if test="tradeYn != null and tradeYn != ''">AND statStock.volumeTrade > 0</if>
-                <if test="startYearMonth != null and startYearMonth != ''">AND statStock.yearMonth <![CDATA[ >= ]]> #{startYearMonth}</if>
-                <if test="endYearMonth != null and endYearMonth != ''">AND statStock.yearMonth <![CDATA[ <= ]]> #{endYearMonth}</if>
-                <if test="startYearWeek != null and startYearWeek != ''">AND statStock.yearWeek <![CDATA[ >= ]]> #{startYearWeek}</if>
-                <if test="endYearWeek != null and endYearWeek != ''">AND statStock.yearWeek <![CDATA[ <= ]]> #{endYearWeek}</if>
+                <if test="startYearMonth != null and startYearMonth != ''">AND statStock.yearOrder <![CDATA[ >= ]]> #{startYearMonth}</if>
+                <if test="endYearMonth != null and endYearMonth != ''">AND statStock.yearOrder <![CDATA[ <= ]]> #{endYearMonth}</if>
+                <if test="startYearWeek != null and startYearWeek != ''">AND statStock.yearOrder <![CDATA[ >= ]]> #{startYearWeek}</if>
+                <if test="endYearWeek != null and endYearWeek != ''">AND statStock.yearOrder <![CDATA[ <= ]]> #{endYearWeek}</if>
                 <if test="pagingParam.filter != null and pagingParam.filter != ''">AND statStock.statNameCode like CONCAT('%',#{pagingParam.filter},'%')</if>
             </trim>
         </where>
@@ -165,10 +187,7 @@
                 <when test="pagingParam.sortIndex eq 'marketCode'">marketCode</when>
                 <when test="pagingParam.sortIndex eq 'periodCode'">periodCode</when>
                 <when test="pagingParam.sortIndex eq 'year'">year</when>
-                <when test="pagingParam.sortIndex eq 'month'">month</when>
-                <when test="pagingParam.sortIndex eq 'yearMonth'">yearMonth</when>
-                <when test="pagingParam.sortIndex eq 'yearWeek'">yearWeek</when>
-                <when test="pagingParam.sortIndex eq 'week'">week</when>
+                <when test="pagingParam.sortIndex eq 'yearOrder'">yearOrder</when>
                 <when test="pagingParam.sortIndex eq 'startDate'">startDate</when>
                 <when test="pagingParam.sortIndex eq 'endDate'">endDate</when>
                 <when test="pagingParam.sortIndex eq 'tradeDays'">tradeDays</when>
