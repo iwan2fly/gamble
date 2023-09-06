@@ -100,7 +100,8 @@ public class DailyBatchController {
      *  DART 의 고유번호로 특정회사 재무정보 가져와서 있는 건 업데이트하고, 없는 건 등록
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 14 16 23 * * ")
+    //초		분		시		일			월		요일			연도
+    @Scheduled(cron = "0 8 18 31 * * ")
     public void updateCompanyFinancialInfo() throws InterruptedException {
 
          /*
@@ -112,8 +113,8 @@ public class DailyBatchController {
 
         log.info( "dartFinancialApi START" );
         String result = "SUCCESS";
-        String year = "2022";
-        String reportCode = "11011";
+        String year = "2023";
+        String reportCode = "11013";
 
         try {
             CompanyParam CompanyParam = new CompanyParam();
@@ -174,7 +175,8 @@ public class DailyBatchController {
      * 다음 주식 정보로 당일 지수 / 종목 정보 업서트
      * @throws InterruptedException
      */
-    @Scheduled(cron = "0 34 15 * * *")
+    // @Scheduled(cron = "0 34 15 * * *")
+    @Scheduled(cron = "0 15 17 * * *")
     public void at1535() throws InterruptedException {
 
         // 다음 데이터로 지수 UPSERT
@@ -227,12 +229,12 @@ public class DailyBatchController {
 
 
 
-    @Scheduled(cron = "0 10 16 20 * * ")
+    @Scheduled(cron = "0 42 10 25 * * ")
     public void test() throws InterruptedException {
 
 
         // 오늘 일간 순위
-        stockDailyBatchService.makeDailyRankStockToday();
+       // stockDailyBatchService.makeDailyRankStockToday();
 
         // 오늘의 주간/월간/년간 순위
         stockDailyBatchService.makePeriodRankStockToday();

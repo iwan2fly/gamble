@@ -143,6 +143,22 @@ project(':gambleAppWeb') {
 	}
 }
 
+project(':gambleAppWeb2') {
+	dependencies {
+		implementation project(':gambleModuleCommon')
+		implementation project(':gambleModuleDomain')
+	}
+
+	sourceSets {
+		main {
+			resources {
+				srcDirs = ['src/main/java', 'src/main/resources']
+				include '**/**'
+			}
+		}
+	}
+}
+
 project(':gambleBatch') {
 	dependencies {
 		implementation project(':gambleModuleCommon')

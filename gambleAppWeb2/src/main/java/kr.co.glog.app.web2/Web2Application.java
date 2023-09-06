@@ -15,15 +15,15 @@ import java.util.Arrays;
 @EnableCaching
 @SpringBootApplication
 @EnableScheduling
-public class WebApplication extends SpringBootServletInitializer {
+public class Web2Application extends SpringBootServletInitializer {
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(WebApplication.class);
+		return application.sources(Web2Application.class);
 	}
 
 	public static void main(String[] args) {
-		ApplicationContext applicationContext = SpringApplication.run(WebApplication.class, args);
+		ApplicationContext applicationContext = SpringApplication.run(Web2Application.class, args);
 
 
 		/*
