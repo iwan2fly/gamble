@@ -1,0 +1,251 @@
+{{>web/layouts/fullNavStart}}
+
+<body>
+{{>web/layouts/nav}}
+<main class="container" id="body">
+
+    <div class="row g-3 mb-2">
+        <div class="col-sm-12 text-end">
+            <span v-text="_DateUtil.yyyymmdd( stock.lastTradeDate, '.')" class="h5"></span>
+            <code class="text-secondary">일 기준</code>
+        </div>
+    </div>
+
+    <div class="row g-5">
+
+        <div class="col-md-8">
+
+            <div class="row g-3 mb-2">
+                <div class="col-sm-6">
+                    <span v-text="stock.stockName" class="h5"></span>
+                    <code v-text="stock.stockCode"></code>
+                </div>
+                <div class="col-sm-6 text-end">
+                    <span v-text="_StrUtil.toCurrency(stockDaily.priceFinal)" class="h5" :class="rateChangeColor"></span>
+                    <code v-text="rateChangeSymbol + _StrUtil.toCurrency(stockDaily.priceChange) + '원'" :class="rateChangeColor"></code>
+                    <code v-text="'(' + rateChangeSymbol + _StrUtil.toCurrency(stockDaily.rateChange) + '%)'" :class="rateChangeColor"></code>
+                </div>
+            </div>
+
+
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-sm">
+                    <tbody>
+                    <tr>
+                        <td class="text-end">전일</td>
+                        <td><strong v-text="_StrUtil.toCurrency(stockDaily.pricePrevious)"></strong></td>
+
+                        <td class="text-end">고가</td>
+                        <td><strong v-text="_StrUtil.toCurrency(stockDaily.priceHigh)"></strong></td>
+
+                        <td class="text-end">거래량</td>
+                        <td><strong v-text="_StrUtil.toCurrency(stockDaily.volumeTrade)"></strong></td>
+
+                    </tr>
+                    <tr>
+                        <td class="text-end">시가</td>
+                        <td><strong v-text="_StrUtil.toCurrency(stockDaily.priceStart)"></strong></td>
+
+                        <td class="text-end" class="text-end">저가</td>
+                        <td><strong v-text="_StrUtil.toCurrency(stockDaily.priceLow)"></strong></td>
+
+                        <td class="text-end">거래대금</td>
+                        <td><strong v-text="_StrUtil.toCurrency( (stockDaily.priceTrade / 1000000).toFixed(2) ) + '(백만)'"></strong></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <span class="badge text-bg-success pointer" @click="drawGraph('day')">일</span>
+                <span class="badge text-bg-success pointer" type="button btn-sm" @click="drawGraph('week')">주</span>
+                <span class="badge text-bg-success pointer" type="button btn-sm" @click="drawGraph('month')">월</span>
+                <span class="badge text-bg-success pointer" type="button btn-sm" @click="drawGraph('year')">연</span>
+            </div>
+
+            <div id="stockChart" style="height:400px"></div>
+
+
+
+
+            <h6 v-text="stock.marketCode == 'kospi' ? '코스피 순위' : '코스닥 순위'"></h6>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-sm">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="text-center">기간</th>
+                        <th class="text-center">상승율</th>
+                        <th class="text-center">거래량</th>
+                        <th class="text-center">거래대금</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="text-center">당일</td>
+                        <td class="text-end">
+                            <span v-text="_StrUtil.toCurrency(stockDaily.priceChange) + '원'" :class="[{'text-danger' : stockDaily.rateChange > 0},{'text-primary' : stockDaily.rateChange < 0}]"></span>
+                            <code class="text-secondary" v-text="_StrUtil.toCurrency(stockDaily.rateChange) + '%'"></code>
+                            <code class="text-secondary" v-text="dailyRank.rateChange + '위'"></code>
+                        </td>
+                        <td class="text-end">
+                            <span  v-text="_StrUtil.toCurrency(stockDaily.volumeTrade)"></span>
+                            <code v-text="dailyRank.volumeTrade + '위'" class="text-secondary"></code>
+                        </td>
+                        <td class="text-end">
+                            <span v-text="_StrUtil.toCurrency((stockDaily.priceTrade / 100000000).toFixed(2)) + '억원'"></span>
+                            <code v-text="dailyRank.priceTrade + '위'" class="text-secondary"></code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">주간</td>
+                        <td class="text-end">
+                            <span v-text="_StrUtil.toCurrency(statStockWeek.priceChange) + '원'" :class="[{'text-danger' : statStockWeek.rateChange > 0},{'text-primary' : statStockWeek.rateChange < 0}]"></span>
+                            <code class="text-secondary" v-text="_StrUtil.toCurrency(statStockWeek.rateChange) + '%'"></code>
+                            <code class="text-secondary" v-text="weeklyRank.rateChange + '위'"></code>
+                        </td>
+                        <td class="text-end">
+                            <span  v-text="_StrUtil.toCurrency(statStockWeek.volumeTrade)"></span>
+                            <code v-text="weeklyRank.volumeTrade + '위'" class="text-secondary"></code>
+                        </td>
+                        <td class="text-end">
+                            <span  v-text="_StrUtil.toCurrency((statStockWeek.priceTrade / 100000000).toFixed(2)) + '억원'"></span>
+                            <code v-text="weeklyRank.priceTrade + '위'" class="text-secondary"></code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">월간</td>
+                        <td class="text-end">
+                            <span v-text="_StrUtil.toCurrency(statStockMonth.priceChange) + '원'" :class="[{'text-danger' : statStockMonth.rateChange > 0},{'text-primary' : statStockMonth.rateChange < 0}]"></span>
+                            <code class="text-secondary" v-text="_StrUtil.toCurrency(statStockMonth.rateChange) + '%'"></code>
+                            <code class="text-secondary" v-text="monthlyRank.rateChange + '위'"></code>
+                        </td>
+                        <td class="text-end">
+                            <span  v-text="_StrUtil.toCurrency(statStockMonth.volumeTrade)"></span>
+                            <code v-text="monthlyRank.volumeTrade + '위'" class="text-secondary"></code>
+                        </td>
+                        <td class="text-end">
+                            <span  v-text="_StrUtil.toCurrency((statStockMonth.priceTrade / 100000000).toFixed(2)) + '억원'"></span>
+                            <code v-text="monthlyRank.priceTrade + '위'" class="text-secondary"></code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">연간</td>
+                        <td class="text-end">
+                            <span v-text="_StrUtil.toCurrency(statStockYear.priceChange) + '원'" :class="[{'text-danger' : statStockYear.rateChange > 0},{'text-primary' : statStockYear.rateChange < 0}]"></span>
+                            <code class="text-secondary" v-text="_StrUtil.toCurrency(statStockYear.rateChange) + '%'"></code>
+                            <code class="text-secondary" v-text="yearlyRank.rateChange + '위'"></code>
+                        </td>
+                        <td class="text-end">
+                            <span  v-text="_StrUtil.toCurrency(statStockYear.volumeTrade)"></span>
+                            <code v-text="yearlyRank.volumeTrade + '위'" class="text-secondary"></code>
+                        </td>
+                        <td class="text-end">
+                            <span  v-text="_StrUtil.toCurrency((statStockYear.priceTrade / 100000000).toFixed(2)) + '억원'"></span>
+                            <code v-text="yearlyRank.priceTrade + '위'" class="text-secondary"></code>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+
+
+        </div>
+
+        <div class="col-md-4">
+
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-sm">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="text-center">구분</th>
+                        <th class="text-center">내용</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!--
+                    <tr>
+                        <td rowspan="2">회사명</td>
+                        <td v-text="company.companyName"></td>
+                    </tr>
+                    <tr>
+                        <td v-text="company.companyNameEng"></td>
+                    </tr>
+                    -->
+                    <tr>
+                        <td>대표자명</td>
+                        <td v-text="company.ceoName"></td>
+                    </tr>
+                    <tr>
+                        <td>주소</td>
+                        <td v-text="company.address"></td>
+                    </tr>
+                    <tr>
+                        <td>홈페이지</td>
+                        <td v-text="company.homepage"></td>
+                    </tr>
+                    <tr>
+                        <td>주식수</td>
+                        <td v-text="_StrUtil.toCurrency(stockDaily.volumeTotal) + '주'"></td>
+                    </tr>
+                    <tr>
+                        <td>시가총액</td>
+                        <td v-text="_StrUtil.toCurrency( ( stockDaily.priceTotal / 100000000 ).toFixed(2) ) + ' 억원'"></td>
+                    </tr>
+                    <tr>
+                        <td>외국인</td>
+                        <td v-text="_StrUtil.toCurrency( stock.foreignersStockCount ) + ' 주 ( ' + stock.foreignersHoldRate + '% )'"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-responsive text-end">
+                <table class="table table-striped table-hover table-sm mb-1">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="text-center">재무제표 항목</th>
+                        <th class="text-center">최근분기<br /></th>
+                        <th class="text-center">최근년도<br /></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item,index) in companyFinanceRecentQuarterList">
+                        <td  class="text-start" v-text="item.account"></td>
+                        <td v-text="_StrUtil.toCurrency( ( item.amount / 100000000 ).toFixed(2) )" class="text-end"></td>
+                        <td v-text="_StrUtil.toCurrency( ( companyFinanceRecentYearList[index].amount  / 100000000 ).toFixed(2) )" class="text-end"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                단위 (억원)
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+</main>
+{{>web/layouts/footerTag}}
+</body>
+
+<script>
+    let _serverParam = {
+        stockCode : '',
+    };
+
+    _serverParam.stockCode = '{{serverParam.stockCode}}';
+</script>
+
+<script src="/lib/local/data/index.js"></script>
+<script src="/lib/local/data/stock.js"></script>
+<script src="/lib/local/data/company.js"></script>
+<script src="/js/svc/krx/stocks/stock.js"></script>
+
+{{>web/layouts/fullNavEnd}}

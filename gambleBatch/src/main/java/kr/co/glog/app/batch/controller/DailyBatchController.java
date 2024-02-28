@@ -3,18 +3,13 @@ package kr.co.glog.app.batch.controller;
 
 import kr.co.glog.batch.service.IndexDailyBatchService;
 import kr.co.glog.batch.service.StockDailyBatchService;
-import kr.co.glog.common.utils.DateUtil;
 import kr.co.glog.domain.service.*;
 import kr.co.glog.domain.stock.MarketCode;
-import kr.co.glog.domain.stock.PeriodCode;
 import kr.co.glog.domain.stock.dao.CompanyDao;
 
-import kr.co.glog.domain.stock.dao.IndexDailyDao;
 import kr.co.glog.domain.stock.dao.StockDao;
 import kr.co.glog.domain.stock.model.CompanyParam;
 import kr.co.glog.domain.stock.model.CompanyResult;
-import kr.co.glog.domain.stock.model.IndexDailyParam;
-import kr.co.glog.domain.stock.model.IndexDailyResult;
 import kr.co.glog.external.dartApi.DartCompanyApi;
 import kr.co.glog.external.dartApi.DartCorpCodeApi;
 import kr.co.glog.external.dartApi.DartFinancialApi;
@@ -24,6 +19,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -37,7 +33,9 @@ public class DailyBatchController {
     private final DartFinancialApi dartFinancialApi;
     private final CompanyDao companyDao;
     private final StockDao stockDao;
-    private final StatIndexService statIndexService;
+    private final SystemConfigService systemConfigService;
+    private final PeriodRankStockService periodRankStockService;
+    private final StatStockService statStockService;
 
 
     //스프링 스케줄러 / 쿼츠 크론 표현식
@@ -74,7 +72,7 @@ public class DailyBatchController {
         log.info( "corpCodeApi START" );
         try {
             CompanyParam CompanyParam = new CompanyParam();
-            CompanyParam.setHasStockCode( true );
+            CompanyParam.setHasStockCode( true );           // 주식코드가 있는 놈만 골라냄
             ArrayList<CompanyResult> CompanyList = companyDao.getCompanyList( CompanyParam );
             int index=0;
 
@@ -82,7 +80,7 @@ public class DailyBatchController {
                 index++;
                 log.debug( index + " :" + dartCorpResult.toString() );
                 if ( dartCorpResult.getCompanyCode().equals("99999999") ) continue;
-                dartCompanyApi.updateCompany(dartCorpResult.getCompanyCode());
+                dartCompanyApi.updateCompanyFromDart(dartCorpResult.getCompanyCode());
                 Thread.sleep( 100 );        // DART 의 경우 1분에 1000회 이상 호출할경우 24시간 IP 차단 방지
             }
 
@@ -101,7 +99,8 @@ public class DailyBatchController {
      * @throws InterruptedException
      */
     //초		분		시		일			월		요일			연도
-    @Scheduled(cron = "0 8 18 31 * * ")
+    // @Scheduled(cron = "0 8 18 31 * * ")
+    @Scheduled(cron = "0 5 21 * * * ")
     public void updateCompanyFinancialInfo() throws InterruptedException {
 
          /*
@@ -113,17 +112,20 @@ public class DailyBatchController {
 
         log.info( "dartFinancialApi START" );
         String result = "SUCCESS";
-        String year = "2023";
-        String reportCode = "11013";
 
         try {
+            Map<String, Object> map = systemConfigService.getConfigFinancialQuarter();
+            Integer year = (Integer)map.get("year");
+            Integer quarter = (Integer)map.get("quarter");
+
+
             CompanyParam CompanyParam = new CompanyParam();
             CompanyParam.setHasStockCode( true );
             ArrayList<CompanyResult> companyList = companyDao.getCompanyList( CompanyParam );
 
             for ( int i = companyList.size()-1; i >= 0; i-- ) {
                 CompanyResult companyResult = companyList.get(i);
-                dartFinancialApi.updateCompanyFinancialInfo(companyResult.getCompanyCode(), year, reportCode);
+                dartFinancialApi.updateCompanyFinancialInfo(companyResult.getCompanyCode(), year, quarter);
                 Thread.sleep(100);
             }
         } catch ( Exception e ) {
@@ -175,8 +177,7 @@ public class DailyBatchController {
      * 다음 주식 정보로 당일 지수 / 종목 정보 업서트
      * @throws InterruptedException
      */
-    // @Scheduled(cron = "0 34 15 * * *")
-    @Scheduled(cron = "0 15 17 * * *")
+    @Scheduled(cron = "0 34 15 * * *")
     public void at1535() throws InterruptedException {
 
         // 다음 데이터로 지수 UPSERT
@@ -223,21 +224,28 @@ public class DailyBatchController {
 
         // 오늘 일간 순위
         stockDailyBatchService.makeDailyRankStockToday();
+
         // 오늘의 주간/월간/년간 순위
         stockDailyBatchService.makePeriodRankStockToday();
     }
 
 
 
-    @Scheduled(cron = "0 42 10 25 * * ")
+   // @Scheduled(cron = "0 41 16 * * * ")
     public void test() throws InterruptedException {
 
-
+        for ( int i = 1; i <= 12; i++ ) {
+            String month = i < 9 ? "0"+ i : ""+i;
+            stockDailyBatchService.upsertFromKrxDataMonthOf( 2020 + month );
+        }
+      //  statStockService.makeStatStockYear("2022" );
+        //statStockService.makeStatStockMonth( "049960", "202402");
+        // periodRankStockService.makePeriodRankMonth( "202402" );
         // 오늘 일간 순위
        // stockDailyBatchService.makeDailyRankStockToday();
 
         // 오늘의 주간/월간/년간 순위
-        stockDailyBatchService.makePeriodRankStockToday();
+        // stockDailyBatchService.makePeriodRankStockToday();
 
 
         /*
@@ -332,17 +340,8 @@ public class DailyBatchController {
         }
 
  */
-/*
-        for ( int i = 1; i < 2; i++ ) {
-            String month = i < 9 ? "0"+ i : ""+i;
-            stockDailyBatchService.upsertFromKrxDataMonthOf( 2021 + month );
-        }
 
-        for ( int i = 1; i <= 12; i++ ) {
-            String month = i < 9 ? "0"+ i : ""+i;
-            stockDailyBatchService.upsertFromKrxDataMonthOf( 2020 + month );
-        }
-*/
+
         // 다음 데이터로 종목 UPSERT
 //        stockDailyBatchService.upsertDailyStockDataBatchFromDaumDaily();
         //    stockDailyService.upsertStockDailyFromDaumDaily( "000020" );

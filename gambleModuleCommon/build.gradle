@@ -1,3 +1,7 @@
+springBoot {
+    mainClass="kr.co.glog.common.utils.StrUtils"
+}
+
 dependencies {
 
 }

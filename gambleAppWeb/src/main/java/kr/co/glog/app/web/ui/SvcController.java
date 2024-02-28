@@ -55,7 +55,7 @@ public class SvcController {
 	}
 
 	@GetMapping("/svc/{p1}/{p2}/{p3}/{p4}")
-	public String svcp1p2p3(Model model, @PathVariable("p1") String p1, @PathVariable("p2") String p2,  @PathVariable("p3") String p3, @PathVariable("p4") String p4, @RequestParam Map<String,Object> serverParam ) throws JsonProcessingException {
+	public String svcp1p2p3p4(Model model, @PathVariable("p1") String p1, @PathVariable("p2") String p2,  @PathVariable("p3") String p3, @PathVariable("p4") String p4, @RequestParam Map<String,Object> serverParam ) throws JsonProcessingException {
 
 		// URL
 		String url = _ROOT;

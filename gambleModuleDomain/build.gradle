@@ -4,13 +4,15 @@ plugins {
 
 version 'unspecified'
 
+bootJar.enabled = false
+
 repositories {
 	mavenCentral()
 }
 
 dependencies {
 	// https://mvnrepository.com/artifact/org.jsoup/jsoup
-	implementation 'org.jsoup:jsoup:1.15.3'
+	implementation group: 'org.jsoup', name: 'jsoup', version: '1.17.2'
 
 }
 

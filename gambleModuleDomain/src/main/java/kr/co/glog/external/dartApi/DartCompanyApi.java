@@ -27,7 +27,7 @@ public class DartCompanyApi {
     /**
      * DART 기업개황 받아서 있으면 업데이트, 없으면 인서트
      */
-    public void updateCompany( String companyCode ) {
+    public void updateCompanyFromDart(String companyCode ) {
         Company company = getCompany( getDocument( companyCode ) );
         company.setCompanyCode( companyCode );
         companyDao.updateInsertCompany( company );

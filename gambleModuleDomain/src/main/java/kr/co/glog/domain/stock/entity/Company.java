@@ -6,6 +6,9 @@ import lombok.Setter;
 import lombok.ToString;
 import org.apache.ibatis.type.Alias;
 
+/**
+ * DART 에서 읽어온 회사 정보
+ */
 @Getter
 @Setter
 @ToString(callSuper=false)

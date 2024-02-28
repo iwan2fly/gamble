@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.glog.domain.system.mapper.SystemConfigMapper">
+
+
+    <insert id="insertSystemConfig" parameterType="SystemConfig" keyProperty="systemConfigCode">
+        INSERT INTO systemConfig
+            ( configCode, configJson, insertTime, updateTime )
+        VALUES
+            ( #{configCode}, #{configJson}, now(), now() )
+    </insert>
+
+    <insert id="insertsSystemConfig" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyColumn="sotckId" keyProperty="systemConfigCode">
+        INSERT INTO systemConfig
+            ( configCode, configJson, insertTime, updateTime )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," open="" close="">
+            ( #{item.configCode}, #{item.configJson}, now(), now() )
+        </foreach>
+    </insert>
+
+    <update id="updateSystemConfig" parameterType="SystemConfig">
+        UPDATE 	systemConfig
+        SET
+        <trim prefix="" suffixOverrides=",">
+            <if test="configCode != null">configCode = #{configCode},</if>
+            <if test="configJson != null">configJson = #{configJson},</if>
+            updateTime = now()
+        </trim>
+        WHERE systemConfig.systemConfigId=#{systemConfigId}
+    </update>
+
+    <delete id="deleteSystemConfig" parameterType="SystemConfig">
+        DELETE FROM systemConfig
+        WHERE 	systemConfigCode=#{systemConfigCode}
+    </delete>
+
+    <select id="selectSystemConfigList" parameterType="SystemConfigParam" resultType="SystemConfigResult" >
+        SELECT 	systemConfig.*
+        FROM 	systemConfig
+        <include refid="whereSystemConfig" ></include>
+        <include refid="orderSystemConfig" ></include>
+    </select>
+
+    <select id="selectSystemConfigListCount" parameterType="SystemConfigParam" resultType="java.lang.Integer">
+        SELECT 	COUNT(*)
+        FROM   	systemConfig
+        <include refid="whereSystemConfig" ></include>
+    </select>
+
+    <sql id="whereSystemConfig">
+        <where>
+            <trim prefixOverrides = "AND | OR">
+                <if test="configCode != null and configCode != ''">AND systemConfig.configCode=#{configCode}</if>
+                <if test="configJson != null and configJson != ''">AND systemConfig.configJson=#{configJson}</if>
+                <if test="pagingParam.filter != null and pagingParam.filter != ''">AND systemConfig.systemConfigName like CONCAT('%',#{pagingParam.filter},'%')</if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="orderSystemConfig">
+        <if test='pagingParam.sortIndex != null and pagingParam.sortIndex != ""'>ORDER BY
+            <choose>
+                <when test="pagingParam.sortIndex eq 'configCode'">configCode</when>
+                <when test="pagingParam.sortIndex eq 'configJson'">configJson</when>
+                <otherwise>configCode</otherwise>
+            </choose>
+            <choose>
+                <when test="pagingParam.sortType != null and pagingParam.sortType.equalsIgnoreCase('desc')">DESC</when>
+                <otherwise>ASC</otherwise>
+            </choose>
+        </if>
+        <if test="pagingParam.rows gt 0">
+            LIMIT #{pagingParam.startIndex}, #{pagingParam.endIndex}
+        </if>
+    </sql>
+    
+</mapper>

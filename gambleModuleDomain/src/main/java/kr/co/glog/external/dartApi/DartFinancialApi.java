@@ -31,25 +31,35 @@ public class DartFinancialApi {
     /**
      * DART 단일회사 재무제표 업데이트, 없으면 인서트
      */
+    public void updateCompanyFinancialInfo( String companyCode, Integer year, Integer quarter ) {
+
+        String reportCode = "11011";
+        if ( quarter == 1 ) reportCode="11013";
+        else if ( quarter == 2 ) reportCode="11012";
+        else if ( quarter == 3 ) reportCode="11014";
+
+        updateCompanyFinancialInfo( companyCode, ""+year, reportCode );
+    }
+
     public void updateCompanyFinancialInfo( String companyCode, String year, String reportCode ) {
-        Document document = getDocument( companyCode, year, reportCode, 3 );
-        ArrayList<DartCompanyFinancialInfo> dartCompanyFinancialInfoList = getCompanyFinancialInfo( document );
-        for ( DartCompanyFinancialInfo dartCompanyFinancialInfo : dartCompanyFinancialInfoList) {
+        Document document = getDocument(companyCode, year, reportCode, 3);
+        ArrayList<DartCompanyFinancialInfo> dartCompanyFinancialInfoList = getCompanyFinancialInfo(document);
+        for (DartCompanyFinancialInfo dartCompanyFinancialInfo : dartCompanyFinancialInfoList) {
             dartCompanyFinancialInfo.setCompanyCode(companyCode);
             dartCompanyFinancialInfoDao.updateInsetCompanyFinancialInfo(dartCompanyFinancialInfo);
         }
     }
 
-    /**
-     * companyCode 로 회사 기본정보 가져옴
-     * @param
-     *  companyCode : 공시대상회사고유번호
-     *  year : 사업연도
-     *  reportCode : 보고서 코드
-     *  fsDiv : 개별/연결구분
-     *
-     * @return
-     */
+        /**
+         * companyCode 로 회사 기본정보 가져옴
+         * @param
+         *  companyCode : 공시대상회사고유번호
+         *  year : 사업연도
+         *  reportCode : 보고서 코드
+         *  fsDiv : 개별/연결구분
+         *
+         * @return
+         */
     public Document getDocument( String companyCode, String year, String reportCode ) throws IOException {
 
         log.debug( companyCode + ":" + year + ":" + reportCode );

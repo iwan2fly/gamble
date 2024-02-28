@@ -309,6 +309,7 @@ public class StatStockService {
         } else if ( periodCode.equals( PeriodCode.week ) ) {
             statStock.setYear( Integer.parseInt( yearOrder.substring(0, 4) ) );
             statStock.setYearOrder( DateUtil.getYearWeek( startDate ) );
+            statStock.setMonth( Integer.parseInt( endDate.substring(4, 6) ) );
             statStock.setWeek( DateUtil.getWeekOfYear( startDate ) );
         }
 

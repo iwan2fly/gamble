@@ -37,15 +37,21 @@ public class DartCorpCodeApi {
      * DART API로 코드 파일 받아서 DB 업데이트
      */
     public void updateCorpCode() {
+        // 파일 다운로드 받아서 압축 해제
         File file = extract( download() );
-        parse( file );
+
+        // 파싱 후 회사 목록 리턴
+        ArrayList<Company> companyList = parse( file );
+
+        // 회사 목록을 DB에 upsert
+        upsertCompany( companyList );
     }
 
     /**
      * 다운로드
      * @throws ApplicationRuntimeException
      */
-    public File download() throws ApplicationRuntimeException {
+    private File download() throws ApplicationRuntimeException {
 
         File zipFile = null;
 
@@ -64,7 +70,7 @@ public class DartCorpCodeApi {
      * @return
      * @throws ApplicationRuntimeException
      */
-    public File extract( File zipFile ) throws ApplicationRuntimeException {
+    private File extract( File zipFile ) throws ApplicationRuntimeException {
         try {
             FileInputStream fileInputStream = new FileInputStream(zipFile);
             ZipInputStream zipInputStream = new ZipInputStream(fileInputStream);
@@ -92,59 +98,55 @@ public class DartCorpCodeApi {
     }
 
     /**
-     * corpCode.xml 읽어서 리턴
+     * corpCode.xml 읽어서 인서트
      * @param file
      * @return
      */
-    public void parse( File file ) {
+    private ArrayList<Company> parse( File file ) {
 
         ArrayList<Company> companyList = new ArrayList<Company>();
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse( file );
-            log.debug( document.toString() );
+            Document document = builder.parse(file);
+            log.debug(document.toString());
             document.getDocumentElement().normalize();
 
             NodeList nodeList = document.getElementsByTagName("list");
             int stockCodeSize = 0;
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
-                if ( node.getNodeType() == Node.ELEMENT_NODE ) {
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
 
                     Element element = (Element) node;
                     Company Company = new Company();
 
                     Node childNode = element.getElementsByTagName("corp_code").item(0);
-                    Company.setCompanyCode( childNode.getChildNodes().item(0).getNodeValue() );
+                    Company.setCompanyCode(childNode.getChildNodes().item(0).getNodeValue());
 
                     childNode = element.getElementsByTagName("corp_name").item(0);
-                    Company.setCompanyName( childNode.getChildNodes().item(0).getNodeValue() );
+                    Company.setCompanyName(childNode.getChildNodes().item(0).getNodeValue());
 
                     childNode = element.getElementsByTagName("stock_code").item(0);
-                    Company.setStockCode( childNode.getChildNodes().item(0).getNodeValue().trim() );
+                    Company.setStockCode(childNode.getChildNodes().item(0).getNodeValue().trim());
 
                     childNode = element.getElementsByTagName("modify_date").item(0);
-                    Company.setModifyDate( childNode.getChildNodes().item(0).getNodeValue() );
+                    Company.setModifyDate(childNode.getChildNodes().item(0).getNodeValue());
 
                     companyList.add(Company);
                 }
             }
 
-        } catch ( Exception e ) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new ApplicationRuntimeException("DART 고유번호 XML 파일을 읽는 중 오류가 발생했습니다.");
         }
 
+        return companyList;
+    }
+
+    private void upsertCompany( ArrayList<Company> companyList ) {
         for ( Company Company : companyList) {
-            /*
-            try {
-                log.debug(DartCompany.toString());
-                DartCompanyDao.insertDartCompany( DartCompany );
-            } catch ( org.springframework.dao.DuplicateKeyException dke ) {
-                DartCompanyDao.updateDartCompany( DartCompany );
-            }
-            */
 
             try {
                 log.debug(Company.toString());

@@ -38,7 +38,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class    SecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String LOGIN_API = "/rest/auth/login";
     private final JwtTokenProvider jwtTokenProvider;

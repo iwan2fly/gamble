@@ -1,0 +1,86 @@
+
+
+<div class="animate__animated p-6" :class="[$store.app.animation]">
+    <div>
+
+        <ul class="flex space-x-2 rtl:space-x-reverse">
+            <li>
+                <a href="javascript:;" class="text-primary hover:underline">Components</a>
+            </li>
+            <li class="before:content-['/'] ltr:before:mr-1 rtl:before:ml-1">
+                <span>Tabs</span>
+            </li>
+        </ul>
+
+        <div class="space-y-8 pt-5" x-data="form">
+            <div class="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
+                <div class="rounded-full bg-primary p-1.5 text-white ring-2 ring-primary/30 ltr:mr-3 rtl:ml-3">
+
+                    <!-- simple tabs -->
+                    <div class="mb-5" x-data="{tab: 'home'}">
+                        <!-- buttons -->
+                        <div>
+                            <ul class="flex flex-wrap mt-3 border-b border-white-light dark:border-[#191e3a]">
+                                <li>
+                                    <a href="javascript:" class="p-3.5 py-2 -mb-[1px] block border border-transparent hover:text-primary dark:hover:border-b-black" :class="{'!border-white-light !border-b-white  text-primary dark:!border-[#191e3a] dark:!border-b-black' : tab  === 'home'}" @click="tab = 'home'">Home</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:" class="p-3.5 py-2 -mb-[1px] block border border-transparent hover:text-primary dark:hover:border-[#191e3a] dark:hover:border-b-black" :class="{'!border-white-light !border-b-white text-primary dark:!border-[#191e3a] dark:!border-b-black' : tab  === 'profile'}" @click="tab = 'profile'">Profile</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:" class="p-3.5 py-2 -mb-[1px] block border border-transparent hover:text-primary dark:hover:border-[#191e3a] dark:hover:border-b-black" :class="{'!border-white-light !border-b-white text-primary dark:!border-[#191e3a] dark:!border-b-black' : tab  === 'contact'}" @click="tab = 'contact'">Contact</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:" class="p-3.5 py-2 -mb-[1px] block pointer-events-none text-white-light dark:text-dark">Disabled</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- description -->
+                        <div class="pt-5 flex-1 text-sm">
+                            <template x-if="tab === 'home'">
+                                <div class="active">
+                                    <h4 class="font-semibold text-2xl mb-4">We move your world!</h4>
+                                    <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+                                </div>
+                            </template>
+                            <template x-if="tab === 'profile'">
+                                <div>
+                                    <div class="flex items-start">
+                                        <div class="w-20 h-20 ltr:mr-4 rtl:ml-4 flex-none">
+                                            <img src="/assets/images/profile-34.jpeg" alt="image" class="w-20 h-20 m-0 rounded-full ring-2 ring-[#ebedf2] dark:ring-white-dark object-cover" />
+                                        </div>
+                                        <div class="flex-auto">
+                                            <h5 class="text-xl font-medium mb-4">Media heading</h5>
+                                            <p class="text-white-dark">Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <template x-if="tab === 'contact'">
+                                <div>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                                </div>
+                            </template>
+                            <template x-if="tab === 'disabled'">
+                                <div>Disabled</div>
+                            </template>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+{{>layouts/fullNavFooter}}
+{{>layouts/scripts}}
+
+

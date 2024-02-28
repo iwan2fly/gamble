@@ -1,5 +1,4 @@
-{{>web/layouts/fullNavHeader}}
-
+{{>web/layouts/fullNavStart}}
 <script>
     let _serverParam = {
         stockCode : '',
@@ -8,425 +7,434 @@
     _serverParam.stockCode = '{{serverParam.stockCode}}';
 </script>
 
-<!-- Page Sidebar Ends-->
-<div class="page-body" id="body">
-
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8 des-xl-50 box-col-6">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>
-                                    <span v-text="stock.stockName" class="f-w-700"></span> <code v-text="stock.stockCode"></code>
-                                    <span v-text="_StrUtil.toCurrency(stockDaily.priceFinal)" class="f-w-700" :class="rateChangeColor"></span>
-                                    <code v-text="rateChangeSymbol + _StrUtil.toCurrency(stockDaily.rateChange) + '%'" class="f-w-700" :class="rateChangeColor"></code>
-                                </h5>
-                                <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
-                                    <code v-text="_DateUtil.yyyymmdd( stock.lastTradeDate, '.')"></code>
-                                </div>
-                            </div>
-                            <div class="card-body p-b-0 p-t-0">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <tbody>
-                                        <tr>
-                                            <td>전일종가</td>
-                                            <td>시가</td>
-                                            <td>고가</td>
-                                            <td>저가</td>
-                                            <td>거래량</td>
-                                        </tr>
-                                        <tr>
-                                            <td v-text="_StrUtil.toCurrency(stockDaily.pricePrevious)" class="text-end"></td>
-                                            <td v-text="_StrUtil.toCurrency(stockDaily.priceStart)" class="text-end"></td>
-                                            <td v-text="_StrUtil.toCurrency(stockDaily.priceHigh)" class="text-end"></td>
-                                            <td v-text="_StrUtil.toCurrency(stockDaily.priceLow)" class="text-end"></td>
-                                            <td v-text="_StrUtil.toCurrency(stockDaily.volumeTrade)" class="text-end"></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="card-body p-t-0">
-                                <div id="stockChart" style="height:400px"></div>
-
-                                <div class="btn-group btn-group-square float-right" role="group" aria-label="Basic example">
-                                    <span @click="drawGraph('day')">일봉</span>
-                                    <span @click="drawGraph('week')">주봉</span>
-                                    <span @click="drawGraph('month')">월봉</span>
-                                    <span @click="drawGraph('year')">년봉</span>
-                                    <!--
-                                    <button class="btn btn-outline-light txt-dark" type="button" @click="drawGraph('day')">일봉</button>
-                                    <button class="btn btn-outline-light txt-dark" type="button" @click="drawGraph('week')">주봉</button>
-                                    <button class="btn btn-outline-light txt-dark" type="button" @click="drawGraph('month')">월봉</button>
-                                    <button class="btn btn-outline-light txt-dark" type="button" @click="drawGraph('year')">년봉</button>
-                                    -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>
-                                    일간
-                                </h5>
-                                <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
-                                    <code v-text="_DateUtil.yyyymmdd(stockDaily.tradeDate, '.')"></code>
-                                </div>
-                            </div>
-                            <div class="card-body p-t-0">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <tbody>
-                                        <tr>
-                                            <td>변동금액</td>
-                                            <td v-text="_StrUtil.toCurrency(stockDaily.priceChange)" class="text-end"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>변동비</td>
-                                            <td class="text-end"><span v-text="stockDaily.rateChange"></span> %</td>
-                                        </tr>
-                                        <tr>
-                                            <td>거래량</td>
-                                            <td v-text="_StrUtil.toCurrency(stockDaily.volumeTrade)" class="text-end"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>거래대금</td>
-                                            <td v-text="_StrUtil.toCurrency(stockDaily.priceTrade)" class="text-end"></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>
-                                    주간
-                                </h5>
-                                <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
-                                    <code v-text="statStockWeek.year + '년 ' + statStockWeek.week + '주'"></code>
-                                </div>
-                            </div>
-                            <div class="card-body p-t-0">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <tbody>
-                                        <tr>
-                                            <td>변동금액</td>
-                                            <td v-text="_StrUtil.toCurrency(statStockWeek.priceChange)" class="text-end"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>변동비</td>
-                                            <td class="text-end"><span v-text="statStockWeek.rateChange"></span> %</td>
-                                        </tr>
-                                        <tr>
-                                            <td>거래량</td>
-                                            <td v-text="_StrUtil.toCurrency(statStockWeek.volumeTrade)" class="text-end"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>거래대금</td>
-                                            <td v-text="_StrUtil.toCurrency(statStockWeek.priceTrade)" class="text-end"></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>
-                                    월간
-                                </h5>
-                                <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
-                                    <code v-text="statStockMonth.year + '년 ' + statStockMonth.month + '월'"></code>
-                                </div>
-                            </div>
-                            <div class="card-body p-t-0">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <tbody>
-                                        <tr>
-                                            <td>변동금액</td>
-                                            <td v-text="_StrUtil.toCurrency(statStockMonth.priceChange)" class="text-end"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>변동비</td>
-                                            <td class="text-end"><span v-text="statStockMonth.rateChange"></span> %</td>
-                                        </tr>
-                                        <tr>
-                                            <td>거래량</td>
-                                            <td v-text="_StrUtil.toCurrency(statStockMonth.volumeTrade)" class="text-end"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>거래대금</td>
-                                            <td v-text="_StrUtil.toCurrency(statStockMonth.priceTrade)" class="text-end"></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>
-                                    년간
-                                </h5>
-                                <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
-                                    <code v-text="statStockYear.year + '년'"></code>
-                                </div>
-                            </div>
-                            <div class="card-body p-t-0">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <tbody>
-                                        <tr>
-                                            <td>변동금액</td>
-                                            <td v-text="_StrUtil.toCurrency(statStockYear.priceChange)" class="text-end"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>변동비</td>
-                                            <td class="text-end"><span v-text="statStockYear.rateChange"></span> %</td>
-                                        </tr>
-                                        <tr>
-                                            <td>거래량</td>
-                                            <td v-text="_StrUtil.toCurrency(statStockYear.volumeTrade)" class="text-end"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>거래대금</td>
-                                            <td v-text="_StrUtil.toCurrency(statStockYear.priceTrade)" class="text-end"></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<body>
+{{>web/layouts/nav}}
+<main class="container">
 
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 v-text="stock.marketCode == 'kospi' ? '코스피 순위' : '코스닥 순위'">
-                                </h5>
-                                <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
-                                    <code v-text="_DateUtil.yyyymmdd(stockDaily.tradeDate, '.')"></code>
+
+    <!-- Page Sidebar Ends-->
+    <div class="page-body" id="body">
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-8 des-xl-50 box-col-6">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>
+                                        <span v-text="stock.stockName" class="f-w-700"></span> <code v-text="stock.stockCode"></code>
+                                        <span v-text="_StrUtil.toCurrency(stockDaily.priceFinal)" class="f-w-700" :class="rateChangeColor"></span>
+                                        <code v-text="rateChangeSymbol + _StrUtil.toCurrency(stockDaily.rateChange) + '%'" class="f-w-700" :class="rateChangeColor"></code>
+                                    </h5>
+                                    <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
+                                        <code v-text="_DateUtil.yyyymmdd( stock.lastTradeDate, '.')"></code>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="card-body p-t-0">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <thead>
+                                <div class="card-body p-b-0 p-t-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm">
+                                            <tbody>
                                             <tr>
-                                                <th>기간</th>
-                                                <th>상승율 순위</th>
-                                                <th>거래량 순위</th>
-                                                <th>거래대금 순위</th>
-                                                <th>시총 순위</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>당일</td>
-                                                <td class="text-end"><span v-text="dailyRank.rateChange"></span></td>
-                                                <td class="text-end"><span v-text="dailyRank.volumeTrade"></span></td>
-                                                <td class="text-end"><span v-text="dailyRank.priceTrade"></span></td>
-                                                <td class="text-end"><span v-text="dailyRank.priceTotal"></span></td>
+                                                <td>전일종가</td>
+                                                <td>시가</td>
+                                                <td>고가</td>
+                                                <td>저가</td>
+                                                <td>거래량</td>
                                             </tr>
                                             <tr>
-                                                <td>주간</td>
-                                                <td class="text-end"><span v-text="weeklyRank.rateChange"></span></td>
-                                                <td class="text-end"><span v-text="weeklyRank.volumeTrade"></span></td>
-                                                <td class="text-end"><span v-text="weeklyRank.priceTrade"></span></td>
-                                                <td class="text-end"><span v-text="weeklyRank.priceTotal"></span></td>
+                                                <td v-text="_StrUtil.toCurrency(stockDaily.pricePrevious)" class="text-end"></td>
+                                                <td v-text="_StrUtil.toCurrency(stockDaily.priceStart)" class="text-end"></td>
+                                                <td v-text="_StrUtil.toCurrency(stockDaily.priceHigh)" class="text-end"></td>
+                                                <td v-text="_StrUtil.toCurrency(stockDaily.priceLow)" class="text-end"></td>
+                                                <td v-text="_StrUtil.toCurrency(stockDaily.volumeTrade)" class="text-end"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="card-body p-t-0">
+                                    <div id="stockChart" style="height:400px"></div>
+
+                                    <div class="btn-group btn-group-square float-right" role="group" aria-label="Basic example">
+                                        <span @click="drawGraph('day')">일봉</span>
+                                        <span @click="drawGraph('week')">주봉</span>
+                                        <span @click="drawGraph('month')">월봉</span>
+                                        <span @click="drawGraph('year')">년봉</span>
+                                        <!--
+                                        <button class="btn btn-outline-light txt-dark" type="button" @click="drawGraph('day')">일봉</button>
+                                        <button class="btn btn-outline-light txt-dark" type="button" @click="drawGraph('week')">주봉</button>
+                                        <button class="btn btn-outline-light txt-dark" type="button" @click="drawGraph('month')">월봉</button>
+                                        <button class="btn btn-outline-light txt-dark" type="button" @click="drawGraph('year')">년봉</button>
+                                        -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>
+                                        일간
+                                    </h5>
+                                    <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
+                                        <code v-text="_DateUtil.yyyymmdd(stockDaily.tradeDate, '.')"></code>
+                                    </div>
+                                </div>
+                                <div class="card-body p-t-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm">
+                                            <tbody>
+                                            <tr>
+                                                <td>변동금액</td>
+                                                <td v-text="_StrUtil.toCurrency(stockDaily.priceChange)" class="text-end"></td>
                                             </tr>
                                             <tr>
-                                                <td>월간</td>
-                                                <td class="text-end"><span v-text="monthlyRank.rateChange"></span></td>
-                                                <td class="text-end"><span v-text="monthlyRank.volumeTrade"></span></td>
-                                                <td class="text-end"><span v-text="monthlyRank.priceTrade"></span></td>
-                                                <td class="text-end"><span v-text="monthlyRank.priceTotal"></span></td>
+                                                <td>변동비</td>
+                                                <td class="text-end"><span v-text="stockDaily.rateChange"></span> %</td>
                                             </tr>
                                             <tr>
-                                                <td>연간</td>
-                                                <td class="text-end"><span v-text="yearlyRank.rateChange"></span></td>
-                                                <td class="text-end"><span v-text="yearlyRank.volumeTrade"></span></td>
-                                                <td class="text-end"><span v-text="yearlyRank.priceTrade"></span></td>
-                                                <td class="text-end"><span v-text="yearlyRank.priceTotal"></span></td>
+                                                <td>거래량</td>
+                                                <td v-text="_StrUtil.toCurrency(stockDaily.volumeTrade)" class="text-end"></td>
                                             </tr>
-                                        </tbody>
-                                    </table>
+                                            <tr>
+                                                <td>거래대금</td>
+                                                <td v-text="_StrUtil.toCurrency(stockDaily.priceTrade)" class="text-end"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>
+                                        주간
+                                    </h5>
+                                    <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
+                                        <code v-text="statStockWeek.year + '년 ' + statStockWeek.week + '주'"></code>
+                                    </div>
+                                </div>
+                                <div class="card-body p-t-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm">
+                                            <tbody>
+                                            <tr>
+                                                <td>변동금액</td>
+                                                <td v-text="_StrUtil.toCurrency(statStockWeek.priceChange)" class="text-end"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>변동비</td>
+                                                <td class="text-end"><span v-text="statStockWeek.rateChange"></span> %</td>
+                                            </tr>
+                                            <tr>
+                                                <td>거래량</td>
+                                                <td v-text="_StrUtil.toCurrency(statStockWeek.volumeTrade)" class="text-end"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>거래대금</td>
+                                                <td v-text="_StrUtil.toCurrency(statStockWeek.priceTrade)" class="text-end"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>
+                                        월간
+                                    </h5>
+                                    <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
+                                        <code v-text="statStockMonth.year + '년 ' + statStockMonth.month + '월'"></code>
+                                    </div>
+                                </div>
+                                <div class="card-body p-t-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm">
+                                            <tbody>
+                                            <tr>
+                                                <td>변동금액</td>
+                                                <td v-text="_StrUtil.toCurrency(statStockMonth.priceChange)" class="text-end"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>변동비</td>
+                                                <td class="text-end"><span v-text="statStockMonth.rateChange"></span> %</td>
+                                            </tr>
+                                            <tr>
+                                                <td>거래량</td>
+                                                <td v-text="_StrUtil.toCurrency(statStockMonth.volumeTrade)" class="text-end"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>거래대금</td>
+                                                <td v-text="_StrUtil.toCurrency(statStockMonth.priceTrade)" class="text-end"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>
+                                        년간
+                                    </h5>
+                                    <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
+                                        <code v-text="statStockYear.year + '년'"></code>
+                                    </div>
+                                </div>
+                                <div class="card-body p-t-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm">
+                                            <tbody>
+                                            <tr>
+                                                <td>변동금액</td>
+                                                <td v-text="_StrUtil.toCurrency(statStockYear.priceChange)" class="text-end"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>변동비</td>
+                                                <td class="text-end"><span v-text="statStockYear.rateChange"></span> %</td>
+                                            </tr>
+                                            <tr>
+                                                <td>거래량</td>
+                                                <td v-text="_StrUtil.toCurrency(statStockYear.volumeTrade)" class="text-end"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>거래대금</td>
+                                                <td v-text="_StrUtil.toCurrency(statStockYear.priceTrade)" class="text-end"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 v-text="stock.marketCode == 'kospi' ? '코스피 순위' : '코스닥 순위'">
+                                    </h5>
+                                    <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
+                                        <code v-text="_DateUtil.yyyymmdd(stockDaily.tradeDate, '.')"></code>
+                                    </div>
+                                </div>
+                                <div class="card-body p-t-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>기간</th>
+                                                    <th>상승율 순위</th>
+                                                    <th>거래량 순위</th>
+                                                    <th>거래대금 순위</th>
+                                                    <th>시총 순위</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>당일</td>
+                                                    <td class="text-end"><span v-text="dailyRank.rateChange"></span></td>
+                                                    <td class="text-end"><span v-text="dailyRank.volumeTrade"></span></td>
+                                                    <td class="text-end"><span v-text="dailyRank.priceTrade"></span></td>
+                                                    <td class="text-end"><span v-text="dailyRank.priceTotal"></span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>주간</td>
+                                                    <td class="text-end"><span v-text="weeklyRank.rateChange"></span></td>
+                                                    <td class="text-end"><span v-text="weeklyRank.volumeTrade"></span></td>
+                                                    <td class="text-end"><span v-text="weeklyRank.priceTrade"></span></td>
+                                                    <td class="text-end"><span v-text="weeklyRank.priceTotal"></span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>월간</td>
+                                                    <td class="text-end"><span v-text="monthlyRank.rateChange"></span></td>
+                                                    <td class="text-end"><span v-text="monthlyRank.volumeTrade"></span></td>
+                                                    <td class="text-end"><span v-text="monthlyRank.priceTrade"></span></td>
+                                                    <td class="text-end"><span v-text="monthlyRank.priceTotal"></span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>연간</td>
+                                                    <td class="text-end"><span v-text="yearlyRank.rateChange"></span></td>
+                                                    <td class="text-end"><span v-text="yearlyRank.volumeTrade"></span></td>
+                                                    <td class="text-end"><span v-text="yearlyRank.priceTrade"></span></td>
+                                                    <td class="text-end"><span v-text="yearlyRank.priceTotal"></span></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>시총 1000원당 매출액/영업이익/당기순이익</h5>
+                                    <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
+                                        <code v-text="_DateUtil.yyyymmdd(stockDaily.tradeDate, '.')"></code>
+                                    </div>
+                                </div>
+                                <div class="card-body p-t-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm">
+                                            <thead>
+                                            <tr>
+                                                <th>구분</th>
+                                                <th>매출액</th>
+                                                <th>영업이익</th>
+                                                <th>당기순이익</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>최근년도</td>
+                                                <td class="text-end"><span v-text="(financeYear.salesAmount / stockDaily.priceTotal * 1000).toFixed(3)"></span></td>
+                                                <td class="text-end"><span v-text="(financeYear.bizProfit / stockDaily.priceTotal * 1000).toFixed(3)"></span></td>
+                                                <td class="text-end"><span v-text="(financeYear.netProfit / stockDaily.priceTotal * 1000).toFixed(3)"></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>최근분기</td>
+                                                <td class="text-end"><span v-text="(financeQuarter.salesAmount / stockDaily.priceTotal * 1000).toFixed(3)"></span></td>
+                                                <td class="text-end"><span v-text="(financeQuarter.bizProfit / stockDaily.priceTotal * 1000).toFixed(3)"></span></td>
+                                                <td class="text-end"><span v-text="(financeQuarter.netProfit / stockDaily.priceTotal * 1000).toFixed(3)"></span></td>
+                                            </tr>
+
+
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>시총 1000원당 매출액/영업이익/당기순이익</h5>
-                                <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
-                                    <code v-text="_DateUtil.yyyymmdd(stockDaily.tradeDate, '.')"></code>
-                                </div>
-                            </div>
-                            <div class="card-body p-t-0">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <thead>
-                                        <tr>
-                                            <th>구분</th>
-                                            <th>매출액</th>
-                                            <th>영업이익</th>
-                                            <th>당기순이익</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td>최근년도</td>
-                                            <td class="text-end"><span v-text="(financeYear.salesAmount / stockDaily.priceTotal * 1000).toFixed(3)"></span></td>
-                                            <td class="text-end"><span v-text="(financeYear.bizProfit / stockDaily.priceTotal * 1000).toFixed(3)"></span></td>
-                                            <td class="text-end"><span v-text="(financeYear.netProfit / stockDaily.priceTotal * 1000).toFixed(3)"></span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>최근분기</td>
-                                            <td class="text-end"><span v-text="(financeQuarter.salesAmount / stockDaily.priceTotal * 1000).toFixed(3)"></span></td>
-                                            <td class="text-end"><span v-text="(financeQuarter.bizProfit / stockDaily.priceTotal * 1000).toFixed(3)"></span></td>
-                                            <td class="text-end"><span v-text="(financeQuarter.netProfit / stockDaily.priceTotal * 1000).toFixed(3)"></span></td>
-                                        </tr>
+                <div class="col-md-4 des-xl-50 box-col-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>회사정보</h5>
+                            <div class="card-header-right">
 
-
-                                        </tbody>
-                                    </table>
-                                </div>
                             </div>
                         </div>
+                        <div class="card-body p-t-0">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm">
+                                    <tbody>
+                                    <tr>
+                                        <td rowspan="2">회사명</td>
+                                        <td v-text="company.companyName"></td>
+                                    </tr>
+                                    <tr>
+                                        <td v-text="company.companyNameEng"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>대표자명</td>
+                                        <td v-text="company.ceoName"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>주소</td>
+                                        <td v-text="company.address"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>홈페이지</td>
+                                        <td v-text="company.homepage"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>주식수</td>
+                                        <td v-text="_StrUtil.toCurrency(stockDaily.volumeTotal) + '주'"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>시가총액</td>
+                                        <td v-text="_StrUtil.toCurrency( parseInt( stockDaily.priceTotal / 100000000 ) ) + ' 억원'"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="col-md-4 des-xl-50 box-col-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>회사정보</h5>
-                        <div class="card-header-right">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>최근분기</h5>
+                            <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
+                                <code v-text="recentQuarter"></code>
+                            </div>
+                        </div>
+                        <div class="card-body p-t-0">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm">
+                                    <tbody>
+                                    <tr v-for="(item,index) in companyFinanceRecentQuarterList">
+                                        <td v-text="item.account"></td>
+                                        <td v-text="_StrUtil.toCurrency(item.amount)" class="text-end"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>최근년도</h5>
+                            <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
+                                <code v-text="recentYear"></code>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-body p-t-0">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <tbody>
-                                <tr>
-                                    <td rowspan="2">회사명</td>
-                                    <td v-text="company.companyName"></td>
-                                </tr>
-                                <tr>
-                                    <td v-text="company.companyNameEng"></td>
-                                </tr>
-                                <tr>
-                                    <td>대표자명</td>
-                                    <td v-text="company.ceoName"></td>
-                                </tr>
-                                <tr>
-                                    <td>주소</td>
-                                    <td v-text="company.address"></td>
-                                </tr>
-                                <tr>
-                                    <td>홈페이지</td>
-                                    <td v-text="company.homepage"></td>
-                                </tr>
-                                <tr>
-                                    <td>주식수</td>
-                                    <td v-text="_StrUtil.toCurrency(stockDaily.volumeTotal) + '주'"></td>
-                                </tr>
-                                <tr>
-                                    <td>시가총액</td>
-                                    <td v-text="_StrUtil.toCurrency( parseInt( stockDaily.priceTotal / 100000000 ) ) + ' 억원'"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h5>최근분기</h5>
-                        <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
-                            <code v-text="recentQuarter"></code>
-                        </div>
-                    </div>
-                    <div class="card-body p-t-0">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <tbody>
-                                <tr v-for="(item,index) in companyFinanceRecentQuarterList">
-                                    <td v-text="item.account"></td>
-                                    <td v-text="_StrUtil.toCurrency(item.amount)" class="text-end"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h5>최근년도</h5>
-                        <div class="card-header-right"  style="position:absolute; top:30px;  right:30px">
-                            <code v-text="recentYear"></code>
-                        </div>
-                    </div>
-                    <div class="card-body p-t-0">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <tbody>
-                                <tr v-for="(item,index) in companyFinanceRecentYearList">
-                                    <td v-text="item.account"></td>
-                                    <td v-text="_StrUtil.toCurrency(item.amount)" class="text-end"></td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        <div class="card-body p-t-0">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm">
+                                    <tbody>
+                                    <tr v-for="(item,index) in companyFinanceRecentYearList">
+                                        <td v-text="item.account"></td>
+                                        <td v-text="_StrUtil.toCurrency(item.amount)" class="text-end"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-4 des-xl-50 box-col-6">
+                <div class="col-md-4 des-xl-50 box-col-6">
 
-            </div>
+                </div>
 
-            <div class="col-md-4 des-xl-50 box-col-6">
+                <div class="col-md-4 des-xl-50 box-col-6">
 
+                </div>
             </div>
         </div>
+
+
+
+
     </div>
 
-
-
-
-</div>
+</main>
+{{>web/layouts/footerTag}}
+</body>
 
 <script src="/lib/local/data/index.js"></script>
 <script src="/lib/local/data/stock.js"></script>
 <script src="/lib/local/data/company.js"></script>
-<script src="/js/web/svc/krx/stocks/stock.js"></script>
+<script src="/js/svc/krx/stocks/stock.js"></script>
 
-
-{{>web/layouts/fullNavFooter}}
+{{>web/layouts/fullNavEnd}}

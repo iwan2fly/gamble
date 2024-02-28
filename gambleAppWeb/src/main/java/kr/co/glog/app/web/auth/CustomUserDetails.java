@@ -2,6 +2,8 @@ package kr.co.glog.app.web.auth;
 
 import kr.co.glog.domain.member.model.MemberResult;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,7 +12,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class CustomUserDetails extends MemberResult implements UserDetails {
 
     private MemberResult memberResult;

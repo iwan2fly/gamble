@@ -23,6 +23,7 @@ public class ROOTController {
 		return _ROOT + "/index";
 	}
 
+	/*
 	@GetMapping("/{p1}/{p2}")
 	public String p1p2(Model model, @PathVariable("p1") String p1, @PathVariable("p2") String p2 ) {
 		model.addAttribute( "greetings", "hi! everyone");
@@ -31,6 +32,6 @@ public class ROOTController {
 		if ( StringUtils.hasText( p2 ) )  url += "/" + p2;
 		return url;
 	}
-
+	*/
 
 }

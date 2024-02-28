@@ -101,7 +101,7 @@ public class StockDailyService {
      * 특정 종목의 전체 일별 데이터를 StockDaily 테이블에 인서트
      * @param stockCode
      */
-    public void insertDailyStockAllFromDaumDaily(String stockCode  ) {
+    public void insertDailyStockAllFromDaumDaily( String stockCode  ) {
 
         // 페이지당 100개씩
         int perPage = 100;
