@@ -33,6 +33,9 @@ build
 #서비스가 직접 만든 파일들 제외
 **/files/
 
+#build
+**/build/
+
 # Created by .ignore support plugin (hsz.mobi)
 
 ### Dropbox template
